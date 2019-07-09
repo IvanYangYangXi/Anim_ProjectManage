@@ -10,7 +10,7 @@
 import sys, os, re
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from ctypes.wintypes import LONG, HWND, UINT, WPARAM, LPARAM, FILETIME
-import listItem_Proj
+import items
 import shutil # 文件夹操作
 
 
@@ -24,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # ------------- 概览 ------------- #
         item = QtWidgets.QListWidgetItem() # 创建QListWidgetItem对象
         item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
-        itemWidget = listItem_Proj.ListItem_Proj() # itemWidget
+        itemWidget = items.ListItem_General_Proj() # itemWidget
         self.ui.listWidget__General_Proj.addItem(item) # 添加item
         self.ui.listWidget__General_Proj.setItemWidget(item, itemWidget)  # 为item设置widget
 
