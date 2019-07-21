@@ -236,30 +236,51 @@ class TreeModel(QtCore.QAbstractItemModel):
 
 
 # Item class
-class SpinBoxDelegate(QtWidgets.QItemDelegate):
+class comboBoxDelegate(QtWidgets.QItemDelegate):
     '''
+    在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
+    # def __init__(self, parent):
+    #     QtWidgets.QItemDelegate.__init__(self, parent)
+
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
-        editor = QtWidgets.QSpinBox(parent)
-        editor.setFrame(False)
-        editor.setFrame(False)
-        editor.setMinimum(0)
-        editor.setMaximum(100)
+        editor = QtWidgets.QComboBox(parent)
+        editor.addItem('C')
+        editor.addItem('C++')
+        editor.addItem('Python')
+        #多个添加条目
+        editor.addItems(['Java','C#','PHP'])
+        #当下拉索引发生改变时发射信号触发绑定的事件
+        editor.currentIndexChanged.connect(lambda:self.selectionchange(editor))
 
         return editor
 
-    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
-    def setEditorData(self, spinBox, index):
-        value = index.model().data(index, QtCore.Qt.EditRole)
+    def selectionchange(self, editor):
+        #currentText()：返回选中选项的文本
+        ct = editor.currentText()
+        print('Items in the list are:' + ct)
 
-        spinBox.setValue(6)
+    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
+    def setEditorData(self, editor, index):
+        data = index.model().data(index, QtCore.Qt.EditRole)
+        comboId = 1
+        if data == 'C':
+            comboId = 0
+        elif data == 'C++':
+            comboId = 1
+
+        # 避免不是由用户引起的信号,因此我们使用blockSignals.
+        editor.blockSignals(True)
+        # ComboBox当前项使用setCurrentIndex()来设置
+        editor.setCurrentIndex(comboId) 
+        editor.blockSignals(False)
+
+        # editor.setValue(6)
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
-    def setModelData(self, spinBox, model, index):
-        spinBox.interpretText()
-        value = spinBox.value()
-
+    def setModelData(self, editor, model, index):
+        value = editor.currentText()
         model.setData(index, value, QtCore.Qt.EditRole)
 
     # 根据给定的样式选项更新索引指定的项目的编辑器。
@@ -288,9 +309,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.treeView.setModel(self.model)
 
         # 设置 Item
-        self.item = SpinBoxDelegate()
+        self.item = comboBoxDelegate()
         # self.ui.treeView.setItemDelegate(self.item)
-        self.ui.treeView.setItemDelegateForColumn(1, self.item)
+        self.ui.treeView.setItemDelegateForColumn(0, self.item)
+        # # openPersistentEditor 默认情况下显示所有组合框
+        # self.ui.treeView.openPersistentEditor(self.model.index(0, 1,QtCore.QModelIndex()))
 
     def closeEvent(self, event):
         '''
