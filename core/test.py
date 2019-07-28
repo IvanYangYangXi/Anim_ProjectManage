@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
 
 class TreeItem(object):
-    def __init__(self, data, parent=None):
+    def __init__(self, data=[], parent=None):
         super(TreeItem, self).__init__()
         
         self._parentItem = parent
@@ -52,11 +52,14 @@ class TreeItem(object):
     def columnCount(self):
         return len(self._itemData)
 
-    def data(self):
-        return self._itemData
+    def data(self, column):
+        try:
+            return self._itemData[column]
+        except IndexError:
+            return None
 
-    def setData(self, value):
-        self._itemData = value
+    def setData(self, value, column):
+        self._itemData[column] = value
 
     def parent(self):
         return self._parentItem
@@ -74,7 +77,7 @@ class TreeItem(object):
         for i in range(tablevel):
             output += "\t"
 
-        output =output + "|------" + self._itemData + "\n"
+        output =output + "|------" + str(self._itemData) + "\n"
 
         for child in self._childItems:
             output =output + child.log(tablevel)
@@ -96,7 +99,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
     # 设置列数
     def columnCount(self, parent):
-        return 3
+        return 9
 
     # 设置行数
     def rowCount(self, parent):
@@ -120,24 +123,24 @@ class TreeModel(QtCore.QAbstractItemModel):
         item = self.getItem(index)
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            if index.column() == 0:
-                return item.data()
-            elif index.column() == 2: 
-                return item.typeInfo()
+            # if index.column() == 1:
+            return item.data(index.column())
+            # elif index.column() == 2: 
+            #     return item.typeInfo()
 
-        if role == QtCore.Qt.DecorationRole:
-            if index.column() == 0:
-                typeInfo = item.typeInfo()
+        # if role == QtCore.Qt.DecorationRole:
+        #     if index.column() == 0:
+        #         typeInfo = item.typeInfo()
 
-                if typeInfo == "Camera":
-                    return QtGui.QIcon(QtGui.QPixmap('./UI/qt-logo.png'))
+        #         if typeInfo == "Camera":
+        #             return QtGui.QIcon(QtGui.QPixmap('./UI/qt-logo.png'))
 
     # 返回一组标志
     def flags(self, index):
 
         # 复选框
-        if index.column() == 2:
-            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable
+        # if index.column() == 2:
+        #     return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable
 
         # 基类实现返回一组标志，标志启用item（ItemIsEnabled），并允许它被选中（ItemIsSelectable）。
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
@@ -148,9 +151,9 @@ class TreeModel(QtCore.QAbstractItemModel):
             item = index.internalPointer()
 
             if role == QtCore.Qt.EditRole:
-                if index.column() == 0:
-                    item.setData(value)
-                    self.dataChanged.emit(index, index) # 更新Model的数据
+                # if index.column() == 1:
+                item.setData(value, index.column())
+                self.dataChanged.emit(index, index) # 更新Model的数据
 
                 return True
 
@@ -192,7 +195,23 @@ class TreeModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             if section == 0:
-                return "Title"
+                return ""
+            elif section == 1:
+                return "任务"
+            elif section == 2:
+                return "类型"
+            elif section == 3:
+                return "状态"
+            elif section == 4:
+                return "执行人"
+            elif section == 5:
+                return "描述"
+            elif section == 6:
+                return "截止日期"
+            elif section == 7:
+                return "预估时间（小时）"
+            elif section == 8:
+                return "结余（小时）"
             else:
                 return "typeInfo"
 
@@ -235,22 +254,26 @@ class TreeModel(QtCore.QAbstractItemModel):
         return isSuccess
 
 
-# Item class
-class comboBoxDelegate(QtWidgets.QItemDelegate):
+# Item class 部件
+class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
-    # def __init__(self, parent):
-    #     QtWidgets.QItemDelegate.__init__(self, parent)
+    def __init__(self):
+        QtWidgets.QItemDelegate.__init__(self)
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
         editor = QtWidgets.QComboBox(parent)
-        editor.addItem('C')
-        editor.addItem('C++')
-        editor.addItem('Python')
+        editor.addItem('项目')
+        editor.addItem('Story')
+        editor.addItem('Epic')
+        editor.addItem('任务')
+        editor.addItem('里程碑')
+        editor.addItem('信息')
+        editor.addItem('文件夹')
         #多个添加条目
-        editor.addItems(['Java','C#','PHP'])
+        editor.addItems(['功能','错误','改进','重构','研究','测试','文件'])
         #当下拉索引发生改变时发射信号触发绑定的事件
         editor.currentIndexChanged.connect(lambda:self.selectionchange(editor))
 
@@ -264,19 +287,41 @@ class comboBoxDelegate(QtWidgets.QItemDelegate):
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, editor, index):
         data = index.model().data(index, QtCore.Qt.EditRole)
-        comboId = 1
-        if data == 'C':
+        comboId = 3
+        if data == '项目':
             comboId = 0
-        elif data == 'C++':
+        elif data == 'Story':
             comboId = 1
+        elif data == 'Epic':
+            comboId = 2
+        elif data == '任务':
+            comboId = 3
+        elif data == '里程碑':
+            comboId = 4
+        elif data == '信息':
+            comboId = 5
+        elif data == '文件夹':
+            comboId = 6
+        elif data == '功能':
+            comboId = 7
+        elif data == '错误':
+            comboId = 8
+        elif data == '改进':
+            comboId = 9
+        elif data == '重构':
+            comboId = 10
+        elif data == '研究':
+            comboId = 11
+        elif data == '测试':
+            comboId = 12
+        elif data == '文件':
+            comboId = 13
 
         # 避免不是由用户引起的信号,因此我们使用blockSignals.
         editor.blockSignals(True)
         # ComboBox当前项使用setCurrentIndex()来设置
         editor.setCurrentIndex(comboId) 
         editor.blockSignals(False)
-
-        # editor.setValue(6)
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
     def setModelData(self, editor, model, index):
@@ -288,19 +333,50 @@ class comboBoxDelegate(QtWidgets.QItemDelegate):
         editor.setGeometry(option.rect)
 
 
+class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
+    # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QComboBox(parent)
+        editor.addItem('待办')
+        editor.addItem('进行中')
+        editor.addItem('完成')
+        #当下拉索引发生改变时发射信号触发绑定的事件
+        editor.currentIndexChanged.connect(lambda:self.selectionchange(editor))
+
+        return editor
+
+    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
+    def setEditorData(self, editor, index):
+        data = index.model().data(index, QtCore.Qt.EditRole)
+        comboId = 0
+        if data == '待办':
+            comboId = 0
+        elif data == '进行中':
+            comboId = 1
+        elif data == '完成':
+            comboId = 2
+
+        # 避免不是由用户引起的信号,因此我们使用blockSignals.
+        editor.blockSignals(True)
+        # ComboBox当前项使用setCurrentIndex()来设置
+        editor.setCurrentIndex(comboId) 
+        editor.blockSignals(False)
+
+
+# 主界面
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, uiPath='', parent=None):
         super(MainWindow, self).__init__(parent)
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
 
-        rootNode = TreeItem('A')
-        childNode1 = TreeItem('A1', rootNode)
-        childNode2 = TreeItem('A2', rootNode)
-        childNode11 = TreeItem('A21', childNode1)
-        childNode12 = TreeItem('A21', childNode1)
-        childNode21 = TreeItem('A21', childNode2)
-        childNode211 = TreeItem('A21', childNode21)
+        rootNode = TreeItem(['A', '1', '2', '3'])
+        childNode1 = TreeItem(['A1', '1', '2', '3'], rootNode)
+        childNode2 = TreeItem(['A2'], rootNode)
+        childNode11 = TreeItem(['A21'], childNode1)
+        childNode12 = TreeItem(['A21'], childNode1)
+        childNode21 = TreeItem(['A21'], childNode2)
+        childNode211 = TreeItem(['A21'], childNode21)
 
         print(rootNode)
 
@@ -308,12 +384,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.model = TreeModel(rootNode)
         self.ui.treeView.setModel(self.model)
 
-        # 设置 Item
-        self.item = comboBoxDelegate()
-        # self.ui.treeView.setItemDelegate(self.item)
-        self.ui.treeView.setItemDelegateForColumn(0, self.item)
-        # # openPersistentEditor 默认情况下显示所有组合框
-        # self.ui.treeView.openPersistentEditor(self.model.index(0, 1,QtCore.QModelIndex()))
+        # 设置 Item 部件
+        self.TaskType = ComboBoxDelegate_TaskType()
+        self.ui.treeView.setItemDelegateForColumn(2, self.TaskType)
+        self.TaskState = ComboBoxDelegate_TaskState()
+        self.ui.treeView.setItemDelegateForColumn(3, self.TaskState)
+        # openPersistentEditor 显示组合框部件
+        # self.ui.treeView.openPersistentEditor(self.model.index(0, 2,QtCore.QModelIndex()))
+
+        # 切换选择事件
+        self.ui.treeView.selectionModel().currentChanged.connect(self.setSelection)
+
+    def setSelection(self, current, old):
+        # openPersistentEditor 显示组合框部件
+        self.ui.treeView.openPersistentEditor(current.index(0, 2,current.parent()))
+
 
     def closeEvent(self, event):
         '''
