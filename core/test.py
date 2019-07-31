@@ -397,7 +397,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setSelection(self, current, old):
         # openPersistentEditor 显示组合框部件
-        self.ui.treeView.openPersistentEditor(current.index(0, 2,current.parent()))
+        # self.ui.treeView.openPersistentEditor(current.index(0, 2,current.parent()))
+        pass
 
 
     def closeEvent(self, event):
