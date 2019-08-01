@@ -259,8 +259,8 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
-    def __init__(self):
-        QtWidgets.QItemDelegate.__init__(self)
+    # def __init__(self):
+    #     QtWidgets.QItemDelegate.__init__(self)
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
@@ -363,6 +363,48 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
         editor.blockSignals(False)
 
 
+class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
+    '''
+    在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
+    '''
+    # def __init__(self):
+    #     QtWidgets.QItemDelegate.__init__(self)
+
+    # self.dateEdit = QtGui.QDateEdit(QtCore.QDate.currentDate())
+    # self.dateEdit.setDisplayFormat('yyyy-MM-dd')
+    # self.dateEdit.setCalendarPopup(True)
+    # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QDateEdit(parent)
+        editor.setDisplayFormat('yyyy-MM-dd')
+        editor.setCalendarPopup(True)
+
+        return editor
+
+    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
+    def setEditorData(self, editor, index):
+        data = index.model().data(index, QtCore.Qt.EditRole)
+        if QtCore.QDate.fromString(data, 'yyyy-MM-dd'):
+            editor.setDate(QtCore.QDate.fromString(data, 'yyyy-MM-dd'))
+        else:
+            now = QtCore.QDate.currentDate()#获取当前日期
+            editor.setDate(now)
+
+    # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
+    def setModelData(self, editor, model, index):
+        # current_Date = time.strftime("%Y-%m-%d", editor.date())
+        current_Date = editor.date()
+        print(current_Date.toString(QtCore.Qt.ISODate)) #ISO日期格式打印
+        # print(current_Date.toString(Qt.DefaultLocaleLongDate)) #本地化长格式日期打印(2018年1月14日 )
+        value = current_Date.toString(QtCore.Qt.ISODate)
+
+        model.setData(index, value, QtCore.Qt.EditRole)
+
+    # 根据给定的样式选项更新索引指定的项目的编辑器。
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+
 # 主界面
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, uiPath='', parent=None):
@@ -371,7 +413,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = uic.loadUi(uiPath, self)
 
         rootNode = TreeItem(['A', '1', '2', '3'])
-        childNode1 = TreeItem(['A1', '1', '2', '3'], rootNode)
+        childNode1 = TreeItem(['A1', '1', '2', '3', '4', '5', 'None', '7', '8'], rootNode)
         childNode2 = TreeItem(['A2'], rootNode)
         childNode11 = TreeItem(['A21'], childNode1)
         childNode12 = TreeItem(['A21'], childNode1)
@@ -389,6 +431,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.treeView.setItemDelegateForColumn(2, self.TaskType)
         self.TaskState = ComboBoxDelegate_TaskState()
         self.ui.treeView.setItemDelegateForColumn(3, self.TaskState)
+        self.TaskDeadline = DateEditDelegate_TaskDeadline()
+        self.ui.treeView.setItemDelegateForColumn(6, self.TaskDeadline)
         # openPersistentEditor 显示组合框部件
         # self.ui.treeView.openPersistentEditor(self.model.index(0, 2,QtCore.QModelIndex()))
 
