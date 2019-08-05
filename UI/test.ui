@@ -32,8 +32,8 @@
       <widget class="QComboBox" name="comboBox">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>10</y>
+         <x>90</x>
+         <y>20</y>
          <width>87</width>
          <height>22</height>
         </rect>
@@ -54,6 +54,48 @@
         </property>
        </item>
       </widget>
+      <widget class="QDateEdit" name="dateEdit">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>20</y>
+         <width>110</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QDateTimeEdit" name="dateTimeEdit">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>20</y>
+         <width>194</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>20</y>
+         <width>68</width>
+         <height>24</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -64,7 +106,7 @@
      <x>0</x>
      <y>0</y>
      <width>815</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -213,7 +213,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             elif section == 8:
                 return "结余（小时）"
             else:
-                return "typeInfo"
+                return ""
 
         return None
 
@@ -255,6 +255,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
 
 # Item class 部件
+# 选择框
 class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
@@ -362,7 +363,7 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
         editor.setCurrentIndex(comboId) 
         editor.blockSignals(False)
 
-
+# 时间选择控件
 class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
