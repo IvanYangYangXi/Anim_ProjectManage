@@ -14,7 +14,7 @@ import configure
 
 # 用于创建列表
  # 建立自增主键:id integer primary key autoincrement
-table_taskInfo = '''(
+create_taskInfo = '''(
     id integer primary key autoincrement,
     parentID int,
     childrenID text,
@@ -91,7 +91,7 @@ def CreateTable():
     conn.text_factory = str
     
     # 执行操作:创建表
-    conn.execute("create table IF NOT EXISTS " + 'taskInfo' + table_taskInfo)
+    conn.execute("create table IF NOT EXISTS " + 'table_taskInfo' + create_taskInfo)
 
     conn.commit() # 保存修改
     conn.close() # 关闭与数据库的连接
@@ -200,38 +200,26 @@ def updateData(tableName, theData, newData):
 # 重建所有表
 def reCreateAll():
     # CreateTable()
-    reCreateTable('taskInfo')
-    # 初始化状态列表
-    insertManyData('state', struct_taskInfo, (
-        ('完成', '#61bd4f'), 
-        ('', '#f2d600'), 
-        ('', '#ff9f1a'),
-        ('', '#eb5a46'), 
-        ('', '#c377e0'),
-        ('', '#f2d600'),
-        ('进行中', '#0079bf'), 
-        ('', '#355263')
-        ))
+    reCreateTable('table_taskInfo')
+    # # 初始化状态列表
+    # insertManyData('state', struct_taskInfo, (
+    #     ('完成', '#61bd4f'), 
+    #     ('', '#f2d600'), 
+    #     ('', '#ff9f1a'),
+    #     ('', '#eb5a46'), 
+    #     ('', '#c377e0'),
+    #     ('', '#f2d600'),
+    #     ('进行中', '#0079bf'), 
+    #     ('', '#355263')
+    #     ))
 
 if __name__ == '__main__':
     print(dbPath())
     # CreateTable()
-    reCreateTable('list')
-    reCreateTable('assets')
-    reCreateTable('state')
-    # 初始化状态列表
-    insertManyData('state', struct_taskInfo, (
-        ('完成', '#61bd4f'), 
-        ('', '#f2d600'), 
-        ('', '#ff9f1a'),
-        ('', '#eb5a46'), 
-        ('', '#c377e0'),
-        ('', '#f2d600'),
-        ('进行中', '#0079bf'), 
-        ('', '#355263')))
-    insertData('list', struct_list, ('nnn', False, 'aaa', 'bbb'))
-    updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
-    deleteData('list', 'listName="n22"')
-    print(findData('list', "listName='g11'")[0])
-    print(findData('list', "listName='g11'", 'listName'))
-    print(findData('list', "listName='g11'"))
+    reCreateTable('table_taskInfo')
+    # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
+    # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
+    # deleteData('list', 'listName="n22"')
+    # print(findData('list', "listName='g11'")[0])
+    # print(findData('list', "listName='g11'", 'listName'))
+    # print(findData('list', "listName='g11'"))
