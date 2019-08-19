@@ -216,7 +216,7 @@ def reCreateAll():
 if __name__ == '__main__':
     print(dbPath())
     # CreateTable()
-    reCreateTable('table_taskInfo')
+    # reCreateTable('table_taskInfo')
     # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')

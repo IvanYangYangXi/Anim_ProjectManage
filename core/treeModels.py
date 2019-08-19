@@ -90,16 +90,19 @@ class TreeItem(object):
 
 
 class TreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, data, parent=None):
+    def __init__(self, item, parent=None):
         super(TreeModel, self).__init__(parent)
 
-        # 设置初始项的内容
-        self._rootItem = data
-        
+        # 设置初始项的item
+        # self._rootItem = TreeItem(data)
+        self._rootItem = item
 
     # 设置列数
     def columnCount(self, parent):
-        return 9
+        if parent.isValid():
+            return parent.internalPointer().columnCount()  
+        else:  
+            return self._rootItem.columnCount()
 
     # 设置行数
     def rowCount(self, parent):
@@ -194,26 +197,7 @@ class TreeModel(QtCore.QAbstractItemModel):
     # 设置标题行
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            if section == 0:
-                return ""
-            elif section == 1:
-                return "任务"
-            elif section == 2:
-                return "类型"
-            elif section == 3:
-                return "状态"
-            elif section == 4:
-                return "执行人"
-            elif section == 5:
-                return "描述"
-            elif section == 6:
-                return "截止日期"
-            elif section == 7:
-                return "预估时间（小时）"
-            elif section == 8:
-                return "结余（小时）"
-            else:
-                return ""
+            return QtCore.QVariant(self._rootItem.data(section))
 
         return None
 

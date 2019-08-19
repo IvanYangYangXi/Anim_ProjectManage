@@ -90,16 +90,20 @@ class TreeItem(object):
 
 
 class TreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, data, parent=None):
+    def __init__(self, item, parent=None):
         super(TreeModel, self).__init__(parent)
 
         # 设置初始项的内容
-        self._rootItem = data
+        self._rootItem = item
+        # self._rootItem = TreeItem(data)
         
 
     # 设置列数
     def columnCount(self, parent):
-        return 9
+        if parent.isValid():
+            return parent.internalPointer().columnCount()  
+        else:  
+            return self._rootItem.columnCount()
 
     # 设置行数
     def rowCount(self, parent):
@@ -194,26 +198,27 @@ class TreeModel(QtCore.QAbstractItemModel):
     # 设置标题行
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            if section == 0:
-                return ""
-            elif section == 1:
-                return "任务"
-            elif section == 2:
-                return "类型"
-            elif section == 3:
-                return "状态"
-            elif section == 4:
-                return "执行人"
-            elif section == 5:
-                return "描述"
-            elif section == 6:
-                return "截止日期"
-            elif section == 7:
-                return "预估时间（小时）"
-            elif section == 8:
-                return "结余（小时）"
-            else:
-                return ""
+            return QtCore.QVariant(self._rootItem.data(section))
+            # if section == 0:
+            #     return ""
+            # elif section == 1:
+            #     return "任务"
+            # elif section == 2:
+            #     return "类型"
+            # elif section == 3:
+            #     return "状态"
+            # elif section == 4:
+            #     return "执行人"
+            # elif section == 5:
+            #     return "描述"
+            # elif section == 6:
+            #     return "截止日期"
+            # elif section == 7:
+            #     return "预估时间（小时）"
+            # elif section == 8:
+            #     return "结余（小时）"
+            # else:
+            #     return ""
 
         return None
 
@@ -413,13 +418,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
 
-        rootNode = TreeItem(['A', '1', '2', '3'])
+        rootNode = TreeItem(['', '任务', '类型', '状态', '执行人', '描述', '截止日期', '预估时间（小时）', '结余（小时）', '9'])
         childNode1 = TreeItem(['A1', '1', '2', '3', '4', '5', 'None', '7', '8'], rootNode)
-        childNode2 = TreeItem(['A2'], rootNode)
-        childNode11 = TreeItem(['A21'], childNode1)
-        childNode12 = TreeItem(['A21'], childNode1)
-        childNode21 = TreeItem(['A21'], childNode2)
-        childNode211 = TreeItem(['A21'], childNode21)
+        childNode2 = TreeItem(['A2', '1', '2', '3', '4', '5', '6', '7'], rootNode)
+        childNode11 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
+        childNode12 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
+        childNode21 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode2)
+        childNode211 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode21)
 
         print(rootNode)
 
