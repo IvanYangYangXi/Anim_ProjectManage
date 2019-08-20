@@ -86,18 +86,18 @@ def executemanyDB(query, data):
 
 
 # 创建sqlite3数据表
-def CreateTable():
+def CreateTable(tableName, createTableStruct):
     conn = sqlite3.connect(dbPath()) # 连接数据库
     conn.text_factory = str
     
     # 执行操作:创建表
-    conn.execute("create table IF NOT EXISTS " + 'table_taskInfo' + create_taskInfo)
+    conn.execute("create table IF NOT EXISTS " + tableName + " " +createTableStruct)
 
     conn.commit() # 保存修改
     conn.close() # 关闭与数据库的连接
 
 # 重新创建数据表
-def reCreateTable(tableName):
+def reCreateTable(tableName, createTableStruct):
     conn = sqlite3.connect(dbPath()) # 连接数据库
     conn.text_factory = str
     
@@ -106,9 +106,9 @@ def reCreateTable(tableName):
     conn.commit() # 保存修改
     conn.close() # 关闭与数据库的连接
 
-    CreateTable() # 创建表
+    CreateTable(tableName, createTableStruct) # 创建表
 
-# 插入
+# 插入行
 def insertData(tableName, tableStruct, data):
     conn = sqlite3.connect(dbPath()) # 连接数据库
     conn.text_factory = str
@@ -120,13 +120,25 @@ def insertData(tableName, tableStruct, data):
     conn.commit() # 保存修改
     conn.close() # 关闭与数据库的连接
 
-# 插入多个
+# 插入多行
 def insertManyData(tableName, tableStruct, datas):
     conn = sqlite3.connect(dbPath()) # 连接数据库
     conn.text_factory = str
     try:
         conn.executemany("insert into " + tableName + "(" + tableStruct + \
             ")" + "VALUES (?%s)"%(',?'*(len(re.findall(r',', tableStruct)))), datas) # 执行操作
+    except Exception as e:
+        print(e)
+    conn.commit() # 保存修改
+    conn.close() # 关闭与数据库的连接
+
+# 插入列
+def insertColumn(tableName, columnName, columnType):
+    conn = sqlite3.connect(dbPath()) # 连接数据库
+    conn.text_factory = str
+    try:
+        # ALTER  TABLE   table-name  ADD COLUMN  column-name column-type
+        conn.execute("alter table " + tableName + " add column " + columnName + " " + columnType) # 执行操作
     except Exception as e:
         print(e)
     conn.commit() # 保存修改
@@ -199,8 +211,8 @@ def updateData(tableName, theData, newData):
 
 # 重建所有表
 def reCreateAll():
-    # CreateTable()
-    reCreateTable('table_taskInfo')
+    # CreateTable(tableName, createTableStruct)
+    reCreateTable('table_taskInfo', create_taskInfo)
     # # 初始化状态列表
     # insertManyData('state', struct_taskInfo, (
     #     ('完成', '#61bd4f'), 
@@ -215,8 +227,9 @@ def reCreateAll():
 
 if __name__ == '__main__':
     print(dbPath())
-    # CreateTable()
-    # reCreateTable('table_taskInfo')
+    # CreateTable('table_taskInfo', create_taskInfo)
+    reCreateTable('table_taskInfo', create_taskInfo)
+    insertColumn('table_taskInfo', 'adds', 'int')
     # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')
