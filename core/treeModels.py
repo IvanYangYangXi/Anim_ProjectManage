@@ -89,6 +89,7 @@ class TreeItem(object):
         return self.log()
 
 
+# ----------------------------- TreeModel -------------------------------- #
 class TreeModel(QtCore.QAbstractItemModel):
     def __init__(self, item, parent=None):
         super(TreeModel, self).__init__(parent)
@@ -238,7 +239,23 @@ class TreeModel(QtCore.QAbstractItemModel):
         return isSuccess
 
 
-# Item class 部件
+class TreeModel_Proj_Task(TreeModel):
+    def __init__(self, item, parent=None):
+        super(TreeModel_Proj_Task, self).__init__(parent)
+
+        # 设置初始项的item
+        self._rootItem = item
+
+    # 更新子项
+    def updateChild(self, parent = QtCore.QModelIndex()):
+        # 删除现有子项
+        if self.rowCount(parent) > 0:
+            self.removeRows(0, self.rowCount(parent), parent)
+
+        parentItem = self.getItem(parent) 
+
+
+# ----------------------------- Item class 部件 -------------------------------- #
 # 选择框
 class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     '''

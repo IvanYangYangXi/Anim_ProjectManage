@@ -53,6 +53,7 @@ def dbPath():
     projectPath = configure.getProjectPath()
     if os.path.isdir(projectPath):
         Path = projectPath + '/data/db.db'
+        # 检查文件夹是否存在，不存在则创建
         return Path
     else:
         return ''
