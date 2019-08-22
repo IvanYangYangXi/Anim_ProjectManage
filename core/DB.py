@@ -54,6 +54,8 @@ def dbPath():
     if os.path.isdir(projectPath):
         Path = projectPath + '/data/db.db'
         # 检查文件夹是否存在，不存在则创建
+        if not os.path.exists(projectPath + '/data'): # 判断是否是目录
+            os.makedirs(projectPath + '/data') # 创建路径
         return Path
     else:
         return ''

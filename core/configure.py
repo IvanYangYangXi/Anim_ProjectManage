@@ -10,10 +10,12 @@
 import os
 import json
 
-# 获取配置文件
-configPath = os.path.dirname(os.path.dirname(__file__)) + '/config/DefaultConfigure.json'
 
-defaultConfig = {
+# ------------------------------ 本地配置文件 ------------------------------- #
+# 获取配置文件
+localConfigPath = os.path.dirname(os.path.dirname(__file__)) + '/config/LocalConfigure.json'
+
+localConfigStruct = {
     'lastProject' : 'DefaultProject',
     'DefaultProject' : {
         'projectPath' : '',
@@ -23,15 +25,15 @@ defaultConfig = {
 
 # 读取配置文件信息
 def loadConfig():
-    if os.path.exists(configPath): # 判断文件是否存在
-        f = open(configPath, 'r')
+    if os.path.exists(localConfigPath): # 判断文件是否存在
+        f = open(localConfigPath, 'r')
         try:
             data = json.loads(f.read())
             f.close()
             return data
         except Exception as e:
             f.close()
-            print('DefaultConfigure loadConfig error:%s'%(e))
+            print('LocalConfigure loadConfig error:%s'%(e))
 
 # 获得所有工程名称
 def getAllProjectNames():
@@ -42,10 +44,10 @@ def getAllProjectNames():
             AllProjectName.remove('lastProject')
             return AllProjectName
     except Exception as e:
-        f = open(configPath, 'w')
-        f.write(json.dumps(defaultConfig)) 
+        f = open(localConfigPath, 'w')
+        f.write(json.dumps(localConfigStruct)) 
         f.close()
-        print('DefaultConfigure getAllProjectNames error:%s'%(e))
+        print('LocalConfigure getAllProjectNames error:%s'%(e))
         return ['DefaultProject']
 
 # 获取最后一次打开的工程名称
@@ -59,32 +61,32 @@ def getLastProjectName():
                     return data['lastProject']
                 else:
                     data['lastProject'] = 'DefaultProject'
-                    f = open(configPath, 'w')
+                    f = open(localConfigPath, 'w')
                     f.write(json.dumps(data)) 
                     f.close()
                     return 'DefaultProject'
             else:
-                f = open(configPath, 'w')
+                f = open(localConfigPath, 'w')
                 f.write(json.dumps(data)) 
                 f.close()
                 return 'DefaultProject'
         else:
-            f = open(configPath, 'w')
-            f.write(json.dumps(defaultConfig)) 
+            f = open(localConfigPath, 'w')
+            f.write(json.dumps(localConfigStruct)) 
             f.close()
             return 'DefaultProject'
     except Exception as e:
-        f = open(configPath, 'w')
-        f.write(json.dumps(defaultConfig)) 
+        f = open(localConfigPath, 'w')
+        f.write(json.dumps(localConfigStruct)) 
         f.close()
-        print('DefaultConfigure getLastProjectName error:%s'%(e))
+        print('LocalConfigure getLastProjectName error:%s'%(e))
         return 'DefaultProject'
 
 # 设置最后一次打开的工程名称
 def setLastProjectName(name):
     data = loadConfig()
     data['lastProject'] = name
-    f = open(configPath, 'w')
+    f = open(localConfigPath, 'w')
     f.write(json.dumps(data)) 
     f.close()
 
@@ -97,7 +99,7 @@ def addNewProject(name, path):
             'collectionPath' : []
         }
         data['lastProject'] = name
-        f = open(configPath, 'w')
+        f = open(localConfigPath, 'w')
         f.write(json.dumps(data)) 
         f.close()
         return True
@@ -119,7 +121,7 @@ def getProjectPath():
         else:
             return ''
     except Exception as e:
-        print('DefaultConfigure getProjectPath error:%s'%e)
+        print('LocalConfigure getProjectPath error:%s'%e)
 
 def setProjectPath(path):
     if not os.path.exists(path):
@@ -127,11 +129,11 @@ def setProjectPath(path):
     try:
         data = loadConfig()
         data[getLastProjectName()]['projectPath'] = os.path.abspath(path)
-        f = open(configPath, 'w')
+        f = open(localConfigPath, 'w')
         f.write(json.dumps(data)) 
         f.close()
     except Exception as e:
-        print('DefaultConfigure setProjectPath error:%s'%e)
+        print('LocalConfigure setProjectPath error:%s'%e)
 
 # ------------ 分支 ---------------- #
 # def getProjectBranch():
@@ -141,37 +143,37 @@ def setProjectPath(path):
 #     except Exception as e:
 #         data = loadConfig()
 #         data[getLastProjectName()]['branch'] = ''
-#         f = open(configPath, 'w')
+#         f = open(localConfigPath, 'w')
 #         f.write(json.dumps(data)) 
 #         f.close()
-#         print('DefaultConfigure error:%s'%e)
+#         print('LocalConfigure error:%s'%e)
 #         return ''
 
 # def setProjectBranch(branch):
 #     try:
 #         data = loadConfig()
 #         data[getLastProjectName()]['branch'] = branch
-#         f = open(configPath, 'w')
+#         f = open(localConfigPath, 'w')
 #         f.write(json.dumps(data)) 
 #         f.close()
 #     except Exception as e:
-#         print('DefaultConfigure error:%s'%e)
+#         print('LocalConfigure error:%s'%e)
 
 # ------------ 收藏目录 --------------------- #
 def getCollectionPath():
-    if os.path.exists(configPath): # 判断文件是否存在
+    if os.path.exists(localConfigPath): # 判断文件是否存在
         try:
             data = loadConfig()
             return data[getLastProjectName()]['collectionPath']
         except Exception as e:
-            print('DefaultConfigure error:%s'%e)
+            print('LocalConfigure error:%s'%e)
 
 def addCollectionPath(path):
     if os.path.exists(path):
         data = loadConfig()
         if not path in data[getLastProjectName()]['collectionPath']:
             data[getLastProjectName()]['collectionPath'].append(path)
-            f = open(configPath, 'w')
+            f = open(localConfigPath, 'w')
             f.write(json.dumps(data)) 
             f.close()
 
@@ -179,9 +181,27 @@ def removeCollectionPath(path):
     data = loadConfig()
     if path in data[getLastProjectName()]['collectionPath']:
         data[getLastProjectName()]['collectionPath'].remove(path)
-        f = open(configPath, 'w')
+        f = open(localConfigPath, 'w')
         f.write(json.dumps(data)) 
         f.close()
+
+
+
+
+# ------------------------------ 项目配置文件 ------------------------------- #
+def setProjectConfig():
+    path = getProjectPath() + '/config/projectConfig.ini'
+    # if not os.path.exists(path):
+    #     os.makedirs(path) # 创建路径
+    try:
+        # data = loadConfig()
+        # data[getLastProjectName()]['projectPath'] = os.path.abspath(path)
+        f = open(path, 'w')
+        f.write(json.dumps(data)) 
+        f.close()
+    except Exception as e:
+        print('LocalConfigure setProjectPath error:%s'%e)
+
 
 
 if __name__ == '__main__':
