@@ -189,21 +189,82 @@ def removeCollectionPath(path):
 
 
 # ------------------------------ 项目配置文件 ------------------------------- #
-def setProjectConfig():
-    path = getProjectPath() + '/config/projectConfig.ini'
-    # if not os.path.exists(path):
-    #     os.makedirs(path) # 创建路径
-    try:
-        # data = loadConfig()
-        # data[getLastProjectName()]['projectPath'] = os.path.abspath(path)
-        f = open(path, 'w')
-        f.write(json.dumps(data)) 
+projectConfigStruct = {
+    'create_taskInfo' : [
+                            'parentID int',
+                            'childrenID text',
+                            'img text',
+                            'task NVARCHAR(100)',
+                            'type NCHAR(30)',
+                            'state NCHAR(20)',
+                            'executive NCHAR(10)',
+                            'reporter NCHAR(10)',
+                            'description text',
+                            'deadline CHAR(20)',
+                            'estimateTime CHAR(20)',
+                            'remaining CHAR(20)',
+                            'priority NCHAR(10)'
+                        ],
+    'struct_taskInfo' : [
+                            'parentID',
+                            'childrenID',
+                            'img',
+                            'task',
+                            'type',
+                            'state',
+                            'executive',
+                            'reporter',
+                            'description',
+                            'deadline',
+                            'estimateTime',
+                            'remaining',
+                            'priority'
+                        ]
+}
+
+projectConfigPath = getProjectPath() + '/config/projectConfig.ini'
+
+# 读取配置文件信息
+def loadProjectConfig():
+    if os.path.exists(projectConfigPath): # 判断文件是否存在
+        f = open(projectConfigPath, 'r')
+        try:
+            data = json.loads(f.read())
+            f.close()
+            return data
+        except Exception as e:
+            f.close()
+            print('ProjectConfigure loadProjectConfig error:%s'%(e))
+
+def createProjectConfig():
+    if not os.path.exists(getProjectPath() + '/config'):
+        os.makedirs(getProjectPath() + '/config') # 创建路径
+    if not os.path.exists(projectConfigPath): # 判断文件是否存在
+        # 创建配置文件
+        f = open(projectConfigPath, 'w')
+        f.write(json.dumps(projectConfigStruct)) 
         f.close()
+        print('ProjectConfigure createProjectConfig : Create New Project Config')
+    try:
+        data = loadProjectConfig()
+        print(data)
     except Exception as e:
-        print('LocalConfigure setProjectPath error:%s'%e)
+        print('ProjectConfigure createProjectConfig error:%s'%e)
+
+def getProjectConfigInfo(variable):
+    try:
+        data = loadProjectConfig()
+        struct = ''
+        for i in data[variable]:
+            struct = struct + i + ', '
+        print(struct)
+    except Exception as e:
+        print('ProjectConfigure getProjectConfigInfo error:%s'%e)
 
 
 
 if __name__ == '__main__':
     print(getProjectPath())
     setProjectPath("./data/TestData")
+    createProjectConfig()
+    getProjectConfigInfo('struct_taskInfo')
