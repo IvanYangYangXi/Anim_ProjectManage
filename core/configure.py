@@ -257,7 +257,9 @@ def getProjectConfigInfo(variable):
         struct = ''
         for i in data[variable]:
             struct = struct + i + ', '
+        struct = struct[:-2] # 去掉最后一个(多个)字符
         print(struct)
+        return struct
     except Exception as e:
         print('ProjectConfigure getProjectConfigInfo error:%s'%e)
 

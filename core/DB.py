@@ -14,38 +14,10 @@ import configure
 
 # 用于创建列表
  # 建立自增主键:id integer primary key autoincrement
-create_taskInfo = '''(
-    id integer primary key autoincrement,
-    parentID int,
-    childrenID text,
-    img text,
-    task NVARCHAR(100),
-    type NCHAR(30),
-    state NCHAR(20),
-    executive NCHAR(10),
-    reporter NCHAR(10),
-    description text,
-    deadline CHAR(20),
-    estimateTime CHAR(20),
-    remaining CHAR(20),
-    priority NCHAR(10)
-)'''
+create_taskInfo = '(id integer primary key autoincrement,' + configure.getProjectConfigInfo('create_taskInfo') + ')'
+
 # 用于初始化列表
-struct_taskInfo = '''
-    parentID,
-    childrenID,
-    img,
-    task,
-    type,
-    state,
-    executive,
-    reporter,
-    description,
-    deadline,
-    estimateTime,
-    remaining,
-    priority
-'''
+struct_taskInfo = configure.getProjectConfigInfo('struct_taskInfo')
 
 
 # 数据库路径
