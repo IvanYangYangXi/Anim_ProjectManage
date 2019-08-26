@@ -14,10 +14,10 @@ import configure
 
 # 用于创建列表
  # 建立自增主键:id integer primary key autoincrement
-create_taskInfo = '(id integer primary key autoincrement,' + configure.getProjectConfigInfo('create_taskInfo') + ')'
+create_taskInfo = '(id integer primary key autoincrement,' + configure.get_DB_Struct_ToString('create_taskInfo') + ')'
 
 # 用于初始化列表
-struct_taskInfo = configure.getProjectConfigInfo('struct_taskInfo')
+struct_taskInfo = configure.get_DB_Struct_ToString('struct_taskInfo')
 
 
 # 数据库路径

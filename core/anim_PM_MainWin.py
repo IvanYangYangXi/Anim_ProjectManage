@@ -67,11 +67,11 @@ class MainWindow(QtWidgets.QMainWindow):
 def main():
     # print(os.path.isdir(amConfigure.getProjectPath()))
     # 启动窗口
-    global w
+    global win
     app = QtWidgets.QApplication(sys.argv)
-    w = MainWindow(os.path.dirname(os.path.dirname(__file__)) +\
+    win = MainWindow(os.path.dirname(os.path.dirname(__file__)) +\
         '/UI/PM_Anim_MainWin.ui')
-    w.show()
+    win.show()
                    
     sys.exit(app.exec_()) 
 

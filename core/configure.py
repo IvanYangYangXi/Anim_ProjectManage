@@ -9,6 +9,7 @@
 
 import os
 import json
+import DB
 
 
 # ------------------------------ 本地配置文件 ------------------------------- #
@@ -189,7 +190,7 @@ def removeCollectionPath(path):
 
 
 # ------------------------------ 项目配置文件 ------------------------------- #
-projectConfigStruct = {
+db_Struct = {
     'create_taskInfo' : [
                             'parentID int',
                             'childrenID text',
@@ -224,34 +225,43 @@ projectConfigStruct = {
 
 projectConfigPath = getProjectPath() + '/config/projectConfig.ini'
 
-# 读取配置文件信息
+# 读取项目配置文件信息
 def loadProjectConfig():
-    if os.path.exists(projectConfigPath): # 判断文件是否存在
-        f = open(projectConfigPath, 'r')
-        try:
-            data = json.loads(f.read())
-            f.close()
-            return data
-        except Exception as e:
-            f.close()
-            print('ProjectConfigure loadProjectConfig error:%s'%(e))
+    if not os.path.exists(projectConfigPath): # 判断文件是否存在
+        createProjectConfig()
+    # 读取文件信息
+    f = open(projectConfigPath, 'r')
+    try:
+        data = json.loads(f.read())
+        f.close()
+        return data
+    except Exception as e:
+        f.close()
+        print('ProjectConfigure loadProjectConfig error:%s'%(e))
 
+# 创建项目配置文件及数据表
 def createProjectConfig():
     if not os.path.exists(getProjectPath() + '/config'):
         os.makedirs(getProjectPath() + '/config') # 创建路径
     if not os.path.exists(projectConfigPath): # 判断文件是否存在
         # 创建配置文件
         f = open(projectConfigPath, 'w')
-        f.write(json.dumps(projectConfigStruct)) 
+        f.write(json.dumps(db_Struct)) 
         f.close()
+        # 创建表
+        DB.CreateTable('table_taskInfo', DB.create_taskInfo)
         print('ProjectConfigure createProjectConfig : Create New Project Config')
+
+def get_DB_Struct(variable):
     try:
         data = loadProjectConfig()
-        print(data)
+        struct = data[variable]
+        print(struct)
+        return struct
     except Exception as e:
-        print('ProjectConfigure createProjectConfig error:%s'%e)
+        print('ProjectConfigure getProjectConfigInfo error:%s'%e)
 
-def getProjectConfigInfo(variable):
+def get_DB_Struct_ToString(variable):
     try:
         data = loadProjectConfig()
         struct = ''
@@ -269,4 +279,4 @@ if __name__ == '__main__':
     print(getProjectPath())
     setProjectPath("./data/TestData")
     createProjectConfig()
-    getProjectConfigInfo('struct_taskInfo')
+    get_DB_Struct_ToString('struct_taskInfo')

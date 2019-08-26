@@ -9,6 +9,8 @@
 
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
+import DB
+import configure
 
 
 class TreeItem(object):
@@ -108,15 +110,18 @@ class BaseTreeItem(TreeItem):
 
     def data(self, column):
         try:
-            return self._itemData[column]
+            return self._itemData[column + 3]
         except IndexError:
             return None
 
-    def datas(self):
-        return self._itemData
-
     def setData(self, value, column):
-        self._itemData[column] = value
+        self._itemData[column + 3] = value
+
+        # 更新数据库数据
+        dbId = self._itemData[0]
+        dbKey = configure.get_DB_Struct('struct_taskInfo')[self._itemData[column + 2]]
+        dbValue = self._itemData[column + 3]
+        DB.updateData('table_taskInfo', 'id=%d'%(dbId), '%s=%s'%(dbKey, dbValue))
 
 
 
@@ -287,7 +292,12 @@ class TreeModel_Proj_Task(TreeModel):
         parentItem = self.getItem(parent)
         #  获取数据
         datas = parentItem.datas()
-        childrenID = parentItem.data(3)
+        childrenID = datas[2].split(', ') 
+
+        items = []
+        for i in childrenID:
+            items.append(BaseTreeItem(DB.findData('table_taskInfo', int(i), 'id')))
+        self.insertRows(self.rowCount(parent), len(childrenID), parent, items) # 插入行
 
 
 
