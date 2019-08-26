@@ -204,7 +204,7 @@ if __name__ == '__main__':
     print(dbPath())
     # CreateTable('table_taskInfo', create_taskInfo)
     reCreateTable('table_taskInfo', create_taskInfo)
-    insertColumn('table_taskInfo', 'adds', 'int')
+    # insertColumn('table_taskInfo', 'adds', 'int')
     # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')

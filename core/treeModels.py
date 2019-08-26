@@ -58,6 +58,9 @@ class TreeItem(object):
         except IndexError:
             return None
 
+    def datas(self):
+        return self._itemData
+
     def setData(self, value, column):
         self._itemData[column] = value
 
@@ -87,6 +90,35 @@ class TreeItem(object):
 
     def __repr__(self): # 返回一个可以用来表示对象的可打印字符串
         return self.log()
+
+
+class BaseTreeItem(TreeItem):
+    def __init__(self, data=[], parent=None):
+        super(BaseTreeItem, self).__init__()
+        
+        self._parentItem = parent
+        self._childItems = []
+        self._itemData = data
+
+        if parent:
+            parent.appendChild(self)
+
+    def columnCount(self):
+        return len(self._itemData - 3)
+
+    def data(self, column):
+        try:
+            return self._itemData[column]
+        except IndexError:
+            return None
+
+    def datas(self):
+        return self._itemData
+
+    def setData(self, value, column):
+        self._itemData[column] = value
+
+
 
 
 # ----------------------------- TreeModel -------------------------------- #
@@ -212,13 +244,13 @@ class TreeModel(QtCore.QAbstractItemModel):
         return self._rootItem
   
     # 插入多列数据
-    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex(), items = []):
         
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position + rows - 1) # index, first, last
                 
-        for i in range(rows):
-            childItem = TreeItem('insert item %d'%i)
+        for i in range(rows - 1):
+            childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
 
         self.endInsertRows()
@@ -252,7 +284,12 @@ class TreeModel_Proj_Task(TreeModel):
         if self.rowCount(parent) > 0:
             self.removeRows(0, self.rowCount(parent), parent)
 
-        parentItem = self.getItem(parent) 
+        parentItem = self.getItem(parent)
+        #  获取数据
+        datas = parentItem.datas()
+        childrenID = parentItem.data(3)
+
+
 
 
 # ----------------------------- Item class 部件 -------------------------------- #
