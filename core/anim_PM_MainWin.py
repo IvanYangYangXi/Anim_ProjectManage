@@ -32,13 +32,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # ----------------------- 项目 ----------------------- #
             # ------------------ 任务 ------------------ #
-        rootNode_Proj_Task = TreeItem(['', '任务', '类型', '状态', '执行人', '描述', '截止日期', '预估时间（小时）', '结余（小时）', '9'])
-        childNode1 = TreeItem(['A1', '1', '2', '3', '4', '5', 'None', '7', '8'], rootNode_Proj_Task)
-        childNode2 = TreeItem(['A2', '1', '2', '3', '4', '5', '6', '7'], rootNode_Proj_Task)
-        childNode11 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
-        childNode12 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
-        childNode21 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode2)
-        childNode211 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode21)
+        rootItemData_Proj_Task = configure.get_DB_Struct('rootNode_taskInfo')
+        rootNode_Proj_Task = BaseTreeItem(rootItemData_Proj_Task)
+        # childNode1 = TreeItem(['A1', '1', '2', '3', '4', '5', 'None', '7', '8'], rootNode_Proj_Task)
+        # childNode2 = TreeItem(['A2', '1', '2', '3', '4', '5', '6', '7'], rootNode_Proj_Task)
+        # childNode11 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
+        # childNode12 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode1)
+        # childNode21 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode2)
+        # childNode211 = TreeItem(['A21', '1', '2', '3', '4', '5', '6', '7'], childNode21)
 
         print(rootNode_Proj_Task)
 

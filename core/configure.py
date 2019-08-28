@@ -220,6 +220,21 @@ db_Struct = {
                             'estimateTime',
                             'remaining',
                             'priority'
+                        ],
+    'rootNode_taskInfo' :[
+                            -1,
+                            -1,
+                            '',
+                            '',
+                            '任务',
+                            '类型', 
+                            '状态', 
+                            '执行人', 
+                            '描述', 
+                            '截止日期', 
+                            '预估时间（小时）', 
+                            '结余（小时）', 
+                            '优先级'
                         ]
 }
 

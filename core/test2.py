@@ -1,0 +1,1 @@
+print(str.isdigit('0'))

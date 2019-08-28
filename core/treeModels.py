@@ -282,6 +282,7 @@ class TreeModel_Proj_Task(TreeModel):
 
         # 设置初始项的item
         self._rootItem = item
+        self.updateChild()
 
     # 更新子项
     def updateChild(self, parent = QtCore.QModelIndex()):
@@ -292,12 +293,15 @@ class TreeModel_Proj_Task(TreeModel):
         parentItem = self.getItem(parent)
         #  获取数据
         datas = parentItem.datas()
-        childrenID = datas[2].split(', ') 
+        if datas[2] != '':
+            childrenID = datas[2].split(',') 
 
-        items = []
-        for i in childrenID:
-            items.append(BaseTreeItem(DB.findData('table_taskInfo', int(i), 'id')))
-        self.insertRows(self.rowCount(parent), len(childrenID), parent, items) # 插入行
+            items = []
+            for i in childrenID:
+                if str.isdigit(i): # 判断是否为正整数
+                    item = BaseTreeItem(DB.findData('table_taskInfo', int(i), 'id'), parent)
+                    items.append(item)
+            self.insertRows(self.rowCount(parent), len(childrenID), parent, items) # 插入行
 
 
 
