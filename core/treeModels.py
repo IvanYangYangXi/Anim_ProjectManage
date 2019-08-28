@@ -106,7 +106,7 @@ class BaseTreeItem(TreeItem):
             parent.appendChild(self)
 
     def columnCount(self):
-        return len(self._itemData - 3)
+        return len(self._itemData) - 3
 
     def data(self, column):
         try:

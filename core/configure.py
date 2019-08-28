@@ -254,6 +254,17 @@ def loadProjectConfig():
         f.close()
         print('ProjectConfigure loadProjectConfig error:%s'%(e))
 
+# 更新项目配置文件信息
+def updateProjectConfig(data):
+    if not os.path.exists(projectConfigPath): # 判断文件是否存在
+        createProjectConfig()
+    try:
+        f = open(projectConfigPath, 'w')
+        f.write(json.dumps(data)) 
+        f.close()
+    except Exception as e:
+        print('ProjectConfigure updateProjectConfig error:%s'%e)
+
 # 创建项目配置文件及数据表
 def createProjectConfig():
     if not os.path.exists(getProjectPath() + '/config'):
@@ -270,6 +281,10 @@ def createProjectConfig():
 def get_DB_Struct(variable):
     try:
         data = loadProjectConfig()
+        if not data.has_key(variable): # 如果Key不存在
+            if db_Struct.has_key(variable):
+                data[variable] = db_Struct[variable] # 添加
+                updateProjectConfig(data) # 更新项目配置文件
         struct = data[variable]
         print(struct)
         return struct
@@ -279,6 +294,10 @@ def get_DB_Struct(variable):
 def get_DB_Struct_ToString(variable):
     try:
         data = loadProjectConfig()
+        if not data.has_key(variable): # 如果Key不存在
+            if db_Struct.has_key(variable):
+                data[variable] = db_Struct[variable] # 添加
+                updateProjectConfig(data) # 更新项目配置文件
         struct = ''
         for i in data[variable]:
             struct = struct + i + ', '
