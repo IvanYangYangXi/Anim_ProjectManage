@@ -247,7 +247,7 @@ class TreeModel(QtCore.QAbstractItemModel):
                 return item
         
         return self._rootItem
-  
+    
     # 插入多列数据
     def insertRows(self, position, rows, parent = QtCore.QModelIndex(), items = []):
         

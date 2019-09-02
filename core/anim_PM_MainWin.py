@@ -42,8 +42,8 @@ class MainWindow(QtWidgets.QMainWindow):
         print(rootNode_Proj_Task)
 
         # 设置 Model
-        self.model = TreeModel_Proj_Task(rootNode_Proj_Task)
-        self.ui.treeView_Proj_Task.setModel(self.model)
+        self.model_Proj_Task = TreeModel_Proj_Task(rootNode_Proj_Task)
+        self.ui.treeView_Proj_Task.setModel(self.model_Proj_Task)
         # 右键菜单（treeView_Proj_Task）
         self.createRightMenu_treeView_Proj_Task()
 
@@ -78,9 +78,32 @@ class MainWindow(QtWidgets.QMainWindow):
         rightMenu.addSeparator() # 分隔器
         itemDel = rightMenu.addAction('删除（包含所有子项和数据）')
 
-        # 将动作与处理函数相关联 
+        index = self.ui.treeView_Proj_Task.selectionModel().currentIndex() # 选择的项
+        currentItem = self.model_Proj_Task.getItem(index) 
+        parentItem = self.model_Proj_Task.parent(index)
+
         # item1.triggered.connect()
         action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示
+
+        # 将动作与处理函数相关联 
+        # 新建项
+        if action == itemNew:
+            item = BaseTreeItem([dbid,
+                            parentID,
+                            '',
+                            '',
+                            '任务',
+                            '类型', 
+                            '状态', 
+                            '执行人', 
+                            '描述', 
+                            '截止日期', 
+                            '预估时间（小时）', 
+                            '结余（小时）', 
+                            '优先级'], parentItem)
+            self.model_Proj_Task.insertRows(parentItem.rows(), 1, parentItem, [item])
+            # else:
+            #     showErrorMsg('目录不存在')
 
     def closeEvent(self, event):
         '''
@@ -89,6 +112,11 @@ class MainWindow(QtWidgets.QMainWindow):
         event.accept()
         quit()
 
+
+# 错误信息
+def showErrorMsg(msg):
+    print(msg)
+    win.ui.statusbar.showMessage(msg)
 
 def main():
     # print(os.path.isdir(amConfigure.getProjectPath()))
