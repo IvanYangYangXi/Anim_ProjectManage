@@ -3,7 +3,7 @@
 #
 # treeModels.py
 # @Author :  ()
-# @Link   : 
+# @Link   :
 # @Date   : 7/10/2019, 2:58:31 PM
 
 
@@ -16,7 +16,7 @@ import configure
 class TreeItem(object):
     def __init__(self, data=[], parent=None):
         super(TreeItem, self).__init__()
-        
+
         self._parentItem = parent
         self._childItems = []
         self._itemData = data
@@ -33,7 +33,7 @@ class TreeItem(object):
     def insertChild(self, position, child):
         if position < 0 or position > len(self._childItems):
             return False
-        
+
         self._childItems.insert(position, child)
         child._parentItem = self
         return True
@@ -78,26 +78,26 @@ class TreeItem(object):
     def log(self, tablevel=-1):
         output = '--'
         tablevel += 1
-        
+
         for i in range(tablevel):
             output += "\t"
 
-        output =output + "|------" + str(self._itemData) + "\n"
+        output = output + "|------" + str(self._itemData) + "\n"
 
         for child in self._childItems:
-            output =output + child.log(tablevel)
+            output = output + child.log(tablevel)
 
         tablevel -= 1
         return output
 
-    def __repr__(self): # 返回一个可以用来表示对象的可打印字符串
+    def __repr__(self):  # 返回一个可以用来表示对象的可打印字符串
         return self.log()
 
 
 class BaseTreeItem(TreeItem):
     def __init__(self, data=[], parent=None):
         super(BaseTreeItem, self).__init__()
-        
+
         self._parentItem = parent
         self._childItems = []
         self._itemData = data
@@ -120,11 +120,11 @@ class BaseTreeItem(TreeItem):
 
         # 更新数据库数据
         dbId = self._itemData[0]
-        dbKey = configure.get_DB_Struct('struct_taskInfo')[self._itemData[column + 2]]
+        dbKey = configure.get_DB_Struct('struct_taskInfo')[
+            self._itemData[column + 2]]
         dbValue = self._itemData[column + 3]
-        DB.updateData('table_taskInfo', 'id=%d'%(dbId), '%s=%s'%(dbKey, dbValue))
-
-
+        DB.updateData('table_taskInfo', 'id=%d' %
+                      (dbId), '%s=%s' % (dbKey, dbValue))
 
 
 # ----------------------------- TreeModel -------------------------------- #
@@ -139,8 +139,8 @@ class TreeModel(QtCore.QAbstractItemModel):
     # 设置列数
     def columnCount(self, parent):
         if parent.isValid():
-            return parent.internalPointer().columnCount()  
-        else:  
+            return parent.internalPointer().columnCount()
+        else:
             return self._rootItem.columnCount()
 
     # 设置行数
@@ -148,7 +148,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         # 当父项有效时，rowCount（）应返回0。
         if parent.column() > 0:
             return 0
-        
+
         if not parent.isValid():
             parentItem = self._rootItem
         else:
@@ -167,7 +167,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             # if index.column() == 1:
             return item.data(index.column())
-            # elif index.column() == 2: 
+            # elif index.column() == 2:
             #     return item.typeInfo()
 
         # if role == QtCore.Qt.DecorationRole:
@@ -195,7 +195,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 # if index.column() == 1:
                 item.setData(value, index.column())
-                self.dataChanged.emit(index, index) # 更新Model的数据
+                self.dataChanged.emit(index, index)  # 更新Model的数据
 
                 return True
 
@@ -219,7 +219,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         # 索引不存在，返回无效索引
         if not self.hasIndex(row, column, parent):
             return QtCore.QModelIndex()
-        
+
         # 如果父项不存在，设置 parentItem = rootItem
         if not parent.isValid():
             parentItem = self._rootItem
@@ -246,15 +246,16 @@ class TreeModel(QtCore.QAbstractItemModel):
             item = index.internalPointer()
             if item:
                 return item
-        
+
         return self._rootItem
-    
+
     # 插入多行数据
-    def insertRows(self, position, rows, parent = QtCore.QModelIndex(), items = []):
-        
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex(), items=[]):
+
         parentItem = self.getItem(parent)
-        self.beginInsertRows(parent, position, position + rows - 1) # index, first, last
-                
+        self.beginInsertRows(parent, position, position +
+                             rows - 1)  # index, first, last
+
         for i in range(rows - 1):
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
@@ -262,10 +263,10 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.endInsertRows()
 
         return isSuccess
-    
+
     # 删除多行数据（插入位置， 插入行数， 父项(默认父项为空项)）
-    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
-        
+    def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
+
         parentItem = self.getItem(parent)
         self.beginRemoveRows(parent, position, position + rows - 1)
 
@@ -286,28 +287,17 @@ class TreeModel_Proj_Task(TreeModel):
         self.updateChild()
 
     # 插入单行数据
-    def insertRow(self, position, parent = QtCore.QModelIndex(), item = None):
+    def insertRow(self, position, parent=QtCore.QModelIndex(), data=None):
         
         parentID = parent._dbId
-        DB.insertData('table_taskInfo', DB.struct_taskInfo, [
-                            parentID,
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            ''
-                        ])
-        self.insertRows(position, 1, parent , [item])
+        if data == None:
+            data = [parentID, '', '', '', '', '', '', '', '', '', '', '', '']
+        dbid = DB.insertData('table_taskInfo', DB.struct_taskInfo, data)
+        item = data.insert(0, dbid)
+        self.insertRows(position, 1, parent, [item])
 
     # 更新子项
-    def updateChild(self, parent = QtCore.QModelIndex()):
+    def updateChild(self, parent=QtCore.QModelIndex()):
         # 删除现有子项
         if self.rowCount(parent) > 0:
             self.removeRows(0, self.rowCount(parent), parent)
@@ -316,16 +306,16 @@ class TreeModel_Proj_Task(TreeModel):
         #  获取数据
         datas = parentItem.datas()
         if datas[2] != '':
-            childrenID = datas[2].split(',') 
+            childrenID = datas[2].split(',')
 
             items = []
             for i in childrenID:
-                if str.isdigit(i): # 判断是否为正整数
-                    item = BaseTreeItem(DB.findData('table_taskInfo', int(i), 'id'), parent)
+                if str.isdigit(i):  # 判断是否为正整数
+                    item = BaseTreeItem(DB.findData(
+                        'table_taskInfo', int(i), 'id'), parent)
                     items.append(item)
-            self.insertRows(self.rowCount(parent), len(childrenID), parent, items) # 插入行
-
-
+            self.insertRows(self.rowCount(parent), len(
+                childrenID), parent, items)  # 插入行
 
 
 # ----------------------------- Item class 部件 -------------------------------- #
@@ -347,15 +337,16 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
         editor.addItem('里程碑')
         editor.addItem('信息')
         editor.addItem('文件夹')
-        #多个添加条目
-        editor.addItems(['功能','错误','改进','重构','研究','测试','文件'])
-        #当下拉索引发生改变时发射信号触发绑定的事件
-        editor.currentIndexChanged.connect(lambda:self.selectionchange(editor))
+        # 多个添加条目
+        editor.addItems(['功能', '错误', '改进', '重构', '研究', '测试', '文件'])
+        # 当下拉索引发生改变时发射信号触发绑定的事件
+        editor.currentIndexChanged.connect(
+            lambda: self.selectionchange(editor))
 
         return editor
 
     def selectionchange(self, editor):
-        #currentText()：返回选中选项的文本
+        # currentText()：返回选中选项的文本
         ct = editor.currentText()
         print('Items in the list are:' + ct)
 
@@ -395,7 +386,7 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
         # 避免不是由用户引起的信号,因此我们使用blockSignals.
         editor.blockSignals(True)
         # ComboBox当前项使用setCurrentIndex()来设置
-        editor.setCurrentIndex(comboId) 
+        editor.setCurrentIndex(comboId)
         editor.blockSignals(False)
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
@@ -407,6 +398,7 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
 
+
 class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
@@ -414,8 +406,9 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
         editor.addItem('待办')
         editor.addItem('进行中')
         editor.addItem('完成')
-        #当下拉索引发生改变时发射信号触发绑定的事件
-        editor.currentIndexChanged.connect(lambda:self.selectionchange(editor))
+        # 当下拉索引发生改变时发射信号触发绑定的事件
+        editor.currentIndexChanged.connect(
+            lambda: self.selectionchange(editor))
 
         return editor
 
@@ -433,10 +426,12 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
         # 避免不是由用户引起的信号,因此我们使用blockSignals.
         editor.blockSignals(True)
         # ComboBox当前项使用setCurrentIndex()来设置
-        editor.setCurrentIndex(comboId) 
+        editor.setCurrentIndex(comboId)
         editor.blockSignals(False)
 
 # 时间选择控件
+
+
 class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
@@ -461,14 +456,14 @@ class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
         if QtCore.QDate.fromString(data, 'yyyy-MM-dd'):
             editor.setDate(QtCore.QDate.fromString(data, 'yyyy-MM-dd'))
         else:
-            now = QtCore.QDate.currentDate()#获取当前日期
+            now = QtCore.QDate.currentDate()  # 获取当前日期
             editor.setDate(now)
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
     def setModelData(self, editor, model, index):
         # current_Date = time.strftime("%Y-%m-%d", editor.date())
         current_Date = editor.date()
-        print(current_Date.toString(QtCore.Qt.ISODate)) #ISO日期格式打印
+        print(current_Date.toString(QtCore.Qt.ISODate))  # ISO日期格式打印
         # print(current_Date.toString(Qt.DefaultLocaleLongDate)) #本地化长格式日期打印(2018年1月14日 )
         value = current_Date.toString(QtCore.Qt.ISODate)
 
@@ -479,10 +474,13 @@ class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
         editor.setGeometry(option.rect)
 
 # 数字显示框
+
+
 class SpinBoxDelegate(QtWidgets.QItemDelegate):
     '''
     '''
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
+
     def createEditor(self, parent, option, index):
         editor = QtWidgets.QSpinBox(parent)
         editor.setFrame(False)
@@ -508,4 +506,3 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
     # 根据给定的样式选项更新索引指定的项目的编辑器。
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
-

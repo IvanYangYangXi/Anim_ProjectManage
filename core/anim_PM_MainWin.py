@@ -81,7 +81,6 @@ class MainWindow(QtWidgets.QMainWindow):
         index = self.ui.treeView_Proj_Task.selectionModel().currentIndex() # 选择的项
         currentItem = self.model_Proj_Task.getItem(index) 
         parentItem = self.model_Proj_Task.parent(index)
-        dbid = 
 
         # item1.triggered.connect()
         action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示
@@ -89,20 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 将动作与处理函数相关联 
         # 新建项
         if action == itemNew:
-            item = BaseTreeItem([dbid,
-                            parentID,
-                            '',
-                            '',
-                            '任务',
-                            '类型', 
-                            '状态', 
-                            '执行人', 
-                            '描述', 
-                            '截止日期', 
-                            '预估时间（小时）', 
-                            '结余（小时）', 
-                            '优先级'], parentItem)
-            self.model_Proj_Task.insertRows(parentItem.rows(), 1, parentItem, [item])
+            self.model_Proj_Task.insertRow(parentItem.childCount(), parentItem)
             # else:
             #     showErrorMsg('目录不存在')
 
