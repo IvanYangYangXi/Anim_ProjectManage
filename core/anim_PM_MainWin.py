@@ -81,6 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         index = self.ui.treeView_Proj_Task.selectionModel().currentIndex() # 选择的项
         currentItem = self.model_Proj_Task.getItem(index) 
         parentItem = self.model_Proj_Task.parent(index)
+        dbid = 
 
         # item1.triggered.connect()
         action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示

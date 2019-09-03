@@ -87,13 +87,17 @@ def reCreateTable(tableName, createTableStruct):
 def insertData(tableName, tableStruct, data):
     conn = sqlite3.connect(dbPath()) # 连接数据库
     conn.text_factory = str
+    cursor=conn.cursor()
     try:
         conn.execute("insert into " + tableName + "(" + tableStruct + \
             ")" + "VALUES (?%s)"%(',?'*(len(re.findall(r',', tableStruct)))), data) # 执行操作
     except Exception as e:
         print(e)
+        
+    lastid = cursor.lastrowid
     conn.commit() # 保存修改
     conn.close() # 关闭与数据库的连接
+    return lastid
 
 # 插入多行
 def insertManyData(tableName, tableStruct, datas):

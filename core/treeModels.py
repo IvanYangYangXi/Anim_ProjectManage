@@ -101,6 +101,7 @@ class BaseTreeItem(TreeItem):
         self._parentItem = parent
         self._childItems = []
         self._itemData = data
+        self._dbId = self._itemData[0]
 
         if parent:
             parent.appendChild(self)
@@ -248,7 +249,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         
         return self._rootItem
     
-    # 插入多列数据
+    # 插入多行数据
     def insertRows(self, position, rows, parent = QtCore.QModelIndex(), items = []):
         
         parentItem = self.getItem(parent)
@@ -283,6 +284,27 @@ class TreeModel_Proj_Task(TreeModel):
         # 设置初始项的item
         self._rootItem = item
         self.updateChild()
+
+    # 插入单行数据
+    def insertRow(self, position, parent = QtCore.QModelIndex(), item = None):
+        
+        parentID = parent._dbId
+        DB.insertData('table_taskInfo', DB.struct_taskInfo, [
+                            parentID,
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
+                        ])
+        self.insertRows(position, 1, parent , [item])
 
     # 更新子项
     def updateChild(self, parent = QtCore.QModelIndex()):
