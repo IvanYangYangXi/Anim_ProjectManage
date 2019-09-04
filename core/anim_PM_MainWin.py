@@ -25,24 +25,25 @@ class MainWindow(QtWidgets.QMainWindow):
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
 
-        # ----------------------- 概览面板 ----------------------- #
-        item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
-        item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
-        itemWidget = listItems.ListItem_General_Proj()  # itemWidget
-        self.ui.listWidget__General_Proj.addItem(item)  # 添加item
+        # ---------------------------- 概览面板 ---------------------------- #
+        self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
+        self.item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
+        self.itemWidget = listItems.ListItem_General_Proj()  # itemWidget
+        self.ui.listWidget__General_Proj.addItem(self.item)  # 添加item
         self.ui.listWidget__General_Proj.setItemWidget(
-            item, itemWidget)  # 为item设置widget
+            self.item, self.itemWidget)  # 为item设置widget
 
-        # ----------------------- 项目面板 ----------------------- #
+        # ---------------------------- 项目面板 ---------------------------- #
         ## ------------------ 任务面板 ------------------ #
         ### --------------- 任务树 --------------- #
-        rootItemData_Proj_Task = configure.get_DB_Struct('rootNode_taskInfo')
-        rootNode_Proj_Task = BaseTreeItem(rootItemData_Proj_Task)
+        self.rootItemData_Proj_Task = configure.get_DB_Struct(
+            'rootNode_taskInfo')
+        self.rootNode_Proj_Task = BaseTreeItem(self.rootItemData_Proj_Task)
 
-        print(rootNode_Proj_Task)
+        print(self.rootNode_Proj_Task)
 
         # 设置 Model
-        self.model_Proj_Task = TreeModel_Proj_Task(rootNode_Proj_Task)
+        self.model_Proj_Task = TreeModel_Proj_Task(self.rootNode_Proj_Task)
         self.ui.treeView_Proj_Task.setModel(self.model_Proj_Task)
         # 右键菜单（treeView_Proj_Task）
         self.createRightMenu_treeView_Proj_Task()
@@ -71,26 +72,51 @@ class MainWindow(QtWidgets.QMainWindow):
         itemNew = rightMenu.addAction('新建项')
         itemNewChild = rightMenu.addAction('新建子项')
         itemWorkFlow = rightMenu.addAction('快速创建工作流')
-        rightMenu.addSeparator() # 分隔器
+        rightMenu.addSeparator()  # 分隔器
         itemRefresh = rightMenu.addAction('刷新')
         itemOpenDir = rightMenu.addAction('打开路径')
         itemCollection = rightMenu.addAction('添加到快速访问')
-        rightMenu.addSeparator() # 分隔器
+        rightMenu.addSeparator()  # 分隔器
         itemDel = rightMenu.addAction('删除（包含所有子项和数据）')
 
-        index = self.ui.treeView_Proj_Task.selectionModel().currentIndex() # 选择的项
-        currentItem = self.model_Proj_Task.getItem(index) 
-        parentItem = self.model_Proj_Task.parent(index)
+        indexes = self.ui.treeView_Proj_Task.selectedIndexes()  # 获取所有选择单项
+        if len(indexes) == 1:
+            index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
+            currentItem = self.model_Proj_Task.getItem(index)
+            currentItems = [currentItem]
+            parentItem = self.model_Proj_Task.parent(index)
+        elif len(indexes) == 0:
+            currentItem = None
+            currentItems = []
+            parentItem = self.self.rootNode_Proj_Task
+        else:
+            currentItems = []
+            for i in indexes:
+                currentItem = self.model_Proj_Task.getItem(i)
+                currentItems.append(currentItem)
+            parentItem = None
 
-        # item1.triggered.connect()
-        action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示
+        # 禁用菜单项
+        if parentItem == None:
+            itemNew.setEnabled(False)
+            itemNewChild.setEnabled(False)
+            itemCollection.setEnabled(False)
+        if currentItem == None:
+            itemNewChild.setEnabled(False)
+            itemOpenDir.setEnabled(False)
 
-        # 将动作与处理函数相关联 
+            # item1.triggered.connect()
+        action = rightMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
+
+        # 将动作与处理函数相关联
         # 新建项
         if action == itemNew:
             self.model_Proj_Task.insertRow(parentItem.childCount(), parentItem)
             # else:
             #     showErrorMsg('目录不存在')
+        if action == itemNewChild:
+            for i in currentItems:
+                self.model_Proj_Task.insertRow(i.childCount(), i)
 
     def closeEvent(self, event):
         '''
@@ -104,6 +130,7 @@ class MainWindow(QtWidgets.QMainWindow):
 def showErrorMsg(msg):
     print(msg)
     win.ui.statusbar.showMessage(msg)
+
 
 def main():
     # print(os.path.isdir(amConfigure.getProjectPath()))
