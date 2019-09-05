@@ -314,3 +314,4 @@ if __name__ == '__main__':
     setProjectPath("./data/TestData")
     createProjectConfig()
     get_DB_Struct_ToString('struct_taskInfo')
+    get_DB_Struct_ToString('create_taskInfo')

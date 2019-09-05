@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 # from ctypes.wintypes import LONG, HWND, UINT, WPARAM, LPARAM, FILETIME
 import shutil  # 文件夹操作
 import listItems
-# import treeModels
+import configure
 from treeModels import *
 
 
@@ -24,6 +24,9 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(parent)
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
+        # 检查工程目录是否存在,不存在则设置工程目录
+        if not os.path.isdir(configure.getProjectPath()):
+            pass
 
         # ---------------------------- 概览面板 ---------------------------- #
         self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
@@ -121,11 +124,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.model_Proj_Task.insertRow(i.childCount(), i)
         # 删除（包含所有子项和数据）
         if action == itemDel:
-            reply = QtWidgets.QMessageBox.warning(self, "警告",  "确认删除选择项?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            reply = QtWidgets.QMessageBox.warning(
+                self, "警告",  "确认删除选择项?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if reply:
-                for (i,o) in (currentItems, indexes):
+                for (i, o) in (currentItems, indexes):
                     # os.removedirs(path)    # 递归删除文件夹
-                    self.model_Proj_Task.removeRows(i.row(), 1, self.model_Proj_Task.parent(o))
+                    self.model_Proj_Task.removeRows(
+                        i.row(), 1, self.model_Proj_Task.parent(o))
 
     def closeEvent(self, event):
         '''
@@ -135,6 +140,34 @@ class MainWindow(QtWidgets.QMainWindow):
         quit()
 
 
+# 选择文件夹
+def browse():
+    directory = ''
+    if configure.getProjectPath() != None:
+        if os.path.isdir(configure.getProjectPath()):
+            directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Find Dir",
+                                                                   configure.getProjectPath())
+        else:
+            directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Find Dir",
+                                                                   QtCore.QDir.currentPath())
+    else:
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Find Dir",
+                                                               QtCore.QDir.currentPath())
+
+    return directory
+
+
+# 设置工程目录
+def SetProjectPath():
+    directory = browse()
+    if directory != '':
+        configure.setProjectPath(directory)
+        configure.createProjectConfig()
+    elif not os.path.isdir(configure.getProjectPath()):
+        showErrorMsg('工程目录不存在')
+        # w.close() # 退出窗口程序
+
+
 # 错误信息
 def showErrorMsg(msg):
     print(msg)
@@ -142,7 +175,7 @@ def showErrorMsg(msg):
 
 
 def main():
-    # print(os.path.isdir(amConfigure.getProjectPath()))
+    # print(os.path.isdir(configure.getProjectPath()))
     # 启动窗口
     global win
     app = QtWidgets.QApplication(sys.argv)
