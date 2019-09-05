@@ -80,8 +80,8 @@ class MainWindow(QtWidgets.QMainWindow):
         itemDel = rightMenu.addAction('删除（包含所有子项和数据）')
 
         indexes = self.ui.treeView_Proj_Task.selectedIndexes()  # 获取所有选择单项
+        index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
         if len(indexes) == 1:
-            index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]
             parentItem = self.model_Proj_Task.parent(index)
@@ -104,6 +104,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if currentItem == None:
             itemNewChild.setEnabled(False)
             itemOpenDir.setEnabled(False)
+            itemDel.setEnabled(False)
 
             # item1.triggered.connect()
         action = rightMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
@@ -114,9 +115,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.model_Proj_Task.insertRow(parentItem.childCount(), parentItem)
             # else:
             #     showErrorMsg('目录不存在')
+        # 新建子项
         if action == itemNewChild:
             for i in currentItems:
                 self.model_Proj_Task.insertRow(i.childCount(), i)
+        # 删除（包含所有子项和数据）
+        if action == itemDel:
+            reply = QtWidgets.QMessageBox.warning(self, "警告",  "确认删除选择项?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if reply:
+                for (i,o) in (currentItems, indexes):
+                    # os.removedirs(path)    # 递归删除文件夹
+                    self.model_Proj_Task.removeRows(i.row(), 1, self.model_Proj_Task.parent(o))
 
     def closeEvent(self, event):
         '''
