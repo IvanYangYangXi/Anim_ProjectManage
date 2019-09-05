@@ -123,7 +123,7 @@ class BaseTreeItem(TreeItem):
         dbKey = configure.get_DB_Struct('struct_taskInfo')[
             self._itemData[column + 2]]
         dbValue = self._itemData[column + 3]
-        DB.updateData('table_taskInfo', 'id=%d' %
+        DB.updateData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %
                       (dbId), '%s=%s' % (dbKey, dbValue))
 
 
@@ -292,7 +292,7 @@ class TreeModel_Proj_Task(TreeModel):
         parentID = parent._dbId
         if data == None:
             data = [parentID, '', '', '', '', '', '', '', '', '', '', '', '']
-        dbid = DB.insertData('table_taskInfo', DB.struct_taskInfo, data)
+        dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
         item = data.insert(0, dbid)
         self.insertRows(position, 1, parent, [item])
 
@@ -311,7 +311,7 @@ class TreeModel_Proj_Task(TreeModel):
             items = []
             for i in childrenID:
                 if str.isdigit(i):  # 判断是否为正整数
-                    item = BaseTreeItem(DB.findData(
+                    item = BaseTreeItem(DB.findData(configure.getProjectPath(), 
                         'table_taskInfo', int(i), 'id'), parent)
                     items.append(item)
             self.insertRows(self.rowCount(parent), len(

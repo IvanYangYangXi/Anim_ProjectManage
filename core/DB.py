@@ -10,22 +10,19 @@
 import sqlite3
 import os
 import re
-import configure
 
-# 用于创建列表
-# 建立自增主键:id integer primary key autoincrement
-DB_Struct = configure.get_DB_Struct_ToString('create_taskInfo')
-print(DB_Struct)
-create_taskInfo = '(id integer primary key autoincrement,' + \
-    DB_Struct + ')'
+# # 用于创建列表
+# # 建立自增主键:id integer primary key autoincrement
+# create_taskInfo = '(id integer primary key autoincrement,' + \
+#     configure.get_DB_Struct_ToString('create_taskInfo') + ')'
 
-# 用于初始化列表
-struct_taskInfo = configure.get_DB_Struct_ToString('struct_taskInfo')
+# # 用于初始化列表
+# struct_taskInfo = configure.get_DB_Struct_ToString('struct_taskInfo')
 
 
 # 数据库路径
-def dbPath():
-    projectPath = configure.getProjectPath()
+def dbPath(projectPath):
+    # projectPath = configure.getProjectPath()
     if os.path.isdir(projectPath):
         Path = projectPath + '/data/db.db'
         # 检查文件夹是否存在，不存在则创建
@@ -37,8 +34,8 @@ def dbPath():
 
 
 # 执行操作
-def executeDB(query):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def executeDB(projectPath, query):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     cursor = conn.cursor()
 
@@ -52,8 +49,8 @@ def executeDB(query):
 # 执行多次操作
 
 
-def executemanyDB(query, data):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def executemanyDB(projectPath, query, data):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     cursor = conn.cursor()
 
@@ -66,8 +63,8 @@ def executemanyDB(query, data):
 
 
 # 创建sqlite3数据表
-def CreateTable(tableName, createTableStruct):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def CreateTable(projectPath, tableName, createTableStruct):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
 
     # 执行操作:创建表
@@ -80,8 +77,8 @@ def CreateTable(tableName, createTableStruct):
 # 重新创建数据表
 
 
-def reCreateTable(tableName, createTableStruct):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def reCreateTable(projectPath, tableName, createTableStruct):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
 
     conn.execute("drop table IF EXISTS %s" % (tableName))  # 删除表
@@ -89,13 +86,13 @@ def reCreateTable(tableName, createTableStruct):
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
 
-    CreateTable(tableName, createTableStruct)  # 创建表
+    CreateTable(projectPath, tableName, createTableStruct)  # 创建表
 
 # 插入行
 
 
-def insertData(tableName, tableStruct, data):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def insertData(projectPath, tableName, tableStruct, data):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     cursor = conn.cursor()
     try:
@@ -112,8 +109,8 @@ def insertData(tableName, tableStruct, data):
 # 插入多行
 
 
-def insertManyData(tableName, tableStruct, datas):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def insertManyData(projectPath, tableName, tableStruct, datas):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     try:
         conn.executemany("insert into " + tableName + "(" + tableStruct +
@@ -126,8 +123,8 @@ def insertManyData(tableName, tableStruct, datas):
 # 插入列
 
 
-def insertColumn(tableName, columnName, columnType):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def insertColumn(projectPath, tableName, columnName, columnType):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     try:
         # ALTER  TABLE   table-name  ADD COLUMN  column-name column-type
@@ -141,8 +138,8 @@ def insertColumn(tableName, columnName, columnType):
 # 查询数据
 
 
-def findData(tableName, theData, keys=''):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def findData(projectPath, tableName, theData, keys=''):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
 
     if keys == '':
@@ -160,8 +157,8 @@ def findData(tableName, theData, keys=''):
 # 查询数据（返回列表）
 
 
-def findDatas(tableName, theData, keys=''):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def findDatas(projectPath, tableName, theData, keys=''):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
 
     if keys == '':
@@ -179,8 +176,8 @@ def findDatas(tableName, theData, keys=''):
 # 遍历数据（返回列表）
 
 
-def getDatas(tableName, keys=''):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def getDatas(projectPath, tableName, keys=''):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
 
     if keys == '':
@@ -197,8 +194,8 @@ def getDatas(tableName, keys=''):
 # 删除数据
 
 
-def deleteData(tableName, theData):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def deleteData(projectPath, tableName, theData):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     try:
         conn.execute('DELETE FROM ' + tableName + ' WHERE ' + theData)  # 执行操作
     except Exception as e:
@@ -209,8 +206,8 @@ def deleteData(tableName, theData):
 # 修改数据
 
 
-def updateData(tableName, theData, newData):
-    conn = sqlite3.connect(dbPath())  # 连接数据库
+def updateData(projectPath, tableName, theData, newData):
+    conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     try:
         conn.execute('UPDATE ' + tableName + ' SET ' +
                      newData + ' WHERE ' + theData)  # 执行操作
@@ -222,9 +219,9 @@ def updateData(tableName, theData, newData):
 # 重建所有表
 
 
-def reCreateAll():
-    # CreateTable(tableName, createTableStruct)
-    reCreateTable('table_taskInfo', create_taskInfo)
+# def reCreateAll(projectPath):
+    # CreateTable(projectPath, tableName, createTableStruct)
+    # reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # # 初始化状态列表
     # insertManyData('state', struct_taskInfo, (
     #     ('完成', '#61bd4f'),
@@ -239,9 +236,26 @@ def reCreateAll():
 
 
 if __name__ == '__main__':
-    print(dbPath())
+    projectPath = os.path.dirname(os.path.dirname(__file__))
+    create_taskInfo = [
+        'parentID int',
+        'childrenID text',
+        'img text',
+        'task NVARCHAR(100)',
+        'type NCHAR(30)',
+        'state NCHAR(20)',
+        'executive NCHAR(10)',
+        'reporter NCHAR(10)',
+        'description text',
+        'deadline CHAR(20)',
+        'estimateTime CHAR(20)',
+        'remaining CHAR(20)',
+        'priority NCHAR(10)'
+    ]
+
+    print(dbPath(projectPath))
     # CreateTable('table_taskInfo', create_taskInfo)
-    reCreateTable('table_taskInfo', create_taskInfo)
+    reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
     # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
