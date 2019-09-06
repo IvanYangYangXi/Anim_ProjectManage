@@ -88,10 +88,13 @@ def reCreateTable(projectPath, tableName, createTableStruct):
 
     CreateTable(projectPath, tableName, createTableStruct)  # 创建表
 
+
 # 插入行
-
-
 def insertData(projectPath, tableName, tableStruct, data):
+    """
+    insertData(projectPath, 'table_taskInfo', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
+    """
+
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
     cursor = conn.cursor()
@@ -106,9 +109,8 @@ def insertData(projectPath, tableName, tableStruct, data):
     conn.close()  # 关闭与数据库的连接
     return lastid
 
+
 # 插入多行
-
-
 def insertManyData(projectPath, tableName, tableStruct, datas):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
@@ -236,28 +238,47 @@ def updateData(projectPath, tableName, theData, newData):
 
 
 if __name__ == '__main__':
-    projectPath = os.path.dirname(os.path.dirname(__file__))
-    create_taskInfo = [
-        'parentID int',
-        'childrenID text',
-        'img text',
-        'task NVARCHAR(100)',
-        'type NCHAR(30)',
-        'state NCHAR(20)',
-        'executive NCHAR(10)',
-        'reporter NCHAR(10)',
-        'description text',
-        'deadline CHAR(20)',
-        'estimateTime CHAR(20)',
-        'remaining CHAR(20)',
-        'priority NCHAR(10)'
-    ]
+    projectPath = os.path.dirname(os.path.dirname(__file__)) + '/data/TestData'
+    create_taskInfo = """
+        (id integer primary key autoincrement,
+        parentID int,
+        childrenID text,
+        img text,
+        task NVARCHAR(100),
+        type NCHAR(30),
+        state NCHAR(20),
+        executive NCHAR(10),
+        reporter NCHAR(10),
+        description text,
+        deadline CHAR(20),
+        estimateTime CHAR(20),
+        remaining CHAR(20),
+        priority NCHAR(10))
+        """
+    struct_taskInfo = """
+        parentID,
+        childrenID,
+        img,
+        task,
+        type,
+        state,
+        executive,
+        reporter,
+        description,
+        deadline,
+        estimateTime,
+        remaining,
+        priority
+        """
 
     print(dbPath(projectPath))
     # CreateTable('table_taskInfo', create_taskInfo)
     reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
-    # insertData('list', struct_taskInfo, ('nnn', False, 'aaa', 'bbb'))
+    insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '', '', '', '', '', '', '', '', '', '', '', ''))
+    print(insertid)
+    insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '', '', '', '', '', '', '', '', '', '', '', ''))
+
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')
     # print(findData('list', "listName='g11'")[0])

@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = uic.loadUi(uiPath, self)
         # 检查工程目录是否存在,不存在则设置工程目录
         if not os.path.isdir(configure.getProjectPath()):
-            pass
+            SetProjectPath()
 
         # ---------------------------- 概览面板 ---------------------------- #
         self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象

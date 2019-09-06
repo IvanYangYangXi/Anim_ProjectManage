@@ -255,7 +255,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position +
                              rows - 1)  # index, first, last
-
+        # isSuccess = False
         for i in range(rows - 1):
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
@@ -291,10 +291,16 @@ class TreeModel_Proj_Task(TreeModel):
         parentItem = self.getItem(parent)
         parentID = parentItem._dbId
         if data == None:
-            data = [parentID, '', '', '', '', '', '', '', '', '', '', '', '']
+            data = configure.get_DB_Struct('empty_taskInfo')
+            data[0] = parentID
+        
+        # 数据库插入项并获取其id
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
-        item = data.insert(0, dbid)
-        self.insertRows(position, 1, parent, [item])
+        print(dbid)
+        data.insert(0, dbid)
+        print(data)
+        item = BaseTreeItem(data, parentItem)
+        return self.insertRows(position, 1, parent, [item])
 
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):

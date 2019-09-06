@@ -241,12 +241,28 @@ db_Struct = {
         '类型',
         '状态',
         '执行人',
+        '报告人',
         '描述',
         '截止日期',
         '预估时间（小时）',
         '结余（小时）',
         '优先级'
-    ]
+    ],
+    'empty_taskInfo': [
+        -1,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+    ],
 }
 
 projectConfigPath = getProjectPath() + '/config/projectConfig.ini'
@@ -316,7 +332,7 @@ def get_DB_Struct_ToString(variable):
                 updateProjectConfig(data)  # 更新项目配置文件
         struct = ''
         for i in data[variable]:
-            struct = struct + i + ', '
+            struct = struct + str(i) + ', '
         struct = struct[:-2]  # 去掉最后一个(多个)字符
         print(struct)
         return struct
