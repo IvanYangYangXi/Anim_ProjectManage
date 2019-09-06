@@ -88,12 +88,10 @@ class MainWindow(QtWidgets.QMainWindow):
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]
             parentIndex = self.model_Proj_Task.parent(index)
-            parentItem = self.model_Proj_Task.getItem(parentIndex)
         elif len(indexes) == 0:
             currentItem = None
             currentItems = []
             parentIndex = QtCore.QModelIndex()
-            parentItem = self.model_Proj_Task.getItem(parentIndex)
         else:
             currentItems = []
             for i in indexes:
@@ -117,7 +115,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 将动作与处理函数相关联
         # 新建项
         if action == itemNew:
-            self.model_Proj_Task.insertRow(parentItem.childCount(), parentIndex)
+            self.model_Proj_Task.insertRow(self.model_Proj_Task.rowCount(parentIndex), parentIndex)
             # else:
             #     showErrorMsg('目录不存在')
         # 新建子项
