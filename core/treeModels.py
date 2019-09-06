@@ -288,8 +288,8 @@ class TreeModel_Proj_Task(TreeModel):
 
     # 插入单行数据
     def insertRow(self, position, parent=QtCore.QModelIndex(), data=None):
-        
-        parentID = parent._dbId
+        parentItem = self.getItem(parent)
+        parentID = parentItem._dbId
         if data == None:
             data = [parentID, '', '', '', '', '', '', '', '', '', '', '', '']
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)

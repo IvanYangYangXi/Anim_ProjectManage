@@ -87,20 +87,22 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(indexes) == 1:
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]
-            parentItem = self.model_Proj_Task.parent(index)
+            parentIndex = self.model_Proj_Task.parent(index)
+            parentItem = self.model_Proj_Task.getItem(parentIndex)
         elif len(indexes) == 0:
             currentItem = None
             currentItems = []
-            parentItem = self.self.rootNode_Proj_Task
+            parentIndex = QtCore.QModelIndex()
+            parentItem = self.model_Proj_Task.getItem(parentIndex)
         else:
             currentItems = []
             for i in indexes:
                 currentItem = self.model_Proj_Task.getItem(i)
                 currentItems.append(currentItem)
-            parentItem = None
+            parentIndex = None
 
         # 禁用菜单项
-        if parentItem == None:
+        if parentIndex == None:
             itemNew.setEnabled(False)
             itemNewChild.setEnabled(False)
             itemCollection.setEnabled(False)
@@ -115,7 +117,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 将动作与处理函数相关联
         # 新建项
         if action == itemNew:
-            self.model_Proj_Task.insertRow(parentItem.childCount(), parentItem)
+            self.model_Proj_Task.insertRow(parentItem.childCount(), parentIndex)
             # else:
             #     showErrorMsg('目录不存在')
         # 新建子项
