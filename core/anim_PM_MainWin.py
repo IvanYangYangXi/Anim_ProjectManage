@@ -84,6 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         indexes = self.ui.treeView_Proj_Task.selectedIndexes()  # 获取所有选择单项
         index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
+        print(len(indexes))
         if len(indexes) == 1:
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]

@@ -256,9 +256,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(parent, position, position +
                              rows - 1)  # index, first, last
         # isSuccess = False
-        print(rows)
         for i in range(rows):
-            print('a'+str(i))
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
             print(childItem.datas())
@@ -296,13 +294,13 @@ class TreeModel_Proj_Task(TreeModel):
         if data == None:
             data = configure.get_DB_Struct('empty_taskInfo') # 从配置文件获取插入的空内容(list)
             data[0] = parentID
-        
+        print(data)
         # 数据库插入项并获取其id
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
         data.insert(0, dbid)
         # print(data)
-        item = BaseTreeItem(data, parentItem)
-        return self.insertRows(position, 1, parent, [item])
+        item = BaseTreeItem(data)
+        self.insertRows(position, 1, parent, [item])
 
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):
@@ -311,19 +309,20 @@ class TreeModel_Proj_Task(TreeModel):
             self.removeRows(0, self.rowCount(parent), parent)
 
         parentItem = self.getItem(parent)
+        if parent==QtCore.QModelIndex():
+            dbdatas = DB.findDatas(configure.getProjectPath(), 'table_taskInfo', 'parentID=-1')
+            for itemdata in dbdatas:
+                print(itemdata)
+                BaseTreeItem(itemdata, parentItem) # 添加行
+
         #  获取数据
         datas = parentItem.datas()
         if datas[2] != '':
-            childrenID = datas[2].split(',')
-
-            items = []
+            childrenID = datas[2].split(',') # 分割childrenID，转化为列表
             for i in childrenID:
                 if str.isdigit(i):  # 判断是否为正整数
-                    item = BaseTreeItem(DB.findData(configure.getProjectPath(), 
-                        'table_taskInfo', int(i), 'id'), parent)
-                    items.append(item)
-            self.insertRows(self.rowCount(parent), len(
-                childrenID), parent, items)  # 插入行
+                    BaseTreeItem(DB.findData(configure.getProjectPath(), 
+                        'table_taskInfo', 'id=%s'%int(i)), parentItem) # 根据childrenID添加行
 
 
 # ----------------------------- Item class 部件 -------------------------------- #

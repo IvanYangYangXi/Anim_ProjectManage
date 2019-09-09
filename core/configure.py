@@ -215,7 +215,7 @@ db_Struct = {
         'deadline CHAR(20)',
         'estimateTime CHAR(20)',
         'remaining CHAR(20)',
-        'priority NCHAR(10)'
+        'priority NCHAR(20)'
     ],
     'struct_taskInfo': [
         'parentID',
@@ -252,16 +252,16 @@ db_Struct = {
         -1,
         '',
         '',
+        'taskName',
+        'None',
+        'None',
+        'executive',
+        'reporter',
+        '描述',
         '',
         '',
         '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        ''
+        'medium'
     ],
 }
 
@@ -320,7 +320,7 @@ def get_DB_Struct(variable):
         # print(struct)
         return struct
     except Exception as e:
-        print('ProjectConfigure getProjectConfigInfo error:%s' % e)
+        print('ProjectConfigure get_DB_Struct error:%s' % e)
 
 
 def get_DB_Struct_ToString(variable):
@@ -330,14 +330,17 @@ def get_DB_Struct_ToString(variable):
             if db_Struct.has_key(variable):
                 data[variable] = db_Struct[variable]  # 添加
                 updateProjectConfig(data)  # 更新项目配置文件
+        print(data[variable])
         struct = ''
         for i in data[variable]:
-            struct = struct + str(i) + ', '
+            if type(i)==int:
+                i = str(i)
+            struct = struct + i + ', '
         struct = struct[:-2]  # 去掉最后一个(多个)字符
         print(struct)
         return struct
     except Exception as e:
-        print('ProjectConfigure getProjectConfigInfo error:%s' % e)
+        print('ProjectConfigure get_DB_Struct_ToString error:%s' % e)
 
 
 # 用于创建列表
@@ -354,3 +357,4 @@ if __name__ == '__main__':
     createProjectConfig()
     get_DB_Struct_ToString('struct_taskInfo')
     get_DB_Struct_ToString('create_taskInfo')
+    get_DB_Struct_ToString('empty_taskInfo')
