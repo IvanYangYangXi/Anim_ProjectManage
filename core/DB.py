@@ -96,15 +96,16 @@ def insertData(projectPath, tableName, tableStruct, data):
     """
 
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
-    conn.text_factory = str
+    # conn.text_factory = str
     cursor = conn.cursor()
     try:
-        conn.execute("insert into " + tableName + "(" + tableStruct +
+        cursor.execute("insert into " + tableName + "(" + tableStruct +
                      ")" + "VALUES (?%s)" % (',?'*(len(re.findall(r',', tableStruct)))), data)  # 执行操作
+        print(cursor.lastrowid)
     except Exception as e:
         print(e)
 
-    lastid = cursor.lastrowid
+    lastid = cursor.lastrowid # 此只读属性提供上次修改行的rowid
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
     return lastid
@@ -276,9 +277,6 @@ if __name__ == '__main__':
     reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
     insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '', '', '', '', '', '', '', '', '', '', '', ''))
-    print(insertid)
-    insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '', '', '', '', '', '', '', '', '', '', '', ''))
-
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')
     # print(findData('list', "listName='g11'")[0])

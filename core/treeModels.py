@@ -256,12 +256,15 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(parent, position, position +
                              rows - 1)  # index, first, last
         # isSuccess = False
-        for i in range(rows - 1):
+        print(rows)
+        for i in range(rows):
+            print('a'+str(i))
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
+            print(childItem.datas())
 
         self.endInsertRows()
-
+        
         return isSuccess
 
     # 删除多行数据（插入位置， 插入行数， 父项(默认父项为空项)）
@@ -291,14 +294,13 @@ class TreeModel_Proj_Task(TreeModel):
         parentItem = self.getItem(parent)
         parentID = parentItem._dbId
         if data == None:
-            data = configure.get_DB_Struct('empty_taskInfo')
+            data = configure.get_DB_Struct('empty_taskInfo') # 从配置文件获取插入的空内容(list)
             data[0] = parentID
         
         # 数据库插入项并获取其id
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
-        print(dbid)
         data.insert(0, dbid)
-        print(data)
+        # print(data)
         item = BaseTreeItem(data, parentItem)
         return self.insertRows(position, 1, parent, [item])
 

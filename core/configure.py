@@ -317,7 +317,7 @@ def get_DB_Struct(variable):
                 data[variable] = db_Struct[variable]  # 添加
                 updateProjectConfig(data)  # 更新项目配置文件
         struct = data[variable]
-        print(struct)
+        # print(struct)
         return struct
     except Exception as e:
         print('ProjectConfigure getProjectConfigInfo error:%s' % e)
