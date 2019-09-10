@@ -265,15 +265,15 @@ db_Struct = {
     ],
 }
 
-projectConfigPath = getProjectPath() + '/config/projectConfig.ini'
+# projectConfigPath() = getProjectPath() + '/config/projectConfig.ini'
 
 
 # 读取项目配置文件信息
 def loadProjectConfig():
-    if not os.path.exists(projectConfigPath):  # 判断文件是否存在
+    if not os.path.exists(getProjectPath() + '/config/projectConfig.ini'):  # 判断文件是否存在
         createProjectConfig()
     # 读取文件信息
-    f = open(projectConfigPath, 'r')
+    f = open(getProjectPath() + '/config/projectConfig.ini', 'r')
     try:
         data = json.loads(f.read())
         f.close()
@@ -285,10 +285,10 @@ def loadProjectConfig():
 
 # 更新项目配置文件信息
 def updateProjectConfig(data):
-    if not os.path.exists(projectConfigPath):  # 判断文件是否存在
+    if not os.path.exists(getProjectPath() + '/config/projectConfig.ini'):  # 判断文件是否存在
         createProjectConfig()
     try:
-        f = open(projectConfigPath, 'w')
+        f = open(getProjectPath() + '/config/projectConfig.ini', 'w')
         f.write(json.dumps(data))
         f.close()
     except Exception as e:
@@ -299,9 +299,10 @@ def updateProjectConfig(data):
 def createProjectConfig():
     if not os.path.exists(getProjectPath() + '/config'):
         os.makedirs(getProjectPath() + '/config')  # 创建路径
-    if not os.path.exists(projectConfigPath):  # 判断文件是否存在
+    if not os.path.exists(getProjectPath() + '/config/projectConfig.ini'):  # 判断文件是否存在
         # 创建配置文件
-        f = open(projectConfigPath, 'w')
+        print(getProjectPath())
+        f = open(getProjectPath() + '/config/projectConfig.ini', 'w')
         f.write(json.dumps(db_Struct))
         f.close()
         # 创建表
