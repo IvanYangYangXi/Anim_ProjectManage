@@ -257,7 +257,7 @@ db_Struct = {
         'None',
         'executive',
         'reporter',
-        '描述',
+        'description',
         '',
         '',
         '',
