@@ -346,7 +346,11 @@
                  </layout>
                 </item>
                 <item>
-                 <widget class="QTreeView" name="treeView_Proj_Task"/>
+                 <widget class="QTreeView" name="treeView_Proj_Task">
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::ContiguousSelection</enum>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>

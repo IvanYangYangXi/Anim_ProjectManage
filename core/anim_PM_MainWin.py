@@ -84,20 +84,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
         indexes = self.ui.treeView_Proj_Task.selectedIndexes()  # 获取所有选择单项
         index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
-        print(len(indexes))
-        if len(indexes) == 1:
+        selectRowCount = len(indexes)/self.model_Proj_Task.columnCount(index) # 选择的行数
+        print(selectRowCount)
+        if selectRowCount == 1: # 选择一行
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]
+            rowIndexes = [index]
             parentIndex = self.model_Proj_Task.parent(index)
-        elif len(indexes) == 0:
+        elif selectRowCount == 0: # 选择0行
             currentItem = None
             currentItems = []
             parentIndex = QtCore.QModelIndex()
-        else:
+        else: # 选择多行
             currentItems = []
-            for i in indexes:
+            rowIndexes = []
+            for i in range(selectRowCount):
+                rowIndexes.append(indexes[i*self.model_Proj_Task.columnCount(index)])
+            for i in rowIndexes:
                 currentItem = self.model_Proj_Task.getItem(i)
                 currentItems.append(currentItem)
+            currentItem = self.model_Proj_Task.getItem(index)
             parentIndex = None
 
         # 禁用菜单项
@@ -128,10 +134,10 @@ class MainWindow(QtWidgets.QMainWindow):
             reply = QtWidgets.QMessageBox.warning(
                 self, "警告",  "确认删除选择项?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             if reply:
-                for (i, o) in (currentItems, indexes):
-                    # os.removedirs(path)    # 递归删除文件夹
+                for i in range(selectRowCount):
+                    # os.removedirs(path)    # 递归删除文件夹 (i, o) in (currentItems, rowIndexes)
                     self.model_Proj_Task.removeRows(
-                        i.row(), 1, self.model_Proj_Task.parent(o))
+                        currentItems[i].row(), 1, self.model_Proj_Task.parent(rowIndexes[i]))
 
     def closeEvent(self, event):
         '''
