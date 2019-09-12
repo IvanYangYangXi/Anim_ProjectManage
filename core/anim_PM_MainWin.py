@@ -136,8 +136,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if reply:
                 for i in range(selectRowCount):
                     # os.removedirs(path)    # 递归删除文件夹 (i, o) in (currentItems, rowIndexes)
-                    self.model_Proj_Task.removeRows(
-                        currentItems[i].row(), 1, self.model_Proj_Task.parent(rowIndexes[i]))
+                    self.model_Proj_Task.removeRow(
+                        currentItems[i].row(), self.model_Proj_Task.parent(rowIndexes[i]), currentItems[i].datas[0])
 
     def closeEvent(self, event):
         '''

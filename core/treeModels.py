@@ -255,7 +255,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position +
                              rows - 1)  # index, first, last
-        # isSuccess = False
+        isSuccess = False
         for i in range(rows):
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
@@ -270,7 +270,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
         parentItem = self.getItem(parent)
         self.beginRemoveRows(parent, position, position + rows - 1)
-
+        isSuccess = False
         for i in range(rows):
             isSuccess = parentItem.removeChild(position)
 
@@ -294,13 +294,25 @@ class TreeModel_Proj_Task(TreeModel):
         if data == None:
             data = configure.get_DB_Struct('empty_taskInfo') # 从配置文件获取插入的空内容(list)
             data[0] = parentID
-        print(data)
+        # print(data)
         # 数据库插入项并获取其id
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
         data.insert(0, dbid)
         # print(data)
         item = BaseTreeItem(data)
         self.insertRows(position, 1, parent, [item])
+
+    # 删除多行数据（插入位置， 插入行数， 父项(默认父项为空项)）
+    def removeRow(self, position, parent=QtCore.QModelIndex(), dbid=None):
+
+        # parentItem = self.getItem(parent)
+        # parentID = parentItem._dbId
+        if dbid != None:
+            # 从数据库删除项
+            DB.deleteData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %(dbid))
+
+            self.removeRows(position, 1, parent)
+        
 
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):

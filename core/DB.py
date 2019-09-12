@@ -123,9 +123,8 @@ def insertManyData(projectPath, tableName, tableStruct, datas):
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
 
+
 # 插入列
-
-
 def insertColumn(projectPath, tableName, columnName, columnType):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     conn.text_factory = str
@@ -138,9 +137,8 @@ def insertColumn(projectPath, tableName, columnName, columnType):
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
 
+
 # 查询数据
-
-
 def findData(projectPath, tableName, theData, keys=''):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
@@ -157,9 +155,8 @@ def findData(projectPath, tableName, theData, keys=''):
     conn.close()  # 关闭与数据库的连接
     return student
 
+
 # 查询数据（返回列表）
-
-
 def findDatas(projectPath, tableName, theData, keys=''):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
@@ -176,9 +173,8 @@ def findDatas(projectPath, tableName, theData, keys=''):
     conn.close()  # 关闭与数据库的连接
     return students
 
+
 # 遍历数据（返回列表）
-
-
 def getDatas(projectPath, tableName, keys=''):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     cursor = conn.cursor()
@@ -194,9 +190,8 @@ def getDatas(projectPath, tableName, keys=''):
     conn.close()  # 关闭与数据库的连接
     return students
 
+
 # 删除数据
-
-
 def deleteData(projectPath, tableName, theData):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     try:
@@ -206,9 +201,8 @@ def deleteData(projectPath, tableName, theData):
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
 
+
 # 修改数据
-
-
 def updateData(projectPath, tableName, theData, newData):
     conn = sqlite3.connect(dbPath(projectPath))  # 连接数据库
     try:
@@ -219,9 +213,8 @@ def updateData(projectPath, tableName, theData, newData):
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
 
+
 # 重建所有表
-
-
 # def reCreateAll(projectPath):
     # CreateTable(projectPath, tableName, createTableStruct)
     # reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
