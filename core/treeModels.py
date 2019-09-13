@@ -107,24 +107,23 @@ class BaseTreeItem(TreeItem):
             parent.appendChild(self)
 
     def columnCount(self):
-        return len(self._itemData) - 3
+        return len(self._itemData) - 4
 
     def data(self, column):
         try:
-            return self._itemData[column + 3]
+            return self._itemData[column + 4]
         except IndexError:
             return None
 
     def setData(self, value, column):
-        self._itemData[column + 3] = value
+        self._itemData = list(self._itemData) # 将元组转换为列表
+        print(self._itemData)
+        self._itemData[column + 4] = value
 
         # 更新数据库数据
-        dbId = self._itemData[0]
-        dbKey = configure.get_DB_Struct('struct_taskInfo')[
-            self._itemData[column + 2]]
-        dbValue = self._itemData[column + 3]
+        dbKey = configure.get_DB_Struct('struct_taskInfo')[column + 3]
         DB.updateData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %
-                      (dbId), '%s=%s' % (dbKey, dbValue))
+                      (self._dbId), '%s="%s"' % (dbKey, value))
 
 
 # ----------------------------- TreeModel -------------------------------- #
@@ -303,17 +302,16 @@ class TreeModel_Proj_Task(TreeModel):
         self.insertRows(position, 1, parent, [item])
 
     # 删除多行数据（插入位置， 插入行数， 父项(默认父项为空项)）
-    def removeRow(self, position, parent=QtCore.QModelIndex(), dbid=None):
+    def removeRow(self, position, parent=QtCore.QModelIndex()):
 
-        # parentItem = self.getItem(parent)
+        parentItem = self.getItem(parent)
         # parentID = parentItem._dbId
-        if dbid != None:
-            # 从数据库删除项
-            DB.deleteData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %(dbid))
-
-            self.removeRows(position, 1, parent)
+        dbid = parentItem.child(position)._dbId # 获取要删除项的ID
+        # 从数据库删除项
+        DB.deleteData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %(dbid))
+        # 从树删除
+        self.removeRows(position, 1, parent)
         
-
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):
         # 删除现有子项
@@ -329,8 +327,9 @@ class TreeModel_Proj_Task(TreeModel):
 
         #  获取数据
         datas = parentItem.datas()
-        if datas[2] != '':
-            childrenID = datas[2].split(',') # 分割childrenID，转化为列表
+        # 添加子项
+        if datas[3] != '':
+            childrenID = datas[3].split(',') # 分割childrenID，转化为列表
             for i in childrenID:
                 if str.isdigit(i):  # 判断是否为正整数
                     BaseTreeItem(DB.findData(configure.getProjectPath(), 

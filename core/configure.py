@@ -204,6 +204,7 @@ def removeCollectionPath(path):
 db_Struct = {
     'create_taskInfo': [
         'parentID int',
+        'sort text',
         'childrenID text',
         'img text',
         'task NVARCHAR(100)',
@@ -219,6 +220,7 @@ db_Struct = {
     ],
     'struct_taskInfo': [
         'parentID',
+        'sort',
         'childrenID',
         'img',
         'task',
@@ -235,6 +237,7 @@ db_Struct = {
     'rootNode_taskInfo': [
         -1,
         -1,
+        '0',
         '',
         '',
         '任务',
@@ -250,6 +253,7 @@ db_Struct = {
     ],
     'empty_taskInfo': [
         -1,
+        '0',
         '',
         '',
         'taskName',

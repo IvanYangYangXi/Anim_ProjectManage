@@ -91,11 +91,11 @@ class MainWindow(QtWidgets.QMainWindow):
             currentItems = [currentItem]
             rowIndexes = [index]
             parentIndex = self.model_Proj_Task.parent(index)
-        elif selectRowCount == 0: # 选择0行
+        elif selectRowCount == 0: # 选择0行(父级为root项)
             currentItem = None
             currentItems = []
             parentIndex = QtCore.QModelIndex()
-        else: # 选择多行
+        else: # 选择多行(父级为空)
             currentItems = []
             rowIndexes = []
             for i in range(selectRowCount):
@@ -137,7 +137,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 for i in range(selectRowCount):
                     # os.removedirs(path)    # 递归删除文件夹 (i, o) in (currentItems, rowIndexes)
                     self.model_Proj_Task.removeRow(
-                        currentItems[i].row(), self.model_Proj_Task.parent(rowIndexes[i]), currentItems[i].datas[0])
+                        currentItems[i].row(), self.model_Proj_Task.parent(rowIndexes[i]))
 
     def closeEvent(self, event):
         '''
