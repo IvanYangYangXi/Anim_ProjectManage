@@ -127,8 +127,8 @@ class MainWindow(QtWidgets.QMainWindow):
             #     showErrorMsg('目录不存在')
         # 新建子项
         if action == itemNewChild:
-            for i in currentItems:
-                self.model_Proj_Task.insertRow(i.childCount(), i)
+            for i in range(selectRowCount):
+                self.model_Proj_Task.insertRow(currentItems[i].childCount(), rowIndexes[i])
         # 删除（包含所有子项和数据）
         if action == itemDel:
             reply = QtWidgets.QMessageBox.warning(

@@ -117,7 +117,7 @@ class BaseTreeItem(TreeItem):
 
     def setData(self, value, column):
         self._itemData = list(self._itemData) # 将元组转换为列表
-        print(self._itemData)
+        # print(self._itemData)
         self._itemData[column + 4] = value
 
         # 更新数据库数据
@@ -296,17 +296,39 @@ class TreeModel_Proj_Task(TreeModel):
         # print(data)
         # 数据库插入项并获取其id
         dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
-        data.insert(0, dbid)
+        
+        # 获取并更新父级 childrenID 数据
+        childrenID = self.getChildrenIdList(parent)
+        if parent != QtCore.QModelIndex():
+            childrenID.insert(position, dbid) # 插入id到childrenID
+            childrenIdStr = str(childrenID)[1:-1] # list转为文字并去掉首尾字符（[])
+            # 更新父级item 数据
+            parentItem._itemData[3] = childrenIdStr
+            # 更新父级数据库数据
+            DB.updateData(configure.getProjectPath(), 'table_taskInfo',  'id=%d' %(parentID), 'childrenID="%s"'%childrenIdStr)
+
+        data.insert(0, dbid) # 将ID添加到插入数据中
         # print(data)
         item = BaseTreeItem(data)
         self.insertRows(position, 1, parent, [item])
 
-    # 删除多行数据（插入位置， 插入行数， 父项(默认父项为空项)）
+    # 删除单行数据（插入位置， 父项(默认父项为空项)）
     def removeRow(self, position, parent=QtCore.QModelIndex()):
 
         parentItem = self.getItem(parent)
-        # parentID = parentItem._dbId
+        parentID = parentItem._dbId
         dbid = parentItem.child(position)._dbId # 获取要删除项的ID
+
+        # 获取并更新父级 childrenID 数据
+        childrenID = self.getChildrenIdList(parent)
+        if parent != QtCore.QModelIndex():
+            childrenID.remove(dbid) # 删除id 从childrenID
+            childrenIdStr = str(childrenID)[1:-1] # list转为文字并去掉首尾字符（[])
+            # 更新父级item 数据
+            parentItem._itemData[3] = childrenIdStr
+            # 更新父级数据库数据
+            DB.updateData(configure.getProjectPath(), 'table_taskInfo',  'id=%d' %(parentID), 'childrenID="%s"'%childrenIdStr)
+
         # 从数据库删除项
         DB.deleteData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %(dbid))
         # 从树删除
@@ -325,15 +347,31 @@ class TreeModel_Proj_Task(TreeModel):
                 print(itemdata)
                 BaseTreeItem(itemdata, parentItem) # 添加行
 
-        #  获取数据
-        datas = parentItem.datas()
+        childrenID = self.getChildrenIdList(parent)
         # 添加子项
-        if datas[3] != '':
-            childrenID = datas[3].split(',') # 分割childrenID，转化为列表
+        if childrenID != '':
             for i in childrenID:
-                if str.isdigit(i):  # 判断是否为正整数
-                    BaseTreeItem(DB.findData(configure.getProjectPath(), 
-                        'table_taskInfo', 'id=%s'%int(i)), parentItem) # 根据childrenID添加行
+                # if str.isdigit(i):  # 判断是否为正整数
+                BaseTreeItem(DB.findData(configure.getProjectPath(), 
+                    'table_taskInfo', 'id=%s'%i), parentItem) # 根据childrenID添加行
+
+    # 获取 childrenID ，并转化为数字列表
+    def getChildrenIdList(self, parent=QtCore.QModelIndex()):
+        if parent == QtCore.QModelIndex():
+            return ''
+        parentItem = self.getItem(parent)
+        # 获取数据
+        datas = parentItem.datas()
+        # 获取子项
+        if datas[3] != '':
+            childrenIdStr = datas[3].split(',') # 分割childrenID，转化为列表
+            childrenID = []
+            # 将文字列表转为数字列表
+            for i in childrenIdStr:
+                childrenID.append(int(i))
+            return childrenID
+        return ''
+
 
 
 # ----------------------------- Item class 部件 -------------------------------- #
