@@ -100,7 +100,7 @@ class BaseTreeItem(TreeItem):
 
         self._parentItem = parent
         self._childItems = []
-        self._itemData = data
+        self._itemData = list(data) # 将元组转换为列表
         self._dbId = self._itemData[0]
 
         if parent:
@@ -116,7 +116,7 @@ class BaseTreeItem(TreeItem):
             return None
 
     def setData(self, value, column):
-        self._itemData = list(self._itemData) # 将元组转换为列表
+        # self._itemData = list(self._itemData) # 将元组转换为列表
         # print(self._itemData)
         self._itemData[column + 4] = value
 
@@ -340,25 +340,34 @@ class TreeModel_Proj_Task(TreeModel):
         if self.rowCount(parent) > 0:
             self.removeRows(0, self.rowCount(parent), parent)
 
+        items = []
         parentItem = self.getItem(parent)
+        # 添加子项(父项为root项时)
         if parent==QtCore.QModelIndex():
             dbdatas = DB.findDatas(configure.getProjectPath(), 'table_taskInfo', 'parentID=-1')
             for itemdata in dbdatas:
-                print(itemdata)
-                BaseTreeItem(itemdata, parentItem) # 添加行
+                # print(itemdata)
+                items.append(BaseTreeItem(itemdata, parentItem))# 添加行
 
         childrenID = self.getChildrenIdList(parent)
-        # 添加子项
-        if childrenID != '':
+        # 添加子项(父项非root项时)
+        if childrenID != None:
             for i in childrenID:
                 # if str.isdigit(i):  # 判断是否为正整数
-                BaseTreeItem(DB.findData(configure.getProjectPath(), 
-                    'table_taskInfo', 'id=%s'%i), parentItem) # 根据childrenID添加行
+                dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%i)
+                itemdata = dbdatas
+                items.append(BaseTreeItem(itemdata, parentItem)) # 根据childrenID添加行
+        
+        # 添加二级子项
+        for item in items:
+            # self.updateChild(item)
+            pass
+
 
     # 获取 childrenID ，并转化为数字列表
     def getChildrenIdList(self, parent=QtCore.QModelIndex()):
         if parent == QtCore.QModelIndex():
-            return ''
+            return None
         parentItem = self.getItem(parent)
         # 获取数据
         datas = parentItem.datas()
@@ -370,7 +379,7 @@ class TreeModel_Proj_Task(TreeModel):
             for i in childrenIdStr:
                 childrenID.append(int(i))
             return childrenID
-        return ''
+        return []
 
 
 

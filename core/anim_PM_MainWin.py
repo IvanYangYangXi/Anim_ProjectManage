@@ -74,6 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
         rightMenu = QtWidgets.QMenu(self.ui.treeView_Proj_Task)
         itemNew = rightMenu.addAction('新建项')
         itemNewChild = rightMenu.addAction('新建子项')
+        itemInsert = rightMenu.addAction('插入项')
         itemWorkFlow = rightMenu.addAction('快速创建工作流')
         rightMenu.addSeparator()  # 分隔器
         itemRefresh = rightMenu.addAction('刷新')
@@ -107,20 +108,22 @@ class MainWindow(QtWidgets.QMainWindow):
             parentIndex = None
 
         # 禁用菜单项
-        if parentIndex == None:
+        if parentIndex == None: # 父项不存在时（选择多行）
             itemNew.setEnabled(False)
             itemNewChild.setEnabled(False)
+            itemInsert.setEnabled(False)
             itemCollection.setEnabled(False)
-        if currentItem == None:
+        if currentItem == None: # 无选择项时（选择0行(父级为root项)）
             itemNewChild.setEnabled(False)
             itemOpenDir.setEnabled(False)
+            itemInsert.setEnabled(False)
             itemDel.setEnabled(False)
 
             # item1.triggered.connect()
         action = rightMenu.exec_(QtGui.QCursor.pos())  # 在鼠标位置显示
 
         # 将动作与处理函数相关联
-        # 新建项
+        # 新建项(在末端添加)
         if action == itemNew:
             self.model_Proj_Task.insertRow(self.model_Proj_Task.rowCount(parentIndex), parentIndex)
             # else:
@@ -129,6 +132,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if action == itemNewChild:
             for i in range(selectRowCount):
                 self.model_Proj_Task.insertRow(currentItems[i].childCount(), rowIndexes[i])
+        # 插入项
+        if action == itemInsert:
+            self.model_Proj_Task.insertRow(currentItem.row(), parentIndex)
         # 删除（包含所有子项和数据）
         if action == itemDel:
             reply = QtWidgets.QMessageBox.warning(
