@@ -347,8 +347,8 @@
                 </item>
                 <item>
                  <widget class="QTreeView" name="treeView_Proj_Task">
-                  <property name="selectionMode">
-                   <enum>QAbstractItemView::ContiguousSelection</enum>
+                  <property name="rootIsDecorated">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -460,7 +460,7 @@
      <x>0</x>
      <y>0</y>
      <width>824</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

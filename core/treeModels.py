@@ -360,8 +360,8 @@ class TreeModel_Proj_Task(TreeModel):
         
         # 添加二级子项
         for item in items:
-            # self.updateChild(item)
-            pass
+            itemIndex =  self.index(item.row(), 0, parent)
+            self.updateChild(itemIndex)
 
 
     # 获取 childrenID ，并转化为数字列表
