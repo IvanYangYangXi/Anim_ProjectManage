@@ -271,7 +271,7 @@ if __name__ == '__main__':
     # CreateTable('table_taskInfo', create_taskInfo)
     reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
-    insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '0', '', 'taskName', '', 'None', 'None', 'executive', 'reporter', u'描述', '', '', '', 'medium'))
+    insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '0', '', 'taskName', '', 'task', 'None', 'executive', 'reporter', u'描述', '', '', '', 'medium'))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')
     # print(findData('list', "listName='g11'")[0])

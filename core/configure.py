@@ -257,7 +257,7 @@ db_Struct = {
         '',
         'taskName',
         '',
-        'None',
+        'task',
         'None',
         'executive',
         'reporter',

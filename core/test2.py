@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-a = '0, 1, 2, 3'
-b = a.split(',')
-c = []
-for i in b:
-    # if str.isdigit(i):  # 判断是否为正整数
-    c.append(int(i))
-print('"%s"'%str(c)[1:-1])
+
+
+str1='\u5927\u592b'
+str2 = str1.encode('utf-8').decode('unicode-escape')
+
+print(str2)

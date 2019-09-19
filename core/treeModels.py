@@ -164,17 +164,23 @@ class TreeModel(QtCore.QAbstractItemModel):
         item = self.getItem(index)
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            # if index.column() == 1:
-            return item.data(index.column())
-            # elif index.column() == 2:
-            #     return item.typeInfo()
+            if index.column() == 1:
+                return 'aaa'
+            else:
+                return item.data(index.column())
 
-        # if role == QtCore.Qt.DecorationRole:
-        #     if index.column() == 0:
-        #         typeInfo = item.typeInfo()
-
-        #         if typeInfo == "Camera":
-        #             return QtGui.QIcon(QtGui.QPixmap('./UI/qt-logo.png'))
+        # 设置图标 state
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0:
+                print(item.data(2))
+                print("任务")
+                if item.data(2).encode("utf-8") == "任务":
+                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_blue.png'))
+                elif item.data(2) == "Story":
+                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_green.png'))
+                else:
+                    return QtGui.QIcon('./UI/point_gray.png') 
+                
 
     # 返回一组标志
     def flags(self, index):
@@ -396,8 +402,8 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     def createEditor(self, parent, option, index):
         editor = QtWidgets.QComboBox(parent)
         editor.addItem('项目')
-        editor.addItem('Story')
         editor.addItem('Epic')
+        editor.addItem('Story')
         editor.addItem('任务')
         editor.addItem('里程碑')
         editor.addItem('信息')
@@ -421,9 +427,9 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
         comboId = 3
         if data == '项目':
             comboId = 0
-        elif data == 'Story':
-            comboId = 1
         elif data == 'Epic':
+            comboId = 1
+        elif data == 'Story':
             comboId = 2
         elif data == '任务':
             comboId = 3
