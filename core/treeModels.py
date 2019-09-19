@@ -285,7 +285,7 @@ class TreeModel_Proj_Task(TreeModel):
         # 设置初始项的item
         self._rootItem = item
         self.updateChild()
-
+    
     # 插入单行数据
     def insertRow(self, position, parent=QtCore.QModelIndex(), data=None):
         parentItem = self.getItem(parent)

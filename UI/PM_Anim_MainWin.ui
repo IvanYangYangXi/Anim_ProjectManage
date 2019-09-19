@@ -347,6 +347,9 @@
                 </item>
                 <item>
                  <widget class="QTreeView" name="treeView_Proj_Task">
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::ExtendedSelection</enum>
+                  </property>
                   <property name="rootIsDecorated">
                    <bool>true</bool>
                   </property>
