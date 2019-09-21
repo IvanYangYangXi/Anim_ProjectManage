@@ -347,10 +347,31 @@
                 </item>
                 <item>
                  <widget class="QTreeView" name="treeView_Proj_Task">
+                  <property name="editTriggers">
+                   <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+                  </property>
                   <property name="selectionMode">
                    <enum>QAbstractItemView::ExtendedSelection</enum>
                   </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>80</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                  <property name="indentation">
+                   <number>15</number>
+                  </property>
                   <property name="rootIsDecorated">
+                   <bool>true</bool>
+                  </property>
+                  <property name="itemsExpandable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="animated">
                    <bool>true</bool>
                   </property>
                  </widget>

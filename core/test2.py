@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+a = 'aa中文'
+b = a.decode("utf-8").encode("utf-8")
+print(b)
 
-
-str1='\u5927\u592b'
-str2 = str1.encode('utf-8').decode('unicode-escape')
-
-print(str2)
+aa = ['cc','dd','ee']
+bb = aa.index('dd')
+print(bb)

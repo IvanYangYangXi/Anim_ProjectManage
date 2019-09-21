@@ -261,12 +261,14 @@ db_Struct = {
         'None',
         'executive',
         'reporter',
-        'description',
+        'description描述',
         '',
         '',
         '',
         'medium'
     ],
+    'TaskType': ['项目', 'Epic', '剧集', 'Story', '场次', '任务', '里程碑', '信息', '文件夹', '功能', '错误', '改进', '重构', '研究', '测试', '文件'],
+    'TaskState': ['待办', '进行中', '完成']
 }
 
 # projectConfigPath() = getProjectPath() + '/config/projectConfig.ini'
@@ -339,10 +341,10 @@ def get_DB_Struct_ToString(variable):
         struct = ''
         for i in data[variable]:
             if type(i)==int:
-                i = str(i)
+                i = str(i).encode("utf-8")
             struct = struct + i + ', '
         struct = struct[:-2]  # 去掉最后一个(多个)字符
-        print(struct)
+        # print(struct)
         return struct
     except Exception as e:
         print('ProjectConfigure get_DB_Struct_ToString error:%s' % e)

@@ -7,7 +7,7 @@
 # @Date   : 7/10/2019, 2:58:31 PM
 
 
-import sys
+import sys, os
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import DB
 import configure
@@ -164,22 +164,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         item = self.getItem(index)
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
-            if index.column() == 1:
-                return 'aaa'
-            else:
-                return item.data(index.column())
-
-        # 设置图标 state
-        if role == QtCore.Qt.DecorationRole:
-            if index.column() == 0:
-                print(item.data(2))
-                print("任务")
-                if item.data(2).encode("utf-8") == "任务":
-                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_blue.png'))
-                elif item.data(2) == "Story":
-                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_green.png'))
-                else:
-                    return QtGui.QIcon('./UI/point_gray.png') 
+            return item.data(index.column())
                 
 
     # 返回一组标志
@@ -292,6 +277,53 @@ class TreeModel_Proj_Task(TreeModel):
         self._rootItem = item
         self.updateChild()
     
+        # 返回索引项目存储的数据。
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        # item = index.internalPointer()
+        item = self.getItem(index)
+        imgPath = item.data(3) # 获取缩略图路径
+
+        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            if index.column() == 1: # 缩略图列
+                if imgPath == None or imgPath == 'None':
+                    return 'None'
+                else:
+                    return ''
+            else:
+                return item.data(index.column())
+
+        # 设置图标 state
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0: # 设置图标
+                print(item.data(2))
+                print("任务")
+                if item.data(2).encode("utf-8") == "任务":
+                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_blue.png'))
+                elif item.data(2).encode("utf-8") == "Story":
+                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_green.png'))
+                else:
+                    return QtGui.QIcon('./UI/point_gray.png') 
+            if index.column() == 1: # 缩略图列
+                if os.path.isfile(imgPath): # 判断文件
+                    if imgPath.endswith(('.jpg', '.jpge', '.png', '.tga', '.gif')):
+                        return QtGui.QIcon(QtGui.QPixmap(imgPath))
+                
+
+    # 返回一组标志
+    def flags(self, index):
+
+        # 复选框
+        # if index.column() == 1:
+        #     return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable
+
+        # 基类实现返回一组标志，标志启用item（ItemIsEnabled），并允许它被选中（ItemIsSelectable）。
+        if index.column() == 1:
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+
     # 插入单行数据
     def insertRow(self, position, parent=QtCore.QModelIndex(), data=None):
         parentItem = self.getItem(parent)
@@ -400,16 +432,13 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
+
+        taskType = configure.get_DB_Struct('TaskType')
+
         editor = QtWidgets.QComboBox(parent)
-        editor.addItem('项目')
-        editor.addItem('Epic')
-        editor.addItem('Story')
-        editor.addItem('任务')
-        editor.addItem('里程碑')
-        editor.addItem('信息')
-        editor.addItem('文件夹')
+        # editor.addItem('项目')
         # 多个添加条目
-        editor.addItems(['功能', '错误', '改进', '重构', '研究', '测试', '文件'])
+        editor.addItems(taskType)
         # 当下拉索引发生改变时发射信号触发绑定的事件
         editor.currentIndexChanged.connect(
             lambda: self.selectionchange(editor))
@@ -424,35 +453,11 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, editor, index):
         data = index.model().data(index, QtCore.Qt.EditRole)
-        comboId = 3
-        if data == '项目':
-            comboId = 0
-        elif data == 'Epic':
-            comboId = 1
-        elif data == 'Story':
-            comboId = 2
-        elif data == '任务':
-            comboId = 3
-        elif data == '里程碑':
-            comboId = 4
-        elif data == '信息':
-            comboId = 5
-        elif data == '文件夹':
-            comboId = 6
-        elif data == '功能':
-            comboId = 7
-        elif data == '错误':
-            comboId = 8
-        elif data == '改进':
-            comboId = 9
-        elif data == '重构':
-            comboId = 10
-        elif data == '研究':
-            comboId = 11
-        elif data == '测试':
-            comboId = 12
-        elif data == '文件':
-            comboId = 13
+        comboId = 5
+        taskType = configure.get_DB_Struct('TaskType')
+
+        if data in taskType:
+            comboId = taskType.index(data)
 
         # 避免不是由用户引起的信号,因此我们使用blockSignals.
         editor.blockSignals(True)
@@ -473,10 +478,11 @@ class ComboBoxDelegate_TaskType(QtWidgets.QItemDelegate):
 class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
+
+        TaskState = configure.get_DB_Struct('TaskState')
+
         editor = QtWidgets.QComboBox(parent)
-        editor.addItem('待办')
-        editor.addItem('进行中')
-        editor.addItem('完成')
+        editor.addItems(TaskState)
         # 当下拉索引发生改变时发射信号触发绑定的事件
         editor.currentIndexChanged.connect(
             lambda: self.selectionchange(editor))
@@ -486,13 +492,12 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, editor, index):
         data = index.model().data(index, QtCore.Qt.EditRole)
+        TaskState = configure.get_DB_Struct('TaskState')
+
         comboId = 0
-        if data == '待办':
-            comboId = 0
-        elif data == '进行中':
-            comboId = 1
-        elif data == '完成':
-            comboId = 2
+
+        if data in TaskState:
+            comboId = TaskState.index(data)
 
         # 避免不是由用户引起的信号,因此我们使用blockSignals.
         editor.blockSignals(True)
