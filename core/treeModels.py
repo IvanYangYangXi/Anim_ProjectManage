@@ -298,8 +298,8 @@ class TreeModel_Proj_Task(TreeModel):
         # 设置图标 state
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0: # 设置图标
-                print(item.data(2))
-                print("任务")
+                # print(item.data(2))
+                # print("任务")
                 if item.data(2).encode("utf-8") == "任务":
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_blue.png'))
                 elif item.data(2).encode("utf-8") == "Story":
