@@ -8,6 +8,7 @@
 
 
 import sys, os
+import shutil
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import DB
 import configure
@@ -350,6 +351,10 @@ class TreeModel_Proj_Task(TreeModel):
         item = BaseTreeItem(data)
         self.insertRows(position, 1, parent, [item])
 
+        filePath = configure.getProjectPath() + '/data/%s'%dbid
+        if not os.path.exists(filePath):
+            os.makedirs(filePath) # 创建路径
+
     # 删除单行数据（插入位置， 父项(默认父项为空项)）
     def removeRow(self, position, parent=QtCore.QModelIndex()):
 
@@ -371,6 +376,9 @@ class TreeModel_Proj_Task(TreeModel):
         DB.deleteData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %(dbid))
         # 从树删除
         self.removeRows(position, 1, parent)
+
+        filePath = configure.getProjectPath() + '/data/%s'%dbid
+        shutil.rmtree(filePath, True)    #递归删除文件夹,True参数表示ignore_errors(忽略错误)。
         
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):
