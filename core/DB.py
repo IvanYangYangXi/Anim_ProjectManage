@@ -101,7 +101,7 @@ def insertData(projectPath, tableName, tableStruct, data):
     try:
         cursor.execute("insert into " + tableName + "(" + tableStruct +
                      ")" + "VALUES (?%s)" % (',?'*(len(re.findall(r',', tableStruct)))), data)  # 执行操作
-        print(cursor.lastrowid)
+        # print(cursor.lastrowid)
     except Exception as e:
         print(e)
 

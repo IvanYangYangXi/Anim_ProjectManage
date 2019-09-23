@@ -307,7 +307,7 @@ def createProjectConfig():
         os.makedirs(getProjectPath() + '/config')  # 创建路径
     if not os.path.exists(getProjectPath() + '/config/projectConfig.ini'):  # 判断文件是否存在
         # 创建配置文件
-        print(getProjectPath())
+        # print(getProjectPath())
         f = open(getProjectPath() + '/config/projectConfig.ini', 'w')
         f.write(json.dumps(db_Struct))
         f.close()
@@ -337,7 +337,7 @@ def get_DB_Struct_ToString(variable):
             if db_Struct.has_key(variable):
                 data[variable] = db_Struct[variable]  # 添加
                 updateProjectConfig(data)  # 更新项目配置文件
-        print(data[variable])
+        # print(data[variable])
         struct = ''
         for i in data[variable]:
             if type(i)==int:

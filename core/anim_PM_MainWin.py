@@ -86,7 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         indexes = self.ui.treeView_Proj_Task.selectedIndexes()  # 获取所有选择单项
         index = self.ui.treeView_Proj_Task.selectionModel().currentIndex()  # 选择的项
         selectRowCount = len(indexes)/self.model_Proj_Task.columnCount(index) # 选择的行数
-        print(selectRowCount)
+        # print(selectRowCount)
         if selectRowCount == 1: # 选择一行
             currentItem = self.model_Proj_Task.getItem(index)
             currentItems = [currentItem]
@@ -125,16 +125,19 @@ class MainWindow(QtWidgets.QMainWindow):
         # 将动作与处理函数相关联
         # 新建项(在末端添加)
         if action == itemNew:
-            self.model_Proj_Task.insertRow(self.model_Proj_Task.rowCount(parentIndex), parentIndex)
+            newItemIndex = self.model_Proj_Task.insertRow(self.model_Proj_Task.rowCount(parentIndex), parentIndex)
+            self.ui.treeView_Proj_Task.setCurrentIndex(newItemIndex)
             # else:
             #     showErrorMsg('目录不存在')
         # 新建子项
         if action == itemNewChild:
             for i in range(selectRowCount):
-                self.model_Proj_Task.insertRow(currentItems[i].childCount(), rowIndexes[i])
+                newItemIndex = self.model_Proj_Task.insertRow(currentItems[i].childCount(), rowIndexes[i])
+                self.ui.treeView_Proj_Task.setCurrentIndex(newItemIndex)
         # 插入项
         if action == itemInsert:
-            self.model_Proj_Task.insertRow(currentItem.row(), parentIndex)
+            newItemIndex = self.model_Proj_Task.insertRow(currentItem.row(), parentIndex)
+            self.ui.treeView_Proj_Task.setCurrentIndex(newItemIndex)
         # 删除（包含所有子项和数据）
         if action == itemDel:
             reply = QtWidgets.QMessageBox.warning(

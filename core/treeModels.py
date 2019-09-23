@@ -250,7 +250,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         for i in range(rows):
             childItem = items[i]
             isSuccess = parentItem.insertChild(position, childItem)
-            print(childItem.datas())
+            # print(childItem.datas())
 
         self.endInsertRows()
         
@@ -306,7 +306,7 @@ class TreeModel_Proj_Task(TreeModel):
                 elif item.data(2).encode("utf-8") == "Story":
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_green.png'))
                 else:
-                    return QtGui.QIcon('./UI/point_gray.png') 
+                    return QtGui.QIcon(QtGui.QPixmap('./UI/point_gray.png')) 
             if index.column() == 1: # 缩略图列
                 if os.path.isfile(imgPath): # 判断文件
                     if imgPath.endswith(('.jpg', '.jpge', '.png', '.tga', '.gif')):
@@ -354,6 +354,8 @@ class TreeModel_Proj_Task(TreeModel):
         filePath = configure.getProjectPath() + '/data/%s'%dbid
         if not os.path.exists(filePath):
             os.makedirs(filePath) # 创建路径
+
+        return self.index(position, 0, parent) # 返回插入项的index
 
     # 删除单行数据（插入位置， 父项(默认父项为空项)）
     def removeRow(self, position, parent=QtCore.QModelIndex()):
