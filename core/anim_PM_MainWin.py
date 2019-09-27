@@ -71,14 +71,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDetailPageInfo(self, index):
         currentItem = self.model_Proj_Task.getItem(index) 
 
-        # QtWidgets.QLineEdit.setText
+        # taskName
         self.detailPage.ui.lineEdit_TaskName.setText(currentItem.datas()[4])
 
 
     # treeView_Proj_Task item 点击事件
     def taskTreeItemClicked(self, index):
-        currentItem = self.model_Proj_Task.getItem(index) 
-
+        # 获取当前项的首列 index
         newIndex = self.model_Proj_Task.getFirstColumnIndex(index)
         self.model_Proj_Task.updateChild(newIndex) # 更新子项
 
@@ -90,7 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # treeView_Proj_Task item 双击事件
     def taskTreeItemDoubleClicked(self, index):
-        currentItem = self.model_Proj_Task.getItem(index) 
         # QtWidgets.QBoxLayout.itemAt(1).Widget().close() / .show()
         # 添加 详细信息面板UI 到 horizontalLayout_Centralwidget
         self.ui.horizontalLayout_Centralwidget.addWidget(self.detailPage)
