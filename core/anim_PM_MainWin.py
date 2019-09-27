@@ -79,12 +79,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def taskTreeItemClicked(self, index):
         currentItem = self.model_Proj_Task.getItem(index) 
 
+        newIndex = self.model_Proj_Task.getFirstColumnIndex(index)
+        self.model_Proj_Task.updateChild(newIndex) # 更新子项
+
         # 展开子项
-        # if currentItem.childCount() > 0:
-        self.ui.treeView_Proj_Task.expand(index)
-
-        self.model_Proj_Task.updateChild(index) # 更新子项
-
+        if self.model_Proj_Task.rowCount(newIndex) > 0:
+            self.ui.treeView_Proj_Task.expand(newIndex)
         # 设置 详细信息面板 内容
         self.setDetailPageInfo(index)
 

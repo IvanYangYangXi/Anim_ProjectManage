@@ -146,8 +146,8 @@ class TreeModel(QtCore.QAbstractItemModel):
     # 设置行数
     def rowCount(self, parent):
         # 当父项有效时，rowCount（）应返回0。
-        # if parent.column() > 0:
-        #     return 0
+        if parent.column() > 0:
+            return 0
     
         if not parent.isValid():
             parentItem = self._rootItem
@@ -260,23 +260,23 @@ class TreeModel(QtCore.QAbstractItemModel):
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
         if not parent.isValid():
             return False
-        print(rows)
         if rows <= 0:
             return False
-        print('aaa')
         parentItem = self.getItem(parent)
-        print('bbb')
         self.beginRemoveRows(parent, position, position + rows - 1)
         isSuccess = False
         for i in range(rows):
-            print('i:'+str(i))
             isSuccess = parentItem.removeChild(position)
-            print('i:'+str(i))
 
         self.endRemoveRows()
-        print('ccc')
 
         return isSuccess
+
+    # 获取当前项的首列 index
+    def getFirstColumnIndex(self, index):
+        currentItem = self.getItem(index)
+        currentIndex = self.index(currentItem.row(), 0, index.parent())
+        return currentIndex
 
 
 class TreeModel_Proj_Task(TreeModel):
@@ -395,13 +395,9 @@ class TreeModel_Proj_Task(TreeModel):
     # 更新子项
     def updateChild(self, parent=QtCore.QModelIndex()):
         parentItem = self.getItem(parent)
-        print(parentItem.childCount())
-        print(self.rowCount(parent))
         # 删除现有子项
         if self.rowCount(parent) > 0:
-            print('-aaa')
             self.removeRows(0, self.rowCount(parent), parent)
-        print('aa')
         items = []
         # 添加子项(父项为root项时)
         if parent==QtCore.QModelIndex():
@@ -409,7 +405,6 @@ class TreeModel_Proj_Task(TreeModel):
             for itemdata in dbdatas:
                 # print(itemdata)
                 items.append(BaseTreeItem(itemdata, parentItem))# 添加行
-        print('bb')
         childrenID = self.getChildrenIdList(parent) # 获取 childrenID 列表
         # 添加子项(父项非root项时)
         if childrenID != None:
@@ -418,7 +413,6 @@ class TreeModel_Proj_Task(TreeModel):
                 dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%i)
                 itemdata = dbdatas
                 items.append(BaseTreeItem(itemdata, parentItem)) # 根据childrenID添加行
-        print('cc')
         # 添加二级子项
         for item in items:
             itemIndex =  self.index(item.row(), 0, parent)
@@ -432,7 +426,6 @@ class TreeModel_Proj_Task(TreeModel):
                     dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%i)
                     itemdata = dbdatas
                     BaseTreeItem(itemdata, item) # 根据childrenID添加行
-        print('dd')
 
     # 获取 childrenID ，并转化为数字列表
     def getChildrenIdList(self, parent=QtCore.QModelIndex()):
