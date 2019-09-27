@@ -13,7 +13,7 @@ import re
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 # from ctypes.wintypes import LONG, HWND, UINT, WPARAM, LPARAM, FILETIME
 import shutil  # 文件夹操作
-import listItems
+import loadWidgets
 import configure
 from treeModels import *
 
@@ -31,10 +31,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # ---------------------------- 概览面板 ---------------------------- #
         self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
         self.item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
-        self.itemWidget = listItems.ListItem_General_Proj()  # itemWidget
-        self.ui.listWidget__General_Proj.addItem(self.item)  # 添加item
-        self.ui.listWidget__General_Proj.setItemWidget(
+        self.itemWidget = loadWidgets.ListItem_General_Proj()  # itemWidget
+        self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
+        self.ui.listWidget_General_Proj.setItemWidget(
             self.item, self.itemWidget)  # 为item设置widget
+        self.detailPage = loadWidgets.DetailPage()  # Widget- DetailPage 详细信息面板
 
         # ---------------------------- 项目面板 ---------------------------- #
         ## ------------------ 任务面板 ------------------ #
@@ -48,6 +49,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置 Model
         self.model_Proj_Task = TreeModel_Proj_Task(self.rootNode_Proj_Task)
         self.ui.treeView_Proj_Task.setModel(self.model_Proj_Task)
+
+        # treeView_Proj_Task item 点击事件
+        self.ui.treeView_Proj_Task.clicked.connect(self.taskTreeItemClicked)
+        # treeView_Proj_Task item 双击事件
+        self.ui.treeView_Proj_Task.doubleClicked.connect(self.taskTreeItemDoubleClicked)
         # 右键菜单（treeView_Proj_Task）
         self.createRightMenu_treeView_Proj_Task()
 
@@ -59,6 +65,38 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TaskDeadline = DateEditDelegate_TaskDeadline()
         self.ui.treeView_Proj_Task.setItemDelegateForColumn(
             6, self.TaskDeadline)
+
+
+    # 设置 详细信息面板 内容
+    def setDetailPageInfo(self, index):
+        currentItem = self.model_Proj_Task.getItem(index) 
+
+        # QtWidgets.QLineEdit.setText
+        self.detailPage.ui.lineEdit_TaskName.setText(currentItem.datas()[4])
+
+
+    # treeView_Proj_Task item 点击事件
+    def taskTreeItemClicked(self, index):
+        currentItem = self.model_Proj_Task.getItem(index) 
+
+        # 展开子项
+        # if currentItem.childCount() > 0:
+        self.ui.treeView_Proj_Task.expand(index)
+
+        self.model_Proj_Task.updateChild(index) # 更新子项
+
+        # 设置 详细信息面板 内容
+        self.setDetailPageInfo(index)
+
+    # treeView_Proj_Task item 双击事件
+    def taskTreeItemDoubleClicked(self, index):
+        currentItem = self.model_Proj_Task.getItem(index) 
+        # QtWidgets.QBoxLayout.itemAt(1).Widget().close() / .show()
+        # 添加 详细信息面板UI 到 horizontalLayout_Centralwidget
+        self.ui.horizontalLayout_Centralwidget.addWidget(self.detailPage)
+
+        # 设置 详细信息面板 内容
+        self.setDetailPageInfo(index)
 
     # 创建右键菜单(treeView_Proj_Task)
     def createRightMenu_treeView_Proj_Task(self):
@@ -112,6 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
             itemNew.setEnabled(False)
             itemNewChild.setEnabled(False)
             itemInsert.setEnabled(False)
+            itemRefresh.setEnabled(False)
             itemCollection.setEnabled(False)
         if currentItem == None: # 无选择项时（选择0行(父级为root项)）
             itemNewChild.setEnabled(False)
@@ -138,6 +177,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if action == itemInsert:
             newItemIndex = self.model_Proj_Task.insertRow(currentItem.row(), parentIndex)
             self.ui.treeView_Proj_Task.setCurrentIndex(newItemIndex)
+        # 刷新
+        if action == itemRefresh:
+            self.model_Proj_Task.updateChild(parentIndex) # 更新子项
         # 删除（包含所有子项和数据）
         if action == itemDel:
             reply = QtWidgets.QMessageBox.warning(
@@ -195,8 +237,9 @@ def main():
     # 启动窗口
     global win
     app = QtWidgets.QApplication(sys.argv)
-    win = MainWindow(os.path.dirname(os.path.dirname(__file__)) +
-                     '/UI/PM_Anim_MainWin.ui')
+    # win = MainWindow(os.path.dirname(os.path.dirname(__file__)) +
+    #                  '/UI/PM_Anim_MainWin.ui')
+    win = MainWindow('./UI/PM_Anim_MainWin.ui')
     win.show()
 
     sys.exit(app.exec_())
