@@ -72,7 +72,19 @@ class MainWindow(QtWidgets.QMainWindow):
         currentItem = self.model_Proj_Task.getItem(index) 
 
         # taskName
-        self.detailPage.ui.lineEdit_TaskName.setText(currentItem.datas()[4])
+        self.detailPage.setTaskName(currentItem.datas()[4])
+        # type
+        self.detailPage.setTaskType(currentItem.datas()[6])
+        # state
+        self.detailPage.setTaskState(currentItem.datas()[7])
+        # treePath
+        treePath = [currentItem.datas()[4]]
+        parentItem = currentItem.parent()
+        while parentItem != None:
+            treePath.insert(0, parentItem.datas()[4])
+            parentItem = parentItem.parent()
+        treePath = treePath[1:]
+        self.detailPage.setTreePath(treePath)
 
 
     # treeView_Proj_Task item 点击事件

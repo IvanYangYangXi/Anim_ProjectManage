@@ -51,6 +51,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
         <widget class="QLineEdit" name="lineEdit_TaskName">
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
+         </property>
          <property name="inputMask">
           <string/>
          </property>
@@ -59,6 +62,9 @@
          </property>
          <property name="placeholderText">
           <string>taskName</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -132,6 +138,9 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboBox_TaskState"/>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
@@ -139,15 +148,19 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_Detail_Status"/>
-       </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_Detail_TreePath">
-         <property name="text">
-          <string>TextLabel</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_Detail_TreePath">
+         <property name="spacing">
+          <number>2</number>
          </property>
-        </widget>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
