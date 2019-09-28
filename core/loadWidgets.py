@@ -145,3 +145,16 @@ class DetailPage(QtWidgets.QWidget):
             lable1 = QtWidgets.QLabel()
             lable1.setText('/')
             self.HL_Detail_TreePath.addWidget(lable1)
+
+    # ---------------- label_Detail_Img ----------------
+
+        pix = QPixmap('sexy.jpg')
+        lb1 = QLabel(self)
+        lb1.setGeometry(0,0,300,200)
+        lb1.setStyleSheet("border: 2px solid red")
+        lb1.setPixmap(pix)
+        lb2 = QLabel(self)
+        lb2.setGeometry(0,250,300,200)
+        lb2.setPixmap(pix)
+        lb2.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
+        lb2.setScaledContents(True) # 缩放像素图以填充可用空间
