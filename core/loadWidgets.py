@@ -8,7 +8,7 @@
 
 
 import sys
-from PyQt5 import QtWidgets, uic, Qt
+from PyQt5 import QtWidgets, uic, Qt, QtCore
 import sip
 import configure
 
@@ -158,3 +158,41 @@ class DetailPage(QtWidgets.QWidget):
         lb2.setPixmap(pix)
         lb2.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
         lb2.setScaledContents(True) # 缩放像素图以填充可用空间
+
+
+
+# 自定义 label
+class ClickLabel(QtWidgets.QLabel):
+
+    pressedSignal=QtCore.pyqtSignal()
+
+    def __init__(self,parent = None):
+        super(interactionLabel,self).__init__(parent)
+        self.MyLabelPressed=0
+
+
+    def mouseDoubleClickEvent(self, Event):
+        print('label mouseDoubleClickEvent')
+
+
+    def mousePressEvent(self,event):
+        #print 'mousePressEvent'
+        self.MyLabelPressed=1
+ 
+    def mouseReleaseEvent(self,event):
+        #print 'mouseReleaseEvent'
+        if self.MyLabelPressed==1:
+            self.pressedSignal.emit()
+            self.MyLabelPressed=0
+            # QtGui.QLabel.mouseReleaseEvent(self, event)
+
+    label = ClickLabel()
+            pixmap = QtGui.QPixmap(image)
+            pixmap = pixmap.scaled(250, 250)
+            label.setPixmap(pixmap)
+            label.setAlignment(QtCore.Qt.AlignHCenter)
+            label.clicked.connect(self.on_product_clicked)
+            self.vbox_choice_img.addWidget(label)
+
+    def on_product_clicked(self):
+        label = self.sender()
