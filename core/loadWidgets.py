@@ -10,6 +10,8 @@
 import sys, os
 from PyQt5 import QtWidgets, uic, Qt, QtCore, QtGui
 import sip
+import platform
+import subprocess
 import configure
 
 
@@ -64,7 +66,7 @@ class DetailPage(QtWidgets.QWidget):
         self.label_TypeIcon = self.ui.label_TypeIcon
 
         # Detail_Img
-        QtWidgets.QHBoxLayout.replaceWidget()
+        # QtWidgets.QHBoxLayout.replaceWidget()
         self.label_Detail_Img = ClickLabel()
         self.label_Detail_Img.setGeometry(1, 1, 135, 85)
         self.label_Detail_Img.setMinimumSize(135, 85)
@@ -178,8 +180,8 @@ class DetailPage(QtWidgets.QWidget):
             painter.setBrush(QtGui.QColor('#61bd4f'))
         else:
             painter.setBrush(QtGui.QColor('#355263'))
-        painter.drawEllipse(3, 3, 20, 20) # 绘制圆
-        # painter.drawRoundedRect(3, 3, 20, 20, 10, 10) # 圆角矩形
+        # painter.drawEllipse(0, 0, 48, 48) # 绘制圆
+        painter.drawRoundedRect(0, 0, 47, 47, 15, 15) # 圆角矩形
         painter.end()
         
         label = self.label_TypeIcon
@@ -202,7 +204,14 @@ class DetailPage(QtWidgets.QWidget):
     def on_Detail_Img_clicked(self, imgPath):
         # label = self.sender()
         # 打开文件(可打开外部程序)
-        os.startfile(imgPath)
+        sysstr = platform.system()
+        if(sysstr =="Windows"):
+            os.startfile(imgPath)
+        elif(sysstr == "Linux"):
+            subprocess.call(["xdg-open",imgPath])
+        else:
+            subprocess.call(["open", imgPath])
+        
 
     # ---------------- FL_Info ----------------
     def setFL_Info(self, data=[], dataAdd=[]):
@@ -220,7 +229,7 @@ class DetailPage(QtWidgets.QWidget):
 # 自定义 Click label
 class ClickLabel(QtWidgets.QLabel):
 
-    pressedSignal=QtCore.pyqtSignal()
+    clicked = QtCore.pyqtSignal()
 
     def __init__(self,parent = None):
         super(ClickLabel,self).__init__(parent)
@@ -233,11 +242,12 @@ class ClickLabel(QtWidgets.QLabel):
 
     def mousePressEvent(self,event):
         print 'mousePressEvent'
+        self.clicked.emit()
         self.MyLabelPressed=1
  
     def mouseReleaseEvent(self,event):
         print 'mouseReleaseEvent'
         if self.MyLabelPressed==1:
-            self.pressedSignal.emit()
+            self.clicked.emit()
             self.MyLabelPressed=0
-            # QtGui.QLabel.mouseReleaseEvent(self, event)
+            QtGui.QLabel.mouseReleaseEvent(self, event)

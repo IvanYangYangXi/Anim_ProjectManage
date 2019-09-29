@@ -58,14 +58,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.createRightMenu_treeView_Proj_Task()
 
         # 设置 Item 部件
-        self.TaskType = ComboBoxDelegate_TaskType()
-        self.ui.treeView_Proj_Task.setItemDelegateForColumn(2, self.TaskType)
-        self.TaskState = ComboBoxDelegate_TaskState()
-        self.ui.treeView_Proj_Task.setItemDelegateForColumn(3, self.TaskState)
-        self.TaskDeadline = DateEditDelegate_TaskDeadline()
-        self.ui.treeView_Proj_Task.setItemDelegateForColumn(
-            6, self.TaskDeadline)
+        self.info_Type = configure.get_DB_Struct('info_Type')
+        # self.TaskType = ComboBoxDelegate_TaskType()
+        # self.ui.treeView_Proj_Task.setItemDelegateForColumn(2, self.TaskType)
+        # self.TaskState = ComboBoxDelegate_TaskState()
+        # self.ui.treeView_Proj_Task.setItemDelegateForColumn(3, self.TaskState)
+        # self.TaskDeadline = DateEditDelegate_TaskDeadline()
+        # self.ui.treeView_Proj_Task.setItemDelegateForColumn(
+        #     6, self.TaskDeadline)
 
+
+    # 设置 Item 部件
+    def setDelegate(self):
+        info_Type = configure.get_DB_Struct('info_Type')
+        TaskType = configure.get_DB_Struct('TaskType')
+        TaskState = configure.get_DB_Struct('TaskState')
 
     # 设置 详细信息面板 内容
     def setDetailPageInfo(self, index):
