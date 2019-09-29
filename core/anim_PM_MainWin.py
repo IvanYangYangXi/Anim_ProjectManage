@@ -85,6 +85,8 @@ class MainWindow(QtWidgets.QMainWindow):
             parentItem = parentItem.parent()
         treePath = treePath[1:]
         self.detailPage.setTreePath(treePath)
+        # Detail_Img
+        self.detailPage.setDetail_Img(currentItem.datas()[5])
 
 
     # treeView_Proj_Task item 点击事件

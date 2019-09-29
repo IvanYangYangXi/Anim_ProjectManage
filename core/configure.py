@@ -267,6 +267,23 @@ db_Struct = {
         '',
         'medium'
     ],
+    'info_Type': [
+        'int',
+        'int',
+        'int',
+        'text',
+        'text',
+        'img',
+        'combo',
+        'combo',
+        'personnel',
+        'personnel',
+        'text',
+        'Date',
+        'float',
+        'float',
+        'combo'
+        ],
     'TaskType': ['项目', 'Epic', '剧集', 'Story', '场次', '任务', '里程碑', '信息', '文件夹', '功能', '错误', '改进', '重构', '研究', '测试', '文件'],
     'TaskState': ['待办', '进行中', '完成']
 }

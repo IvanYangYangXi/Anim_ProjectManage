@@ -361,7 +361,7 @@ class TreeModel_Proj_Task(TreeModel):
         item = BaseTreeItem(data)
         self.insertRows(position, 1, parent, [item])
 
-        filePath = configure.getProjectPath() + '/data/%s'%dbid
+        filePath = configure.getProjectPath() + '/data/Content/%s'%dbid
         if not os.path.exists(filePath):
             os.makedirs(filePath) # 创建路径
 
@@ -530,9 +530,8 @@ class ComboBoxDelegate_TaskState(ComboBoxDelegate_TaskType):
         editor.setCurrentIndex(comboId)
         editor.blockSignals(False)
 
+
 # 时间选择控件
-
-
 class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
@@ -574,9 +573,8 @@ class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
 
+
 # 数字显示框
-
-
 class SpinBoxDelegate(QtWidgets.QItemDelegate):
     '''
     '''

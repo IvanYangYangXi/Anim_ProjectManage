@@ -7,8 +7,8 @@
 # @Date   : 7/2/2019, 5:16:22 PM
 
 
-import sys
-from PyQt5 import QtWidgets, uic, Qt, QtCore
+import sys, os
+from PyQt5 import QtWidgets, uic, Qt, QtCore, QtGui
 import sip
 import configure
 
@@ -60,6 +60,20 @@ class DetailPage(QtWidgets.QWidget):
         # TreePath
         self.HL_Detail_TreePath = self.ui.horizontalLayout_Detail_TreePath
 
+        # TypeIcon
+        self.label_TypeIcon = self.ui.label_TypeIcon
+
+        # Detail_Img
+        QtWidgets.QHBoxLayout.replaceWidget()
+        self.label_Detail_Img = ClickLabel()
+        self.label_Detail_Img.setGeometry(1, 1, 135, 85)
+        self.label_Detail_Img.setMinimumSize(135, 85)
+        self.label_Detail_Img.setMaximumSize(135, 85)
+        self.ui.horizontalLayout_Detail_Img.replaceWidget(self.ui.label_Detail_Img, self.label_Detail_Img)
+
+        # -------- Info ---------
+        self.FL_Info = self.ui.formLayout_Detail_Info
+
 
     # 关闭事件
     def closeEvent(self):
@@ -91,6 +105,8 @@ class DetailPage(QtWidgets.QWidget):
         # ComboBox当前项使用setCurrentIndex()来设置
         self.comboBox_TaskType.setCurrentIndex(comboId)
         self.comboBox_TaskType.blockSignals(False)
+
+        self.setTypeIcon() # 设置 Type 图标
 
     # 从编辑器窗口小部件获取数据
     def getTaskType(self):
@@ -134,9 +150,10 @@ class DetailPage(QtWidgets.QWidget):
         i=0
         for i in data:
             lable = QtWidgets.QLabel()
-            lable.setText(str(i))
-            # lable.setTextFormat(Qt.Qt.AutoText) # 设置自动文本格式
-            lable.setOpenExternalLinks(True) # 打开与外部的连接
+            lable.setText(" <a href='none' style='color:blue'>%s</a>"%str(i))
+            lable.setTextFormat(Qt.Qt.AutoText) # 设置自动文本格式
+            lable.setOpenExternalLinks(True) # 打开与外部的连接,允许访问超链接
+            # lable.linkActivated.connect(self.link_clicked)#针对链接点击事件
             # 文本交互形式 鼠标或键盘操作
             lable.setTextInteractionFlags(Qt.Qt.LinksAccessibleByMouse | Qt.Qt.LinksAccessibleByKeyboard)
             lable.setTextInteractionFlags(Qt.Qt.TextBrowserInteraction)
@@ -146,28 +163,67 @@ class DetailPage(QtWidgets.QWidget):
             lable1.setText('/')
             self.HL_Detail_TreePath.addWidget(lable1)
 
+    # ---------------- label_TypeIcon ----------------
+    def setTypeIcon(self):
+        TaskType = self.getTaskType()
+
+        # 绘制
+        pixmap = QtGui.QPixmap(48, 48)
+        pixmap.fill()
+        painter = QtGui.QPainter(pixmap)
+
+        if TaskType == '任务':
+            painter.setBrush(QtGui.QColor('#0079bf'))
+        elif TaskType == 'Story':
+            painter.setBrush(QtGui.QColor('#61bd4f'))
+        else:
+            painter.setBrush(QtGui.QColor('#355263'))
+        painter.drawEllipse(3, 3, 20, 20) # 绘制圆
+        # painter.drawRoundedRect(3, 3, 20, 20, 10, 10) # 圆角矩形
+        painter.end()
+        
+        label = self.label_TypeIcon
+        # pixmap = QtGui.QPixmap(imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
+        # pixmap = pixmap.scaled(48, 48)
+        label.setPixmap(pixmap)  # 在label上显示图片
+        label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
+
     # ---------------- label_Detail_Img ----------------
+    def setDetail_Img(self, imgPath):
+        label = self.label_Detail_Img
+        pixmap = QtGui.QPixmap(imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
+        pixmap = pixmap.scaled(135, 85)
+        label.setPixmap(pixmap)  # 在label上显示图片
+        label.setAlignment(QtCore.Qt.AlignHCenter)
+        label.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
+        label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
+        label.clicked.connect(lambda: self.on_Detail_Img_clicked(imgPath))
 
-        pix = QPixmap('sexy.jpg')
-        lb1 = QLabel(self)
-        lb1.setGeometry(0,0,300,200)
-        lb1.setStyleSheet("border: 2px solid red")
-        lb1.setPixmap(pix)
-        lb2 = QLabel(self)
-        lb2.setGeometry(0,250,300,200)
-        lb2.setPixmap(pix)
-        lb2.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
-        lb2.setScaledContents(True) # 缩放像素图以填充可用空间
+    def on_Detail_Img_clicked(self, imgPath):
+        # label = self.sender()
+        # 打开文件(可打开外部程序)
+        os.startfile(imgPath)
+
+    # ---------------- FL_Info ----------------
+    def setFL_Info(self, data=[], dataAdd=[]):
+        data = data[8:]
+        
+        # fromlayout = self.FL_Info
+        # for i in data:
+        #     label = QtWidgets.QLabel("")
+        #     QtWidgets.QFormLayout.addRow()
+        #     fromlayout.addRow()
 
 
 
-# 自定义 label
+
+# 自定义 Click label
 class ClickLabel(QtWidgets.QLabel):
 
     pressedSignal=QtCore.pyqtSignal()
 
     def __init__(self,parent = None):
-        super(interactionLabel,self).__init__(parent)
+        super(ClickLabel,self).__init__(parent)
         self.MyLabelPressed=0
 
 
@@ -176,23 +232,12 @@ class ClickLabel(QtWidgets.QLabel):
 
 
     def mousePressEvent(self,event):
-        #print 'mousePressEvent'
+        print 'mousePressEvent'
         self.MyLabelPressed=1
  
     def mouseReleaseEvent(self,event):
-        #print 'mouseReleaseEvent'
+        print 'mouseReleaseEvent'
         if self.MyLabelPressed==1:
             self.pressedSignal.emit()
             self.MyLabelPressed=0
             # QtGui.QLabel.mouseReleaseEvent(self, event)
-
-    label = ClickLabel()
-            pixmap = QtGui.QPixmap(image)
-            pixmap = pixmap.scaled(250, 250)
-            label.setPixmap(pixmap)
-            label.setAlignment(QtCore.Qt.AlignHCenter)
-            label.clicked.connect(self.on_product_clicked)
-            self.vbox_choice_img.addWidget(label)
-
-    def on_product_clicked(self):
-        label = self.sender()
