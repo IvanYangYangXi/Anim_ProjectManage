@@ -452,9 +452,9 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
-    def __init__(self, combos=[], defaultComboId=0):
+    def __init__(self, combos, defaultComboId=0):
         QtWidgets.QItemDelegate.__init__(self)
-        self.combos = combos
+        self.combos = configure.get_DB_Struct(combos)
         self.defaultComboId = defaultComboId
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
@@ -503,7 +503,7 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
 
 
 # 时间选择控件
-class DateEditDelegate_TaskDeadline(QtWidgets.QItemDelegate):
+class DateEditDelegate(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
@@ -563,8 +563,11 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, spinBox, index):
         value = index.model().data(index, QtCore.Qt.EditRole)
-
-        spinBox.setValue(6)
+        print(int(value))
+        if int(value):
+            spinBox.setValue(int(value))
+        else:
+            spinBox.setValue(0)
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
     def setModelData(self, spinBox, model, index):

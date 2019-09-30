@@ -58,7 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.createRightMenu_treeView_Proj_Task()
 
         # 设置 Item 部件
-        self.info_Type = configure.get_DB_Struct('info_Type')
+        self.setDelegate()
         # self.TaskType = ComboBoxDelegate_TaskType()
         # self.ui.treeView_Proj_Task.setItemDelegateForColumn(2, self.TaskType)
         # self.TaskState = ComboBoxDelegate_TaskState()
@@ -70,9 +70,27 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # 设置 Item 部件
     def setDelegate(self):
-        info_Type = configure.get_DB_Struct('info_Type')
-        TaskType = configure.get_DB_Struct('TaskType')
-        TaskState = configure.get_DB_Struct('TaskState')
+        dataTypes = configure.get_DB_Struct('dataTypes')
+        # print(dataTypes)
+        dataTypes = dataTypes[4:]
+        print(dataTypes)
+        delegate = range(len(dataTypes))
+        for i in range(len(dataTypes)-6):
+            if dataTypes[i] == 'int':
+                delegate[i] = SpinBoxDelegate()
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, delegate[i])
+            elif dataTypes[i] == 'float':
+                delegate[i] = SpinBoxDelegate()
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, delegate)
+            elif dataTypes[i] == 'date':
+                delegate[i] = DateEditDelegate()
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, delegate[i])
+            elif dataTypes[i].split(':')[0] == 'combo':
+                delegate1 = ComboBoxDelegate(dataTypes[i].split(':')[1], dataTypes[i].split(':')[2])
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, delegate1)
+            elif dataTypes[i].split(':')[0] == 'combo1':
+                delegate2 = ComboBoxDelegate(dataTypes[i].split(':')[1], dataTypes[i].split(':')[2])
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, delegate2)
 
     # 设置 详细信息面板 内容
     def setDetailPageInfo(self, index):
