@@ -65,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.ui.treeView_Proj_Task.setItemDelegateForColumn(3, self.TaskState)
         # self.TaskDeadline = DateEditDelegate_TaskDeadline()
         # self.ui.treeView_Proj_Task.setItemDelegateForColumn(
-        #     6, self.TaskDeadline)
+        #     7, self.TaskDeadline)
 
 
     # 设置 Item 部件
