@@ -192,6 +192,8 @@ class DetailPage(QtWidgets.QWidget):
 
     # ---------------- label_Detail_Img ----------------
     def setDetail_Img(self, imgPath):
+        if not os.path.isfile(imgPath): # 判断文件
+            imgPath = '.UI/img_loss.jpg'
         label = self.label_Detail_Img
         pixmap = QtGui.QPixmap(imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
         pixmap = pixmap.scaled(135, 85)
