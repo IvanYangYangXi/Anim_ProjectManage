@@ -545,7 +545,7 @@ class DateEditDelegate(QtWidgets.QItemDelegate):
         editor.setGeometry(option.rect)
 
 
-# 数字显示框
+# 整数数字显示框
 class SpinBoxDelegate(QtWidgets.QItemDelegate):
     '''
     '''
@@ -563,9 +563,51 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, spinBox, index):
         value = index.model().data(index, QtCore.Qt.EditRole)
-        print(int(value))
-        if int(value):
-            spinBox.setValue(int(value))
+        # print(int(value))
+        if value != '':
+            if int(value):
+                spinBox.setValue(int(value))
+            else:
+                spinBox.setValue(0)
+        else:
+            spinBox.setValue(0)
+
+    # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
+    def setModelData(self, spinBox, model, index):
+        spinBox.interpretText()
+        value = spinBox.value()
+
+        model.setData(index, value, QtCore.Qt.EditRole)
+
+    # 根据给定的样式选项更新索引指定的项目的编辑器。
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+
+# 小数数字显示框
+class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
+    '''
+    '''
+    # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
+
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QDoubleSpinBox(parent)
+        editor.setFrame(False)
+        editor.setFrame(False)
+        editor.setMinimum(0)
+        editor.setMaximum(100)
+
+        return editor
+
+    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
+    def setEditorData(self, spinBox, index):
+        value = index.model().data(index, QtCore.Qt.EditRole)
+        # print(int(value))
+        if value != '':
+            if float(value):
+                spinBox.setValue(float(value))
+            else:
+                spinBox.setValue(0)
         else:
             spinBox.setValue(0)
 

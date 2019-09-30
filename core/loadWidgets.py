@@ -214,15 +214,76 @@ class DetailPage(QtWidgets.QWidget):
         
 
     # ---------------- FL_Info ----------------
-    def setFL_Info(self, data=[], dataAdd=[]):
-        data = data[8:]
-        
-        # fromlayout = self.FL_Info
-        # for i in data:
-        #     label = QtWidgets.QLabel("")
-        #     QtWidgets.QFormLayout.addRow()
-        #     fromlayout.addRow()
+    def setFL_Info(self, labels=[], datas=[], dataTypes=[]):
+        labels = labels[8:]
+        datas = datas[8:]
+        dataTypes = dataTypes[8:]
 
+        fromlayout = self.FL_Info
+        for i in range(fromlayout.count()): 
+            fromlayout.itemAt(i).widget().delete()
+        for i in range(len(dataTypes)):
+            label = QtWidgets.QLabel(labels[i])
+            if dataTypes[i] == 'int':
+                widght = QtWidgets.QSpinBox()
+                widght.setFrame(False)
+                widght.setFrame(False)
+                widght.setMinimum(150)
+                widght.setMaximum(200)
+                try:
+                    widght.setValue(int(datas[i]))
+                except Exception as e:
+                    widght.setValue(0)
+                    print('setFL_Info error:%s' % (e))
+            elif dataTypes[i] == 'float':
+                widght = QtWidgets.QDoubleSpinBox()
+                widght.setFrame(False)
+                widght.setFrame(False)
+                widght.setMinimum(150)
+                widght.setMaximum(200)
+                try:
+                    widght.setValue(float(datas[i]))
+                except Exception as e:
+                    widght.setValue(0)
+                    print('setFL_Info error:%s' % (e))
+            elif dataTypes[i] == 'date':
+                widght = QtWidgets.QDateEdit()
+                widght.setDisplayFormat('yyyy-MM-dd')
+                widght.setCalendarPopup(True)
+                widght.setMinimum(150)
+                widght.setMaximum(200)
+                if QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'):
+                    widght.setDate(QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'))
+                else:
+                    now = QtCore.QDate.currentDate()  # 获取当前日期
+                    widght.setDate(now)
+            elif dataTypes[i] == 'longText':
+                widght = QtWidgets.QTextEdit()
+                widght.setMinimum(150, 85)
+                widght.setMaximum(200, 85)
+                widght.setText(datas[i])
+            elif dataTypes[i].split(':')[0] == 'combo':
+                combos = configure.get_DB_Struct(dataTypes[i].split(':')[1])
+                widght = QtWidgets.QComboBox()
+                widght.setMinimum(150)
+                widght.setMaximum(200)
+                # 多个添加条目
+                widght.addItems(combos)
+                defaultComboId = dataTypes[i].split(':')[2]
+                if dataTypes[i].split(':')[1] in combos:
+                    defaultComboId = combos.index(dataTypes[i].split(':')[1])
+                # 避免不是由用户引起的信号,因此我们使用blockSignals.
+                widght.blockSignals(True)
+                # ComboBox当前项使用setCurrentIndex()来设置
+                widght.setCurrentIndex(defaultComboId)
+                widght.blockSignals(False)
+            else:
+                widght = QtWidgets.QLineEdit()
+                widght.setMinimum(150)
+                widght.setMaximum(200)
+                widght.setText(datas[i])
+            fromlayout.addRow(label, widght)
+            # QtWidgets.QFormLayout.addRow()
 
 
 

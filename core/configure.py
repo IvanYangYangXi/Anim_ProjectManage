@@ -278,7 +278,7 @@ db_Struct = {
         'combo:TaskState:0',
         'personnel',
         'personnel',
-        'text',
+        'longText',
         'date',
         'float',
         'float',
