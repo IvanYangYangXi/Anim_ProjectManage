@@ -10,6 +10,7 @@
 import sys, os
 from PyQt5 import QtWidgets, uic, Qt, QtCore, QtGui
 import sip
+import threading, time
 import platform
 import subprocess
 import configure
@@ -67,16 +68,10 @@ class DetailPage(QtWidgets.QWidget):
 
         # Detail_Img
         # QtWidgets.QHBoxLayout.replaceWidget()
-        self.label_Detail_Img = ClickLabel()
-        self.label_Detail_Img.setGeometry(1, 1, 135, 85)
-        self.label_Detail_Img.setMinimumSize(135, 85)
-        self.label_Detail_Img.setMaximumSize(135, 85)
-        # 替换并移除控件
-        self.ui.horizontalLayout_Detail_Img.replaceWidget(self.ui.label_Detail_Img, self.label_Detail_Img)
-        self.label_Detail_Img = self.ui.label_Detail_Img
-        # self.ui.horizontalLayout_Detail_Img.removeWidget(self.ui.label_Detail_Img)
-        # self.ui.label_Detail_Img.setParent(None)
-        # sip.delete(self.ui.label_Detail_Img)
+        self.Detail_Img = self.ui.pushButton_Detail_Img
+        self.imgPath = os.path.abspath('./UI/img_loss.png')
+        self.Detail_Img.clicked.connect(self.on_Detail_Img_clicked)
+        self.BtnTime = 0
 
         # -------- Info ---------
         self.FL_Info = self.ui.formLayout_Detail_Info
@@ -193,31 +188,49 @@ class DetailPage(QtWidgets.QWidget):
         label.setPixmap(pixmap)  # 在label上显示图片
         label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
 
-    # ---------------- label_Detail_Img ----------------
+    # ---------------- Detail_Img ----------------
     def setDetail_Img(self, imgPath):
-        if not os.path.isfile(imgPath): # 判断文件
-            imgPath = './UI/img_loss.png'
-        print(imgPath)
-        label = self.label_Detail_Img
-        pixmap = QtGui.QPixmap(imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
+        if os.path.isfile(os.path.abspath(imgPath)): # 判断文件
+            self.imgPath = os.path.abspath(imgPath)
+        else:
+            self.imgPath = os.path.abspath('./UI/img_loss.png')
+        # print(self.imgPath)
+        button = self.Detail_Img
+        pixmap = QtGui.QPixmap(self.imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
         pixmap = pixmap.scaled(135, 85)
-        label.setPixmap(pixmap)  # 在label上显示图片
-        label.setAlignment(QtCore.Qt.AlignHCenter)
-        label.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
-        label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
-        label.clicked.connect(lambda: self.on_Detail_Img_clicked(imgPath))
+        icon = QtGui.QIcon(pixmap)
+        button.setIcon(icon)  # 在button上显示图片
+        button.setIconSize(QtCore.QSize(135, 85))
+        # label.setAlignment(QtCore.Qt.AlignHCenter)
+        # label.setStyleSheet("border: 2px solid red") # 便于查看这个标签设置的大小范围
+        # label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
 
-    def on_Detail_Img_clicked(self, imgPath):
+    def on_Detail_Img_clicked(self):
         # label = self.sender()
+        if self.BtnTime == 0:
+            self.BtnTime = 1
+            self.openFile(self.imgPath)
+        thread_imgBtn = threading.Thread(target=self.timeing) # 计时线程
+        thread_imgBtn.setDaemon(True) # 设置子线程为守护线程时，主线程一旦执行结束，则全部线程全部被终止执行
+        thread_imgBtn.start()
+        
+    def openFile(self, path):
         # 打开文件(可打开外部程序)
         sysstr = platform.system()
         if(sysstr =="Windows"):
-            os.startfile(imgPath)
+            # print('Windows')
+            os.startfile(path)
         elif(sysstr == "Linux"):
-            subprocess.call(["xdg-open",imgPath])
+            # print('Linux')
+            subprocess.call(["xdg-open", path])
         else:
-            subprocess.call(["open", imgPath])
-        
+            # print('otherSys')
+            subprocess.call(["open", path])
+
+    # 计时器
+    def timeing(self):
+        time.sleep(1)
+        self.BtnTime = 0
 
     # ---------------- FL_Info ----------------
     def setFL_Info(self, labels=[], datas=[], dataTypes=[]):
@@ -276,7 +289,12 @@ class DetailPage(QtWidgets.QWidget):
                     widght.setDate(now)
             elif dataTypes[i] == 'longText':
                 widght = QtWidgets.QTextEdit()
-                widght.setMinimumSize(180, 85)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed) 
+                sizePolicy.setHorizontalStretch(0) 
+                sizePolicy.setVerticalStretch(0) 
+                widght.setSizePolicy(sizePolicy)
+                widght.setMinimumSize(180, 50)
+                widght.setMaximumHeight(85)
                 widght.setText(datas[i])
             elif dataTypes[i].split(':')[0] == 'combo':
                 combos = configure.get_DB_Struct(dataTypes[i].split(':')[1])

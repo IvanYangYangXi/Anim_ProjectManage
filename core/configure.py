@@ -210,13 +210,13 @@ db_Struct = {
         'img text',
         'type NCHAR(30)',
         'state NCHAR(20)',
-        'executive NCHAR(10)',
-        'reporter NCHAR(10)',
+        'executive NCHAR(20)',
+        'reporter NCHAR(20)',
+        'priority NCHAR(20)',
         'description text',
         'deadline CHAR(20)',
         'estimateTime CHAR(20)',
-        'remaining CHAR(20)',
-        'priority NCHAR(20)'
+        'remaining CHAR(20)'
     ],
     'struct_taskInfo': [
         'parentID',
@@ -228,11 +228,11 @@ db_Struct = {
         'state',
         'executive',
         'reporter',
+        'priority',
         'description',
         'deadline',
         'estimateTime',
-        'remaining',
-        'priority'
+        'remaining'
     ],
     'rootNode_taskInfo': [
         -1,
@@ -245,11 +245,11 @@ db_Struct = {
         '状态',
         '执行人',
         '报告人',
+        '优先级',
         '描述',
         '截止日期',
         '预估时间（小时）',
-        '结余（小时）',
-        '优先级'
+        '结余（小时）'
     ],
     'empty_taskInfo': [
         -1,
@@ -261,11 +261,11 @@ db_Struct = {
         'None',
         'executive',
         'reporter',
+        'medium',
         'description描述',
         '',
         '',
-        '',
-        'medium'
+        ''
     ],
     'dataTypes': [
         'int',
@@ -278,14 +278,14 @@ db_Struct = {
         'combo:TaskState:0',
         'personnel',
         'personnel',
+        'combo:priority:1',
         'longText',
         'date',
         'float',
-        'float',
-        'combo:priority:1'
+        'float'
         ],
     'TaskType': ['项目', 'Epic', '剧集', 'Story', '场次', '任务', '里程碑', '信息', '文件夹', '功能', '错误', '改进', '重构', '研究', '测试', '文件'],
-    'TaskState': ['待办', '进行中', '完成'],
+    'TaskState': ['待办', '进行中', '提交审核', '审核通过', '返修'],
     'priority': ['hight', 'medium', 'low']
 }
 

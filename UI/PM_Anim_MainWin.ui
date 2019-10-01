@@ -30,7 +30,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_Centralwidget">
       <property name="spacing">
-       <number>10</number>
+       <number>3</number>
       </property>
       <item>
        <widget class="QTabWidget" name="tabWidget">
@@ -503,7 +503,7 @@
      <x>0</x>
      <y>0</y>
      <width>914</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

@@ -299,10 +299,7 @@ class TreeModel_Proj_Task(TreeModel):
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             if index.column() == 1: # 缩略图列
-                if imgPath == None or imgPath == 'None':
-                    return 'None'
-                else:
-                    return ''
+                return ''
             else:
                 return item.data(index.column())
 
@@ -456,7 +453,7 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
     def __init__(self, combos, defaultComboId=0):
         QtWidgets.QItemDelegate.__init__(self)
         self.combos = configure.get_DB_Struct(combos)
-        self.defaultComboId = defaultComboId
+        self.defaultComboId = int(defaultComboId)
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
@@ -566,10 +563,11 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
         value = index.model().data(index, QtCore.Qt.EditRole)
         # print(int(value))
         if value != '':
-            if int(value):
+            try:
                 spinBox.setValue(int(value))
-            else:
+            except Exception as e:
                 spinBox.setValue(0)
+                print('SpinBoxDelegate error:%s' % (e))
         else:
             spinBox.setValue(0)
 
@@ -605,10 +603,11 @@ class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
         value = index.model().data(index, QtCore.Qt.EditRole)
         # print(int(value))
         if value != '':
-            if float(value):
+            try:
                 spinBox.setValue(float(value))
-            else:
+            except Exception as e:
                 spinBox.setValue(0)
+                print('DoubleSpinBoxDelegate error:%s' % (e))
         else:
             spinBox.setValue(0)
 
