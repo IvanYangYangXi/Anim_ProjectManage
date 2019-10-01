@@ -147,7 +147,7 @@
       <enum>QLayout::SetMinimumSize</enum>
      </property>
      <item>
-      <widget class="QLabel" name="label_Detail_Img">
+      <widget class="QPushButton" name="pushButton_Detail_Img">
        <property name="minimumSize">
         <size>
          <width>135</width>
@@ -161,7 +161,13 @@
         </size>
        </property>
        <property name="text">
-        <string>缩略图</string>
+        <string>PushButton</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>135</width>
+         <height>85</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -177,13 +183,6 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="comboBox_TaskState"/>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>路径：</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_Detail_TreePath">
          <property name="spacing">
@@ -197,6 +196,13 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>路径：</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -306,9 +312,15 @@
          </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEdit_detail_executive">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
-             <width>200</width>
+             <width>180</width>
              <height>0</height>
             </size>
            </property>

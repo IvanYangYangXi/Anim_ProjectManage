@@ -30,7 +30,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_Centralwidget">
       <property name="spacing">
-       <number>5</number>
+       <number>10</number>
       </property>
       <item>
        <widget class="QTabWidget" name="tabWidget">
@@ -226,7 +226,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <widget class="QWidget" name="verticalLayoutWidget_4">
-             <layout class="QVBoxLayout" name="verticalLayout_5" stretch="10,16,0,0">
+             <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,16,0,0">
               <property name="bottomMargin">
                <number>5</number>
               </property>

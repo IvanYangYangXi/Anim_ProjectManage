@@ -71,7 +71,12 @@ class DetailPage(QtWidgets.QWidget):
         self.label_Detail_Img.setGeometry(1, 1, 135, 85)
         self.label_Detail_Img.setMinimumSize(135, 85)
         self.label_Detail_Img.setMaximumSize(135, 85)
+        # 替换并移除控件
         self.ui.horizontalLayout_Detail_Img.replaceWidget(self.ui.label_Detail_Img, self.label_Detail_Img)
+        self.label_Detail_Img = self.ui.label_Detail_Img
+        # self.ui.horizontalLayout_Detail_Img.removeWidget(self.ui.label_Detail_Img)
+        # self.ui.label_Detail_Img.setParent(None)
+        # sip.delete(self.ui.label_Detail_Img)
 
         # -------- Info ---------
         self.FL_Info = self.ui.formLayout_Detail_Info
@@ -140,7 +145,6 @@ class DetailPage(QtWidgets.QWidget):
         # for i in range(self.HL_Detail_TreePath.count()):
         #     if self.HL_Detail_TreePath.itemAt(i) != None:
         #          self.HL_Detail_TreePath.itemAt(i).widget().delete()
-        i=0
         for i in range(self.HL_Detail_TreePath.count()):
             widgetItem = self.HL_Detail_TreePath.itemAt(0)
             if widgetItem != None:
@@ -149,7 +153,6 @@ class DetailPage(QtWidgets.QWidget):
                 self.HL_Detail_TreePath.removeWidget(widget)
                 widget.setParent(None)
                 sip.delete(widget)
-        i=0
         for i in data:
             lable = QtWidgets.QLabel()
             lable.setText(" <a href='none' style='color:blue'>%s</a>"%str(i))
@@ -193,7 +196,8 @@ class DetailPage(QtWidgets.QWidget):
     # ---------------- label_Detail_Img ----------------
     def setDetail_Img(self, imgPath):
         if not os.path.isfile(imgPath): # 判断文件
-            imgPath = '.UI/img_loss.jpg'
+            imgPath = './UI/img_loss.png'
+        print(imgPath)
         label = self.label_Detail_Img
         pixmap = QtGui.QPixmap(imgPath) # 按指定路径找到图片，注意路径必须用双引号包围，不能用单引号
         pixmap = pixmap.scaled(135, 85)
@@ -223,37 +227,48 @@ class DetailPage(QtWidgets.QWidget):
 
         fromlayout = self.FL_Info
         for i in range(fromlayout.count()): 
-            fromlayout.itemAt(i).widget().delete()
+            # fromlayout.itemAt(i).widget().delete()
+            widgetItem = fromlayout.itemAt(0)
+            if widgetItem != None:
+                widget = widgetItem.widget()
+                fromlayout.removeWidget(widget)
+                widget.setParent(None)
+                sip.delete(widget)
         for i in range(len(dataTypes)):
             label = QtWidgets.QLabel(labels[i])
             if dataTypes[i] == 'int':
                 widght = QtWidgets.QSpinBox()
                 widght.setFrame(False)
                 widght.setFrame(False)
-                widght.setMinimum(150)
-                widght.setMaximum(200)
-                try:
-                    widght.setValue(int(datas[i]))
-                except Exception as e:
+                widght.setMinimum(0)
+                widght.setMaximum(1000)
+                if datas[i] != '':
+                    try:
+                        widght.setValue(int(datas[i]))
+                    except Exception as e:
+                        widght.setValue(0)
+                        print('setFL_Info error:%s' % (e))
+                else:
                     widght.setValue(0)
-                    print('setFL_Info error:%s' % (e))
             elif dataTypes[i] == 'float':
                 widght = QtWidgets.QDoubleSpinBox()
                 widght.setFrame(False)
                 widght.setFrame(False)
-                widght.setMinimum(150)
-                widght.setMaximum(200)
-                try:
-                    widght.setValue(float(datas[i]))
-                except Exception as e:
+                widght.setMinimum(0)
+                widght.setMaximum(1000)
+                if datas[i] != '':
+                    try:
+                        widght.setValue(float(datas[i]))
+                    except Exception as e:
+                        widght.setValue(0)
+                        print('setFL_Info error:%s' % (e))
+                else:
                     widght.setValue(0)
-                    print('setFL_Info error:%s' % (e))
             elif dataTypes[i] == 'date':
                 widght = QtWidgets.QDateEdit()
                 widght.setDisplayFormat('yyyy-MM-dd')
                 widght.setCalendarPopup(True)
-                widght.setMinimum(150)
-                widght.setMaximum(200)
+                # widght.setMinimumWidth(180)
                 if QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'):
                     widght.setDate(QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'))
                 else:
@@ -261,17 +276,15 @@ class DetailPage(QtWidgets.QWidget):
                     widght.setDate(now)
             elif dataTypes[i] == 'longText':
                 widght = QtWidgets.QTextEdit()
-                widght.setMinimum(150, 85)
-                widght.setMaximum(200, 85)
+                widght.setMinimumSize(180, 85)
                 widght.setText(datas[i])
             elif dataTypes[i].split(':')[0] == 'combo':
                 combos = configure.get_DB_Struct(dataTypes[i].split(':')[1])
                 widght = QtWidgets.QComboBox()
-                widght.setMinimum(150)
-                widght.setMaximum(200)
+                # widght.setMinimumWidth(180)
                 # 多个添加条目
                 widght.addItems(combos)
-                defaultComboId = dataTypes[i].split(':')[2]
+                defaultComboId = int(dataTypes[i].split(':')[2])
                 if dataTypes[i].split(':')[1] in combos:
                     defaultComboId = combos.index(dataTypes[i].split(':')[1])
                 # 避免不是由用户引起的信号,因此我们使用blockSignals.
@@ -281,8 +294,7 @@ class DetailPage(QtWidgets.QWidget):
                 widght.blockSignals(False)
             else:
                 widght = QtWidgets.QLineEdit()
-                widght.setMinimum(150)
-                widght.setMaximum(200)
+                # widght.setMinimumWidth(180)
                 widght.setText(datas[i])
             fromlayout.addRow(label, widght)
             # QtWidgets.QFormLayout.addRow()

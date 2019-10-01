@@ -321,6 +321,7 @@ class TreeModel_Proj_Task(TreeModel):
                 if os.path.isfile(imgPath): # 判断文件
                     if imgPath.endswith(('.jpg', '.jpge', '.png', '.tga', '.gif')):
                         return QtGui.QIcon(QtGui.QPixmap(imgPath))
+                return QtGui.QIcon(QtGui.QPixmap('./UI/img_loss.jpg'))
                 
 
     # 返回一组标志
@@ -556,7 +557,7 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setFrame(False)
         editor.setMinimum(0)
-        editor.setMaximum(100)
+        editor.setMaximum(1000)
 
         return editor
 
@@ -595,7 +596,7 @@ class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setFrame(False)
         editor.setMinimum(0)
-        editor.setMaximum(100)
+        editor.setMaximum(1000)
 
         return editor
 
