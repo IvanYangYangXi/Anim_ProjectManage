@@ -37,6 +37,9 @@ class DetailPage(QtWidgets.QWidget):
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
 
+        self.datas = []
+        self.thread_imgBtn = None
+
         # 关闭按钮 点击事件
         self.closeButton = self.ui.pushButton_Detail_Close
         self.closeButton.setToolTip('关闭详细面板')
@@ -211,25 +214,35 @@ class DetailPage(QtWidgets.QWidget):
             self.BtnTime = 1
             self.openFile(self.imgPath)
         thread_imgBtn = threading.Thread(target=self.timeing) # 计时线程
+        self.thread_imgBtn = thread_imgBtn
         thread_imgBtn.setDaemon(True) # 设置子线程为守护线程时，主线程一旦执行结束，则全部线程全部被终止执行
         thread_imgBtn.start()
         
     def openFile(self, path):
-        # 打开文件(可打开外部程序)
-        sysstr = platform.system()
-        if(sysstr =="Windows"):
-            # print('Windows')
-            os.startfile(path)
-        elif(sysstr == "Linux"):
-            # print('Linux')
-            subprocess.call(["xdg-open", path])
+        if path == os.path.abspath('./UI/img_loss.png'):
+            filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
+            if not os.path.exists(filePath):
+                os.makedirs(filePath) # 创建路径
+            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
+                filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
+            self.setDetail_Img(imgPath)
         else:
-            # print('otherSys')
-            subprocess.call(["open", path])
+            # 打开文件(可打开外部程序)
+            sysstr = platform.system()
+            if(sysstr =="Windows"):
+                # print('Windows')
+                os.startfile(path)
+            elif(sysstr == "Linux"):
+                # print('Linux')
+                subprocess.call(["xdg-open", path])
+            else:
+                # print('otherSys')
+                subprocess.call(["open", path])
 
     # 计时器
     def timeing(self):
-        time.sleep(1)
+        while self.thread_imgBtn.is_alive():
+            time.sleep(1)
         self.BtnTime = 0
 
     # ---------------- FL_Info ----------------

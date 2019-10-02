@@ -236,7 +236,7 @@ db_Struct = {
     ],
     'rootNode_taskInfo': [
         -1,
-        -1,
+        -2,
         '0',
         '',
         '任务',

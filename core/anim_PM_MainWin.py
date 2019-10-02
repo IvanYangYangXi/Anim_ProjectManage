@@ -91,6 +91,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDetailPageInfo(self, index):
         currentItem = self.model_Proj_Task.getItem(index) 
 
+        self.detailPage.datas = currentItem.datas()
+
         # taskName
         self.detailPage.setTaskName(currentItem.datas()[4])
         # type
