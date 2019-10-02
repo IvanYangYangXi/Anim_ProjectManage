@@ -27,7 +27,7 @@ class ListItem_General_Proj(QtWidgets.QWidget):
         self.ui = uic.loadUi(uiPath, self)
 
 
-# 详细信息面板UI
+# 任务面板 树列表 对应的 详细信息面板UI
 class DetailPage(QtWidgets.QWidget):
     def __init__(self, uiPath='', parent=None):
         super(DetailPage, self).__init__(parent)
@@ -37,8 +37,10 @@ class DetailPage(QtWidgets.QWidget):
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
 
-        self.datas = []
-        self.thread_imgBtn = None
+        self.datas = [] # Item 数据
+        self.thread_imgBtn = None # 按钮计时器线程
+        self.model_Proj_Task = None # 任务面板 树列表 对应的 Model
+        self.currentIndex = None # 当前选择的 Index
 
         # 关闭按钮 点击事件
         self.closeButton = self.ui.pushButton_Detail_Close
@@ -73,8 +75,11 @@ class DetailPage(QtWidgets.QWidget):
         # QtWidgets.QHBoxLayout.replaceWidget()
         self.Detail_Img = self.ui.pushButton_Detail_Img
         self.imgPath = os.path.abspath('./UI/img_loss.png')
-        self.Detail_Img.clicked.connect(self.on_Detail_Img_clicked)
-        self.BtnTime = 0
+        self.Detail_Img.clicked.connect(self.on_Detail_Img_clicked) 
+        self.BtnTime = 0 # 用于防止过快的重复点击
+        # 重设右键并绑定信号槽
+        self.Detail_Img.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.Detail_Img.customContextMenuRequested[QtCore.QPoint].connect(self.Detail_ImgContext)
 
         # -------- Info ---------
         self.FL_Info = self.ui.formLayout_Detail_Info
@@ -85,6 +90,34 @@ class DetailPage(QtWidgets.QWidget):
 
         # 将其父设置为空，隐藏控件
         self.setParent(None)
+
+    # 自定义 Detail_Img 右键按钮
+    def Detail_ImgContext(self):
+        popMenu = QtWidgets.QMenu()
+        popMenu.addAction(QtWidgets.QAction(u'设置缩略图', self))
+        popMenu.addAction(QtWidgets.QAction(u'清除缩略图', self))
+        popMenu.triggered[QtWidgets.QAction].connect(self.processtrigger)
+        popMenu.exec_(Qt.QCursor.pos())
+    
+    # Detail_Img 右键按钮事件
+    def processtrigger(self, q):
+        # 输出那个Qmenu对象被点击
+        if q.text().encode("utf-8") == "设置缩略图":
+            filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
+            if not os.path.exists(filePath):
+                os.makedirs(filePath) # 创建路径
+            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
+                filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
+            self.imgPath = imgPath[0]
+            self.setDetail_Img(self.imgPath)
+            # set 任务树item的缩略图
+            if self.model_Proj_Task != None:
+                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
+        elif q.text().encode("utf-8") == "清除缩略图":
+            self.setDetail_Img()
+            # set 任务树item的缩略图
+            if self.model_Proj_Task != None:
+                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
 
     # -------------- Name -----------------
     # set name
@@ -175,7 +208,7 @@ class DetailPage(QtWidgets.QWidget):
         pixmap.fill()
         painter = QtGui.QPainter(pixmap)
 
-        if TaskType == '任务':
+        if TaskType.encode("utf-8") == '任务':
             painter.setBrush(QtGui.QColor('#0079bf'))
         elif TaskType == 'Story':
             painter.setBrush(QtGui.QColor('#61bd4f'))
@@ -192,7 +225,7 @@ class DetailPage(QtWidgets.QWidget):
         label.setScaledContents(True) # 缩放像素图以填充可用空间,图片自适应label大小
 
     # ---------------- Detail_Img ----------------
-    def setDetail_Img(self, imgPath):
+    def setDetail_Img(self, imgPath=''):
         if os.path.isfile(os.path.abspath(imgPath)): # 判断文件
             self.imgPath = os.path.abspath(imgPath)
         else:
@@ -210,10 +243,14 @@ class DetailPage(QtWidgets.QWidget):
 
     def on_Detail_Img_clicked(self):
         # label = self.sender()
+        if self.thread_imgBtn != None: # 判断上一线程是否存在
+            if self.thread_imgBtn.is_alive(): # 判断上一线程是否在运行
+                print('alive')
+                return None
         if self.BtnTime == 0:
             self.BtnTime = 1
             self.openFile(self.imgPath)
-        thread_imgBtn = threading.Thread(target=self.timeing) # 计时线程
+        thread_imgBtn = threading.Thread(target=self.timeing) # 新建计时线程
         self.thread_imgBtn = thread_imgBtn
         thread_imgBtn.setDaemon(True) # 设置子线程为守护线程时，主线程一旦执行结束，则全部线程全部被终止执行
         thread_imgBtn.start()
@@ -225,7 +262,11 @@ class DetailPage(QtWidgets.QWidget):
                 os.makedirs(filePath) # 创建路径
             imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
-            self.setDetail_Img(imgPath)
+            self.imgPath = imgPath[0]
+            self.setDetail_Img(imgPath[0])
+            # set 任务树item的缩略图
+            if self.model_Proj_Task != None:
+                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
         else:
             # 打开文件(可打开外部程序)
             sysstr = platform.system()
@@ -241,8 +282,7 @@ class DetailPage(QtWidgets.QWidget):
 
     # 计时器
     def timeing(self):
-        while self.thread_imgBtn.is_alive():
-            time.sleep(1)
+        time.sleep(1) # 防止过快的重复点击
         self.BtnTime = 0
 
     # ---------------- FL_Info ----------------

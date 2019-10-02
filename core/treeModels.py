@@ -186,6 +186,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 # if index.column() == 1:
                 item.setData(value, index.column())
+                print(item.datas)
                 self.dataChanged.emit(index, index)  # 更新Model的数据
 
                 return True
@@ -273,9 +274,9 @@ class TreeModel(QtCore.QAbstractItemModel):
         return isSuccess
 
     # 获取当前项的首列 index
-    def getFirstColumnIndex(self, index):
+    def getColumnIndex(self, index, column=0):
         currentItem = self.getItem(index)
-        currentIndex = self.index(currentItem.row(), 0, index.parent())
+        currentIndex = self.index(currentItem.row(), column, index.parent())
         return currentIndex
 
 
@@ -295,7 +296,7 @@ class TreeModel_Proj_Task(TreeModel):
 
         # item = index.internalPointer()
         item = self.getItem(index)
-        imgPath = item.data(3) # 获取缩略图路径
+        imgPath = item.data(1) # 获取缩略图路径
 
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             if index.column() == 1: # 缩略图列

@@ -35,7 +35,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
         self.ui.listWidget_General_Proj.setItemWidget(
             self.item, self.itemWidget)  # 为item设置widget
-        self.detailPage = loadWidgets.DetailPage()  # Widget- DetailPage 详细信息面板
+        self.detailPage_Proj_Task = loadWidgets.DetailPage()  # Widget- DetailPage 详细信息面板
 
         # ---------------------------- 项目面板 ---------------------------- #
         ## ------------------ 任务面板 ------------------ #
@@ -49,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置 Model
         self.model_Proj_Task = TreeModel_Proj_Task(self.rootNode_Proj_Task)
         self.ui.treeView_Proj_Task.setModel(self.model_Proj_Task)
+        self.detailPage_Proj_Task.model_Proj_Task = self.model_Proj_Task # 把树model传入detailPage
 
         # treeView_Proj_Task item 点击事件
         self.ui.treeView_Proj_Task.clicked.connect(self.taskTreeItemClicked)
@@ -91,14 +92,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDetailPageInfo(self, index):
         currentItem = self.model_Proj_Task.getItem(index) 
 
-        self.detailPage.datas = currentItem.datas()
+        self.detailPage_Proj_Task.datas = currentItem.datas()
+        self.detailPage_Proj_Task.currentIndex = index
 
         # taskName
-        self.detailPage.setTaskName(currentItem.datas()[4])
+        self.detailPage_Proj_Task.setTaskName(currentItem.datas()[4])
         # type
-        self.detailPage.setTaskType(currentItem.datas()[6])
+        self.detailPage_Proj_Task.setTaskType(currentItem.datas()[6])
         # state
-        self.detailPage.setTaskState(currentItem.datas()[7])
+        self.detailPage_Proj_Task.setTaskState(currentItem.datas()[7])
         # treePath
         treePath = [currentItem.datas()[4]]
         parentItem = currentItem.parent()
@@ -106,20 +108,20 @@ class MainWindow(QtWidgets.QMainWindow):
             treePath.insert(0, parentItem.datas()[4])
             parentItem = parentItem.parent()
         treePath = treePath[1:]
-        self.detailPage.setTreePath(treePath)
+        self.detailPage_Proj_Task.setTreePath(treePath)
         # Detail_Img
-        self.detailPage.setDetail_Img(currentItem.datas()[5])
+        self.detailPage_Proj_Task.setDetail_Img(currentItem.datas()[5])
         # FL_Info
         labels = configure.get_DB_Struct('rootNode_taskInfo')
         datas = currentItem.datas()
         dataTypes = configure.get_DB_Struct('dataTypes')
-        self.detailPage.setFL_Info(labels, datas, dataTypes)
+        self.detailPage_Proj_Task.setFL_Info(labels, datas, dataTypes)
 
 
     # treeView_Proj_Task item 点击事件
     def taskTreeItemClicked(self, index):
         # 获取当前项的首列 index
-        newIndex = self.model_Proj_Task.getFirstColumnIndex(index)
+        newIndex = self.model_Proj_Task.getColumnIndex(index)
         self.model_Proj_Task.updateChild(newIndex) # 更新子项
 
         # 展开子项
@@ -133,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def taskTreeItemDoubleClicked(self, index):
         # QtWidgets.QBoxLayout.itemAt(1).Widget().close() / .show()
         # 添加 详细信息面板UI 到 horizontalLayout_Centralwidget
-        self.ui.horizontalLayout_Centralwidget.addWidget(self.detailPage)
+        self.ui.horizontalLayout_Centralwidget.addWidget(self.detailPage_Proj_Task)
 
         # 设置 详细信息面板 内容
         self.setDetailPageInfo(index)
