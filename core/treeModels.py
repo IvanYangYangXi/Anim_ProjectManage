@@ -455,6 +455,7 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
         QtWidgets.QItemDelegate.__init__(self)
         self.combos = configure.get_DB_Struct(combos)
         self.defaultComboId = int(defaultComboId)
+        self.func = None
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
     def createEditor(self, parent, option, index):
@@ -466,15 +467,18 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
         # 多个添加条目
         editor.addItems(self.combos)
         # 当下拉索引发生改变时发射信号触发绑定的事件
+        # editor.currentIndexChanged.connect(self.currentIndexDataChanged)
         editor.currentIndexChanged.connect(
-            lambda: self.selectionchange(editor))
+            lambda: self.currentIndexDataChanged(editor))
 
         return editor
 
-    def selectionchange(self, editor):
+    def currentIndexDataChanged(self, editor):
         # currentText()：返回选中选项的文本
-        ct = editor.currentText()
-        print('Items in the list are:' + ct)
+        # ct = editor.currentText()
+        # print('Items in the list are:' + ct)
+        if self.func != None:
+            self.func()
 
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, editor, index):
@@ -506,8 +510,9 @@ class DateEditDelegate(QtWidgets.QItemDelegate):
     '''
     在应用它的列的每个单元格中放置一个功能齐全的QComboBox的委托
     '''
-    # def __init__(self):
-    #     QtWidgets.QItemDelegate.__init__(self)
+    def __init__(self):
+        QtWidgets.QItemDelegate.__init__(self)
+        self.func = None
 
     # self.dateEdit = QtGui.QDateEdit(QtCore.QDate.currentDate())
     # self.dateEdit.setDisplayFormat('yyyy-MM-dd')
@@ -517,8 +522,14 @@ class DateEditDelegate(QtWidgets.QItemDelegate):
         editor = QtWidgets.QDateEdit(parent)
         editor.setDisplayFormat('yyyy-MM-dd')
         editor.setCalendarPopup(True)
+        editor.timeChanged.connect(
+            lambda: self.currentIndexDataChanged(editor))
 
         return editor
+
+    def currentIndexDataChanged(self, editor):
+        if self.func != None:
+            self.func()
 
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, editor, index):
@@ -548,6 +559,10 @@ class DateEditDelegate(QtWidgets.QItemDelegate):
 class SpinBoxDelegate(QtWidgets.QItemDelegate):
     '''
     '''
+    def __init__(self):
+        QtWidgets.QItemDelegate.__init__(self)
+        self.func = None
+
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
 
     def createEditor(self, parent, option, index):
@@ -556,8 +571,14 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setMinimum(0)
         editor.setMaximum(1000)
+        editor.valueChanged.connect(
+            lambda: self.currentIndexDataChanged(editor))
 
         return editor
+
+    def currentIndexDataChanged(self, editor):
+        if self.func != None:
+            self.func()
 
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, spinBox, index):
@@ -588,6 +609,10 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
 class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
     '''
     '''
+    def __init__(self):
+        QtWidgets.QItemDelegate.__init__(self)
+        self.func = None
+
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
 
     def createEditor(self, parent, option, index):
@@ -596,8 +621,14 @@ class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setMinimum(0)
         editor.setMaximum(1000)
+        editor.valueChanged.connect(
+            lambda: self.currentIndexDataChanged(editor))
 
         return editor
+
+    def currentIndexDataChanged(self, editor):
+        if self.func != None:
+            self.func()
 
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
     def setEditorData(self, spinBox, index):

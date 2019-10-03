@@ -244,11 +244,11 @@ if __name__ == '__main__':
         state NCHAR(20),
         executive NCHAR(10),
         reporter NCHAR(10),
+        priority NCHAR(20),
         description text,
         deadline CHAR(20),
         estimateTime CHAR(20),
-        remaining CHAR(20),
-        priority NCHAR(20))
+        remaining CHAR(20))
         """
     struct_taskInfo = """
         parentID,
@@ -260,11 +260,11 @@ if __name__ == '__main__':
         state,
         executive,
         reporter,
+        priority,
         description,
         deadline,
         estimateTime,
-        remaining,
-        priority
+        remaining
         """
 
     print(dbPath(projectPath))

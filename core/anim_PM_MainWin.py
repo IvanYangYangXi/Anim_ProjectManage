@@ -78,39 +78,63 @@ class MainWindow(QtWidgets.QMainWindow):
             if dataTypes[i] == 'int':
                 self.delegate[i] = SpinBoxDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
+                # 传入函数对象
+                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i] == 'float':
                 self.delegate[i] = DoubleSpinBoxDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
+                # 传入函数对象
+                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i] == 'date':
                 self.delegate[i] = DateEditDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
+                # 传入函数对象
+                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i].split(':')[0] == 'combo':
                 self.delegate[i] = ComboBoxDelegate(dataTypes[i].split(':')[1], dataTypes[i].split(':')[2])
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
+                # 传入函数对象
+                self.delegate[i].func = self.currentIndexDataChanged
+    
+    # @QtCore.pyqtSlot()
+    def currentIndexDataChanged(self):
+        # print('currentIndexDataChanged')
+        self.setDetailPageInfo(self.ui.treeView_Proj_Task.currentIndex())
 
     # 设置 详细信息面板 内容
     def setDetailPageInfo(self, index):
         currentItem = self.model_Proj_Task.getItem(index) 
-
         self.detailPage_Proj_Task.datas = currentItem.datas()
         self.detailPage_Proj_Task.currentIndex = index
 
+        labels = configure.get_DB_Struct("rootNode_taskInfo")
+
         # taskName
-        self.detailPage_Proj_Task.setTaskName(currentItem.datas()[4])
+        if u'任务' in labels:
+            num = labels.index(u'任务')
+            self.detailPage_Proj_Task.setTaskName(currentItem.datas()[num])
         # type
-        self.detailPage_Proj_Task.setTaskType(currentItem.datas()[6])
+        if u'类型' in labels:
+            num = labels.index(u'类型')
+            self.detailPage_Proj_Task.setTaskType(currentItem.datas()[num])
         # state
-        self.detailPage_Proj_Task.setTaskState(currentItem.datas()[7])
+        if u'状态' in labels:
+            num = labels.index(u'状态')
+            self.detailPage_Proj_Task.setTaskState(currentItem.datas()[num])
         # treePath
-        treePath = [currentItem.datas()[4]]
-        parentItem = currentItem.parent()
-        while parentItem != None:
-            treePath.insert(0, parentItem.datas()[4])
-            parentItem = parentItem.parent()
-        treePath = treePath[1:]
-        self.detailPage_Proj_Task.setTreePath(treePath)
+        if u'任务' in labels:
+            num = labels.index(u'任务')
+            treePath = [currentItem.datas()[num]]
+            parentItem = currentItem.parent()
+            while parentItem != None:
+                treePath.insert(0, parentItem.datas()[num])
+                parentItem = parentItem.parent()
+            treePath = treePath[1:]
+            self.detailPage_Proj_Task.setTreePath(treePath)
         # Detail_Img
-        self.detailPage_Proj_Task.setDetail_Img(currentItem.datas()[5])
+        if u'缩略图' in labels:
+            num = labels.index(u'缩略图')
+            self.detailPage_Proj_Task.setDetail_Img(currentItem.datas()[num])
         # FL_Info
         labels = configure.get_DB_Struct('rootNode_taskInfo')
         datas = currentItem.datas()

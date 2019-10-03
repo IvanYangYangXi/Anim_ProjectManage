@@ -47,14 +47,18 @@ class DetailPage(QtWidgets.QWidget):
         self.closeButton.setToolTip('关闭详细面板')
         self.closeButton.clicked.connect(self.closeEvent)
 
+        # name
+        # self.ui.lineEdit_TaskName.textChanged.connect(self.nameChanged) # 当内容改变时触发事件
+        self.ui.lineEdit_TaskName.editingFinished.connect(lambda: self.lineEditFinished(self.ui.lineEdit_TaskName, u'任务')) # 当内容修改完成时触发事件
+
         # Type
         self.comboBox_TaskType = self.ui.comboBox_TaskType
         taskType = configure.get_DB_Struct('TaskType')
         # 添加多个添加条目
         self.comboBox_TaskType.addItems(taskType)
         # 当下拉索引发生改变时发射信号触发绑定的事件
-        # self.comboBox_TaskType.currentIndexChanged.connect(
-        #     lambda: self.selectionchange(self.comboBox_TaskType))
+        self.comboBox_TaskType.currentIndexChanged.connect(
+            lambda: self.comboBoxSelectionChanged(self.comboBox_TaskType, u'类型'))
 
         # State
         self.comboBox_TaskState = self.ui.comboBox_TaskState
@@ -62,8 +66,8 @@ class DetailPage(QtWidgets.QWidget):
         # 添加多个添加条目
         self.comboBox_TaskState.addItems(TaskState)
         # # 当下拉索引发生改变时发射信号触发绑定的事件
-        # self.comboBox_TaskState.currentIndexChanged.connect(
-        #     lambda: self.selectionchange(self.comboBox_TaskState))
+        self.comboBox_TaskState.currentIndexChanged.connect(
+            lambda: self.comboBoxSelectionChanged(self.comboBox_TaskState, u'状态'))
 
         # TreePath
         self.HL_Detail_TreePath = self.ui.horizontalLayout_Detail_TreePath
@@ -85,6 +89,15 @@ class DetailPage(QtWidgets.QWidget):
         self.FL_Info = self.ui.formLayout_Detail_Info
 
 
+    # 应用修改内容
+    def dataChanged(self, label, data):
+        labels = configure.get_DB_Struct("rootNode_taskInfo")
+        # print(label,labels)
+        if label in labels:
+            num = labels.index(label)
+            if self.model_Proj_Task != None:
+                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, num-4), data)
+    
     # 关闭事件
     def closeEvent(self):
 
@@ -111,23 +124,29 @@ class DetailPage(QtWidgets.QWidget):
             self.imgPath = imgPath[0]
             self.setDetail_Img(self.imgPath)
             # set 任务树item的缩略图
-            if self.model_Proj_Task != None:
-                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
+            self.dataChanged(u'缩略图', self.imgPath)
         elif q.text().encode("utf-8") == "清除缩略图":
             self.setDetail_Img()
             # set 任务树item的缩略图
-            if self.model_Proj_Task != None:
-                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
+            self.dataChanged(u'缩略图', self.imgPath)
+
+    # -------------- 内容改变时 -----------------
+    # lineEdit
+    def lineEditFinished(self, editor, label):
+        if editor.isModified(): # 检测是否进行了任何更改
+            self.dataChanged(label, editor.text())
+        editor.setModified(False)
+
+    # comboBox
+    def comboBoxSelectionChanged(self, editor, label):
+        # currentText()：返回选中选项的文本
+        ct = editor.currentText()
+        self.dataChanged(label, ct)
 
     # -------------- Name -----------------
     # set name
     def setTaskName(self, data):
         self.ui.lineEdit_TaskName.setText(data)
-
-    # def selectionchange(self, editor):
-    #     # currentText()：返回选中选项的文本
-    #     ct = editor.currentText()
-    #     print('Items in the list are:' + ct)
 
     # -------------- Type -----------------
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
@@ -186,7 +205,7 @@ class DetailPage(QtWidgets.QWidget):
                 sip.delete(widget)
         for i in data:
             lable = QtWidgets.QLabel()
-            lable.setText(" <a href='none' style='color:blue'>%s</a>"%str(i))
+            lable.setText(u" <a href='none' style='color:blue'>%s</a>"%i)
             lable.setTextFormat(Qt.Qt.AutoText) # 设置自动文本格式
             lable.setOpenExternalLinks(True) # 打开与外部的连接,允许访问超链接
             # lable.linkActivated.connect(self.link_clicked)#针对链接点击事件
@@ -265,8 +284,7 @@ class DetailPage(QtWidgets.QWidget):
             self.imgPath = imgPath[0]
             self.setDetail_Img(imgPath[0])
             # set 任务树item的缩略图
-            if self.model_Proj_Task != None:
-                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, 1), self.imgPath)
+            self.dataChanged(u'缩略图', self.imgPath)
         else:
             # 打开文件(可打开外部程序)
             sysstr = platform.system()
@@ -367,6 +385,8 @@ class DetailPage(QtWidgets.QWidget):
                 widght = QtWidgets.QLineEdit()
                 # widght.setMinimumWidth(180)
                 widght.setText(datas[i])
+                # 当内容修改完成时触发事件
+                widght.editingFinished.connect(lambda: self.lineEditFinished(widght, labels[i]))
             fromlayout.addRow(label, widght)
             # QtWidgets.QFormLayout.addRow()
 
