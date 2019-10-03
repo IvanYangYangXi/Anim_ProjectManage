@@ -370,8 +370,8 @@ def get_DB_Struct_ToString(variable):
 
 # 用于创建列表
 # 建立自增主键:id integer primary key autoincrement
-create_taskInfo = '(id integer primary key autoincrement,' + str(get_DB_Struct_ToString('create_taskInfo')) + ')'
-
+create_taskInfo = '(id integer primary key autoincrement,' + str(get_DB_Struct_ToString(u'create_taskInfo')) + ')'
+print(create_taskInfo)
 # 用于初始化列表
 struct_taskInfo = get_DB_Struct_ToString('struct_taskInfo')
 

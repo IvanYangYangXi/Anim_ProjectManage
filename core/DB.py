@@ -68,8 +68,7 @@ def CreateTable(projectPath, tableName, createTableStruct):
     conn.text_factory = str
 
     # 执行操作:创建表
-    conn.execute("create table IF NOT EXISTS " +
-                 tableName + " " + createTableStruct)
+    conn.execute("create table IF NOT EXISTS " + tableName + " " + createTableStruct)
 
     conn.commit()  # 保存修改
     conn.close()  # 关闭与数据库的连接
@@ -268,10 +267,10 @@ if __name__ == '__main__':
         """
 
     print(dbPath(projectPath))
-    # CreateTable('table_taskInfo', create_taskInfo)
-    reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
+    CreateTable(projectPath, 'table_taskInfo', create_taskInfo)
+    # reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
-    insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '0', '', 'taskName', '', 'task', 'None', 'executive', 'reporter', u'描述', '', '', '', 'medium'))
+    insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '0', '', 'taskName', '', 'task', 'None', 'executive', 'reporter', 'medium' , u'描述', '', '', ''))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')
     # deleteData('list', 'listName="n22"')
     # print(findData('list', "listName='g11'")[0])
