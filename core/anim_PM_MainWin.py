@@ -45,6 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rootNode_Proj_Task = BaseTreeItem(self.rootItemData_Proj_Task)
 
         print(self.rootNode_Proj_Task)
+        self.ui.treeView_Proj_Task.setColumnWidth(0,200) # 不起作用！！！？
 
         # 设置 Model
         self.model_Proj_Task = TreeModel_Proj_Task(self.rootNode_Proj_Task)

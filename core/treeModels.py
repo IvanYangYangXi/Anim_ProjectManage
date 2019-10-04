@@ -298,6 +298,11 @@ class TreeModel_Proj_Task(TreeModel):
         item = self.getItem(index)
         imgPath = item.data(1) # 获取缩略图路径
 
+        # 设置行高
+        if role == QtCore.Qt.SizeHintRole:
+            # 返回单元格尺寸
+            return QtCore.QSize(0, 40)
+
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
             if index.column() == 1: # 缩略图列
                 return ''
@@ -311,7 +316,7 @@ class TreeModel_Proj_Task(TreeModel):
                 # print("任务")
                 if item.data(2).encode("utf-8") == "任务":
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_blue.png'))
-                elif item.data(2).encode("utf-8") == "Story":
+                elif item.data(2).encode("utf-8") == "用户故事":
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_green.png'))
                 else:
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_gray.png')) 
