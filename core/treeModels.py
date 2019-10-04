@@ -343,7 +343,7 @@ class TreeModel_Proj_Task(TreeModel):
             data[0] = parentID
         # print(data)
         # 数据库插入项并获取其id
-        dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo, data)
+        dbid = DB.insertData(configure.getProjectPath(), 'table_taskInfo', configure.struct_taskInfo(), data)
         
         # 获取并更新父级 childrenID 数据
         childrenID = self.getChildrenIdList(parent)

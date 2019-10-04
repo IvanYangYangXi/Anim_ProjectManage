@@ -268,7 +268,7 @@ if __name__ == '__main__':
 
     print(dbPath(projectPath))
     CreateTable(projectPath, 'table_taskInfo', create_taskInfo)
-    # reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
+    reCreateTable(projectPath, 'table_taskInfo', create_taskInfo)
     # insertColumn('table_taskInfo', 'adds', 'int')
     insertid = insertData(projectPath, 'table_taskInfo', struct_taskInfo, (-1, '0', '', 'taskName', '', 'task', 'None', 'executive', 'reporter', 'medium' , u'描述', '', '', ''))
     # updateData('list', 'listName="n11"', 'listName="g11",listComplete=1')

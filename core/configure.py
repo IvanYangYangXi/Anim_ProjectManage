@@ -329,8 +329,9 @@ def createProjectConfig():
         f = open(getProjectPath() + '/config/projectConfig.ini', 'w')
         f.write(json.dumps(db_Struct))
         f.close()
+    if not os.path.exists(getProjectPath() + '/data/db.db'):  # 判断文件是否存在
         # 创建表
-        DB.CreateTable(getProjectPath(), 'table_taskInfo', create_taskInfo)
+        DB.CreateTable(getProjectPath(), 'table_taskInfo', create_taskInfo())
         print('ProjectConfigure createProjectConfig : Create New Project Config')
 
 
@@ -370,10 +371,14 @@ def get_DB_Struct_ToString(variable):
 
 # 用于创建列表
 # 建立自增主键:id integer primary key autoincrement
-create_taskInfo = '(id integer primary key autoincrement,' + str(get_DB_Struct_ToString(u'create_taskInfo')) + ')'
-print(create_taskInfo)
+def create_taskInfo():
+    create_taskInfo = '(id integer primary key autoincrement,' + str(get_DB_Struct_ToString(u'create_taskInfo')) + ')'
+    print(create_taskInfo())
+    return create_taskInfo
 # 用于初始化列表
-struct_taskInfo = get_DB_Struct_ToString('struct_taskInfo')
+def struct_taskInfo():
+    struct_taskInfo = get_DB_Struct_ToString('struct_taskInfo')
+    return struct_taskInfo
 
 
 if __name__ == '__main__':
