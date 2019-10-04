@@ -131,6 +131,7 @@ def getProjectPath():
             return ''
     except Exception as e:
         print('LocalConfigure getProjectPath error:%s' % e)
+        return ''
 
 
 def setProjectPath(path):
@@ -372,8 +373,8 @@ def get_DB_Struct_ToString(variable):
 # 用于创建列表
 # 建立自增主键:id integer primary key autoincrement
 def create_taskInfo():
-    create_taskInfo = '(id integer primary key autoincrement,' + str(get_DB_Struct_ToString(u'create_taskInfo')) + ')'
-    print(create_taskInfo())
+    create_taskInfo = '(id integer primary key autoincrement,' + get_DB_Struct_ToString('create_taskInfo') + ')'
+    print(create_taskInfo)
     return create_taskInfo
 # 用于初始化列表
 def struct_taskInfo():
