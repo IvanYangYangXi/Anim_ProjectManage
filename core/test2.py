@@ -7,4 +7,5 @@ aa = ['cc', 'dd', 'ee']
 bb = aa.index('dd')
 print(bb)
 
-print("C:\Users\Drock\Desktop\内网通截图20190923110224.png")
+cc = range(10)
+print(cc)

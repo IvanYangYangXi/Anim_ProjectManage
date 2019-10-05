@@ -186,7 +186,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 # if index.column() == 1:
                 item.setData(value, index.column())
-                print(item.datas)
+                # print(item.datas)
                 self.dataChanged.emit(index, index)  # 更新Model的数据
 
                 return True
@@ -286,6 +286,8 @@ class TreeModel_Proj_Task(TreeModel):
 
         # 设置初始项的item
         self._rootItem = item
+        # 数据更新时调用的函数
+        self.func = None
 
         self.updateChild()
     
@@ -326,6 +328,34 @@ class TreeModel_Proj_Task(TreeModel):
                         return QtGui.QIcon(QtGui.QPixmap(imgPath))
                 return QtGui.QIcon(QtGui.QPixmap('./UI/img_loss.jpg'))
                 
+    # 编辑数据
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if index.isValid():
+            item = index.internalPointer()
+
+            if role == QtCore.Qt.EditRole:
+                # if index.column() == 1:
+                item.setData(value, index.column())
+                self.dataChanged.emit(index, index)  # 更新Model的数据
+
+                # 数据更新时调用的函数
+                if self.func != None:
+                    self.func()
+                return True
+        return False
+
+    # 通过详细面板更新数据，不执行函数调用
+    def setDataByDetail(self, index, value, role=QtCore.Qt.EditRole):
+        if index.isValid():
+            item = index.internalPointer()
+
+            if role == QtCore.Qt.EditRole:
+                # if index.column() == 1:
+                item.setData(value, index.column())
+                # print(item.datas)
+                self.dataChanged.emit(index, index)  # 更新Model的数据
+                return True
+        return False
 
     # 返回一组标志
     def flags(self, index):
@@ -412,9 +442,9 @@ class TreeModel_Proj_Task(TreeModel):
         childrenID = self.getChildrenIdList(parent) # 获取 childrenID 列表
         # 添加子项(父项非root项时)
         if childrenID != None:
-            for i in childrenID:
+            for ci in childrenID:
                 # if str.isdigit(i):  # 判断是否为正整数
-                dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%i)
+                dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%ci)
                 itemdata = dbdatas
                 items.append(BaseTreeItem(itemdata, parentItem)) # 根据childrenID添加行
         # 添加二级子项
@@ -425,9 +455,9 @@ class TreeModel_Proj_Task(TreeModel):
             # 获取 childrenID 列表
             secChildrenID = self.getChildrenIdList(itemIndex)
             if secChildrenID != None:
-                for i in secChildrenID:
+                for sci in secChildrenID:
                     # if str.isdigit(i):  # 判断是否为正整数
-                    dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%i)
+                    dbdatas = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%s'%sci)
                     itemdata = dbdatas
                     BaseTreeItem(itemdata, item) # 根据childrenID添加行
 
@@ -472,9 +502,8 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
         # 多个添加条目
         editor.addItems(self.combos)
         # 当下拉索引发生改变时发射信号触发绑定的事件
-        # editor.currentIndexChanged.connect(self.currentIndexDataChanged)
-        editor.currentIndexChanged.connect(
-            lambda: self.currentIndexDataChanged(editor))
+        # editor.currentIndexChanged.connect(
+        #     lambda: self.currentIndexDataChanged(editor))
 
         return editor
 
@@ -527,8 +556,8 @@ class DateEditDelegate(QtWidgets.QItemDelegate):
         editor = QtWidgets.QDateEdit(parent)
         editor.setDisplayFormat('yyyy-MM-dd')
         editor.setCalendarPopup(True)
-        editor.timeChanged.connect(
-            lambda: self.currentIndexDataChanged(editor))
+        # editor.timeChanged.connect(
+        #     lambda: self.currentIndexDataChanged(editor))
 
         return editor
 
@@ -576,8 +605,8 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setMinimum(0)
         editor.setMaximum(1000)
-        editor.valueChanged.connect(
-            lambda: self.currentIndexDataChanged(editor))
+        # editor.valueChanged.connect(
+        #     lambda: self.currentIndexDataChanged(editor))
 
         return editor
 
@@ -626,8 +655,8 @@ class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setFrame(False)
         editor.setMinimum(0)
         editor.setMaximum(1000)
-        editor.valueChanged.connect(
-            lambda: self.currentIndexDataChanged(editor))
+        # editor.valueChanged.connect(
+        #     lambda: self.currentIndexDataChanged(editor))
 
         return editor
 

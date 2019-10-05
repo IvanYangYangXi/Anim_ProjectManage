@@ -49,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # 设置 Model
         self.model_Proj_Task = TreeModel_Proj_Task(self.rootNode_Proj_Task)
+        self.model_Proj_Task.func = self.currentIndexDataChanged # 数据更新时调用的函数
         self.ui.treeView_Proj_Task.setModel(self.model_Proj_Task)
         self.detailPage_Proj_Task.model_Proj_Task = self.model_Proj_Task # 把树model传入detailPage
 
@@ -62,6 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 设置 Item 部件
         self.delegate = range(10)
         self.setDelegate()
+        self.lastSelectIndex = None
         # self.TaskDeadline = DateEditDelegate()
         # self.ui.treeView_Proj_Task.setItemDelegateForColumn(
         #     7, self.TaskDeadline)
@@ -79,23 +81,15 @@ class MainWindow(QtWidgets.QMainWindow):
             if dataTypes[i] == 'int':
                 self.delegate[i] = SpinBoxDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
-                # 传入函数对象
-                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i] == 'float':
                 self.delegate[i] = DoubleSpinBoxDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
-                # 传入函数对象
-                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i] == 'date':
                 self.delegate[i] = DateEditDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
-                # 传入函数对象
-                self.delegate[i].func = self.currentIndexDataChanged
             elif dataTypes[i].split(':')[0] == 'combo':
                 self.delegate[i] = ComboBoxDelegate(dataTypes[i].split(':')[1], dataTypes[i].split(':')[2])
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
-                # 传入函数对象
-                self.delegate[i].func = self.currentIndexDataChanged
     
     # @QtCore.pyqtSlot()
     def currentIndexDataChanged(self):
@@ -104,47 +98,51 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # 设置 详细信息面板 内容
     def setDetailPageInfo(self, index):
-        currentItem = self.model_Proj_Task.getItem(index) 
-        self.detailPage_Proj_Task.datas = currentItem.datas()
-        self.detailPage_Proj_Task.currentIndex = index
+        if index == QtCore.QModelIndex():
+            index = self.lastSelectIndex
+        if index != None: 
+            currentItem = self.model_Proj_Task.getItem(index) 
+            self.detailPage_Proj_Task.datas = currentItem.datas()
+            self.detailPage_Proj_Task.currentIndex = index
 
-        labels = configure.get_DB_Struct("rootNode_taskInfo")
+            labels = configure.get_DB_Struct("rootNode_taskInfo")
 
-        # taskName
-        if u'任务' in labels:
-            num = labels.index(u'任务')
-            self.detailPage_Proj_Task.setTaskName(currentItem.datas()[num])
-        # type
-        if u'类型' in labels:
-            num = labels.index(u'类型')
-            self.detailPage_Proj_Task.setTaskType(currentItem.datas()[num])
-        # state
-        if u'状态' in labels:
-            num = labels.index(u'状态')
-            self.detailPage_Proj_Task.setTaskState(currentItem.datas()[num])
-        # treePath
-        if u'任务' in labels:
-            num = labels.index(u'任务')
-            treePath = [currentItem.datas()[num]]
-            parentItem = currentItem.parent()
-            while parentItem != None:
-                treePath.insert(0, parentItem.datas()[num])
-                parentItem = parentItem.parent()
-            treePath = treePath[1:]
-            self.detailPage_Proj_Task.setTreePath(treePath)
-        # Detail_Img
-        if u'缩略图' in labels:
-            num = labels.index(u'缩略图')
-            self.detailPage_Proj_Task.setDetail_Img(currentItem.datas()[num])
-        # FL_Info
-        labels = configure.get_DB_Struct('rootNode_taskInfo')
-        datas = currentItem.datas()
-        dataTypes = configure.get_DB_Struct('dataTypes')
-        self.detailPage_Proj_Task.setFL_Info(labels, datas, dataTypes)
+            # taskName
+            if u'任务' in labels:
+                num = labels.index(u'任务')
+                self.detailPage_Proj_Task.setTaskName(currentItem.datas()[num])
+            # type
+            if u'类型' in labels:
+                num = labels.index(u'类型')
+                self.detailPage_Proj_Task.setTaskType(currentItem.datas()[num])
+            # state
+            if u'状态' in labels:
+                num = labels.index(u'状态')
+                self.detailPage_Proj_Task.setTaskState(currentItem.datas()[num])
+            # treePath
+            if u'任务' in labels:
+                num = labels.index(u'任务')
+                treePath = [currentItem.datas()[num]]
+                parentItem = currentItem.parent()
+                while parentItem != None:
+                    treePath.insert(0, parentItem.datas()[num])
+                    parentItem = parentItem.parent()
+                treePath = treePath[1:]
+                self.detailPage_Proj_Task.setTreePath(treePath)
+            # Detail_Img
+            if u'缩略图' in labels:
+                num = labels.index(u'缩略图')
+                self.detailPage_Proj_Task.setDetail_Img(currentItem.datas()[num])
+            # FL_Info
+            labels = configure.get_DB_Struct('rootNode_taskInfo')
+            datas = currentItem.datas()
+            dataTypes = configure.get_DB_Struct('dataTypes')
+            self.detailPage_Proj_Task.setFL_Info(labels, datas, dataTypes)
 
 
     # treeView_Proj_Task item 点击事件
     def taskTreeItemClicked(self, index):
+        self.lastSelectIndex = index
         # 获取当前项的首列 index
         newIndex = self.model_Proj_Task.getColumnIndex(index)
         self.model_Proj_Task.updateChild(newIndex) # 更新子项
@@ -158,6 +156,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # treeView_Proj_Task item 双击事件
     def taskTreeItemDoubleClicked(self, index):
+        self.lastSelectIndex = index
         # QtWidgets.QBoxLayout.itemAt(1).Widget().close() / .show()
         # 添加 详细信息面板UI 到 horizontalLayout_Centralwidget
         self.ui.horizontalLayout_Centralwidget.addWidget(self.detailPage_Proj_Task)

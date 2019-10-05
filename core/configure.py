@@ -202,6 +202,27 @@ def removeCollectionPath(path):
 
 
 # ------------------------------ 项目配置文件 ------------------------------- #
+'''
+    注：数据库使用自增id， [0-3]在treeItem中不显示（id，父级，排序，子级），
+            [4-7]在详细信息固定栏显示（'任务','缩略图','类型','状态',）
+    create_taskInfo: DB 创建数据库的Key 及 type （不含id）
+    struct_taskInfo: DB 数据对应的key （不含id）
+    rootNode_taskInfo: 标题行标签内容
+    empty_taskInfo: 空数据时的默认数据，DB Item 的默认数据
+    dataTypes: 自定义数据类型：
+                    整数：'int'
+                    小数：'float'
+                    单行文本：'text'
+                    多行文本：'longText'
+                    人员：'personnel'
+                    时间：'date'
+                    下拉选择框：'combo:下拉框关键字:默认项id'【'combo:TaskType:5'】
+    
+    下拉框关键字对应选项
+        TaskType: 对应任务类型
+        TaskState: 对应任务状态
+        priority: 对应任务优先级
+'''
 db_Struct = {
     'create_taskInfo': [
         'parentID int',

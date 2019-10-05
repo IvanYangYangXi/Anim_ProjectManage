@@ -87,16 +87,17 @@ class DetailPage(QtWidgets.QWidget):
 
         # -------- Info ---------
         self.FL_Info = self.ui.formLayout_Detail_Info
+        self.widght = [] # 用于存储动态添加的部件
 
 
-    # 应用修改内容
+    # 应用详细面板修改的内容
     def dataChanged(self, label, data):
         labels = configure.get_DB_Struct("rootNode_taskInfo")
         # print(label,labels)
         if label in labels:
             num = labels.index(label)
             if self.model_Proj_Task != None:
-                self.model_Proj_Task.setData(self.model_Proj_Task.getColumnIndex(self.currentIndex, num-4), data)
+                self.model_Proj_Task.setDataByDetail(self.model_Proj_Task.getColumnIndex(self.currentIndex, num-4), data)
     
     # 关闭事件
     def closeEvent(self):
@@ -133,9 +134,26 @@ class DetailPage(QtWidgets.QWidget):
     # -------------- 内容改变时 -----------------
     # lineEdit
     def lineEditFinished(self, editor, label):
-        if editor.isModified(): # 检测是否进行了任何更改
+        # 检测是否进行了任何更改
+        if editor.isModified(): 
             self.dataChanged(label, editor.text())
         editor.setModified(False)
+
+    # lineEdit
+    def textEditFinished(self, editor, label):
+        # QtWidgets.QTextEdit.toPlainText
+        print(editor, label)
+        self.dataChanged(label, editor.toPlainText())
+
+    # spinBox
+    def spinBoxFinished(self, editor, label):
+        # QtWidgets.QSpinBox.value
+        self.dataChanged(label, editor.value())
+
+    # QtWidgets.QDateEdit
+    def dateEditFinished(self, editor, label):
+        # QtWidgets.QDateEdit.date
+        self.dataChanged(label, editor.date())
 
     # comboBox
     def comboBoxSelectionChanged(self, editor, label):
@@ -309,6 +327,8 @@ class DetailPage(QtWidgets.QWidget):
         datas = datas[8:]
         dataTypes = dataTypes[8:]
 
+        self.widght = range(len(dataTypes))
+
         fromlayout = self.FL_Info
         for i in range(fromlayout.count()): 
             # fromlayout.itemAt(i).widget().delete()
@@ -321,73 +341,85 @@ class DetailPage(QtWidgets.QWidget):
         for i in range(len(dataTypes)):
             label = QtWidgets.QLabel(labels[i])
             if dataTypes[i] == 'int':
-                widght = QtWidgets.QSpinBox()
-                widght.setFrame(False)
-                widght.setFrame(False)
-                widght.setMinimum(0)
-                widght.setMaximum(1000)
+                self.widght[i] = QtWidgets.QSpinBox()
+                self.widght[i].setFrame(False)
+                self.widght[i].setFrame(False)
+                self.widght[i].setMinimum(0)
+                self.widght[i].setMaximum(1000)
                 if datas[i] != '':
                     try:
-                        widght.setValue(int(datas[i]))
+                        self.widght[i].setValue(int(datas[i]))
                     except Exception as e:
-                        widght.setValue(0)
+                        self.widght[i].setValue(0)
                         print('setFL_Info error:%s' % (e))
                 else:
-                    widght.setValue(0)
+                    self.widght[i].setValue(0)
+                # 当内容修改完成时触发事件
+                self.widght[i].editingFinished.connect(lambda: self.spinBoxFinished(self.widght[i], labels[i]))
             elif dataTypes[i] == 'float':
-                widght = QtWidgets.QDoubleSpinBox()
-                widght.setFrame(False)
-                widght.setFrame(False)
-                widght.setMinimum(0)
-                widght.setMaximum(1000)
+                self.widght[i] = QtWidgets.QDoubleSpinBox()
+                self.widght[i].setFrame(False)
+                self.widght[i].setFrame(False)
+                self.widght[i].setMinimum(0)
+                self.widght[i].setMaximum(1000)
                 if datas[i] != '':
                     try:
-                        widght.setValue(float(datas[i]))
+                        self.widght[i].setValue(float(datas[i]))
                     except Exception as e:
-                        widght.setValue(0)
+                        self.widght[i].setValue(0)
                         print('setFL_Info error:%s' % (e))
                 else:
-                    widght.setValue(0)
+                    self.widght[i].setValue(0)
+                # 当内容修改完成时触发事件
+                self.widght[i].editingFinished.connect(lambda: self.spinBoxFinished(self.widght[i], labels[i]))
             elif dataTypes[i] == 'date':
-                widght = QtWidgets.QDateEdit()
-                widght.setDisplayFormat('yyyy-MM-dd')
-                widght.setCalendarPopup(True)
-                # widght.setMinimumWidth(180)
+                self.widght[i] = QtWidgets.QDateEdit()
+                self.widght[i].setDisplayFormat('yyyy-MM-dd')
+                self.widght[i].setCalendarPopup(True)
+                # self.widght[i].setMinimumWidth(180)
                 if QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'):
-                    widght.setDate(QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'))
+                    self.widght[i].setDate(QtCore.QDate.fromString(datas[i], 'yyyy-MM-dd'))
                 else:
                     now = QtCore.QDate.currentDate()  # 获取当前日期
-                    widght.setDate(now)
+                    self.widght[i].setDate(now)
+                # 当内容修改完成时触发事件
+                self.widght[i].editingFinished.connect(lambda: self.dateEditFinished(self.widght[i], labels[i]))
             elif dataTypes[i] == 'longText':
-                widght = QtWidgets.QTextEdit()
+                self.widght[i] = CustomTextEdit()
                 sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed) 
                 sizePolicy.setHorizontalStretch(0) 
                 sizePolicy.setVerticalStretch(0) 
-                widght.setSizePolicy(sizePolicy)
-                widght.setMinimumSize(180, 50)
-                widght.setMaximumHeight(85)
-                widght.setText(datas[i])
+                self.widght[i].setSizePolicy(sizePolicy)
+                self.widght[i].setMinimumSize(180, 50)
+                self.widght[i].setMaximumHeight(85)
+                self.widght[i].setText(datas[i])
+                # 当内容修改完成时触发事件
+                # self.widght[i].focus_out(self.textEditFinished(self.widght[i], labels[i]))
+                self.widght[i].focus_out.connect(lambda: self.textEditFinished(self.widght[i], labels[i]))
             elif dataTypes[i].split(':')[0] == 'combo':
                 combos = configure.get_DB_Struct(dataTypes[i].split(':')[1])
-                widght = QtWidgets.QComboBox()
-                # widght.setMinimumWidth(180)
+                self.widght[i] = QtWidgets.QComboBox()
+                # self.widght[i].setMinimumWidth(180)
                 # 多个添加条目
-                widght.addItems(combos)
+                self.widght[i].addItems(combos)
                 defaultComboId = int(dataTypes[i].split(':')[2])
-                if dataTypes[i].split(':')[1] in combos:
-                    defaultComboId = combos.index(dataTypes[i].split(':')[1])
+                if datas[i] in combos:
+                    defaultComboId = combos.index(datas[i])
                 # 避免不是由用户引起的信号,因此我们使用blockSignals.
-                widght.blockSignals(True)
+                self.widght[i].blockSignals(True)
                 # ComboBox当前项使用setCurrentIndex()来设置
-                widght.setCurrentIndex(defaultComboId)
-                widght.blockSignals(False)
-            else:
-                widght = QtWidgets.QLineEdit()
-                # widght.setMinimumWidth(180)
-                widght.setText(datas[i])
+                self.widght[i].setCurrentIndex(defaultComboId)
+                self.widght[i].blockSignals(False)
                 # 当内容修改完成时触发事件
-                widght.editingFinished.connect(lambda: self.lineEditFinished(widght, labels[i]))
-            fromlayout.addRow(label, widght)
+                self.widght[i].currentIndexChanged.connect(lambda: self.comboBoxSelectionChanged(self.widght[i], labels[i]))
+            elif dataTypes[i] == 'text' or dataTypes[i] == 'personnel':
+                self.widght[i] = QtWidgets.QLineEdit()
+                # self.widght[i].setMinimumWidth(180)
+                self.widght[i].setText(datas[i])
+                # 当内容修改完成时触发事件
+                # print(self.widght[i])
+                self.widght[i].editingFinished.connect(lambda: self.lineEditFinished(self.widght[i], labels[i]))
+            fromlayout.addRow(label, self.widght[i])
             # QtWidgets.QFormLayout.addRow()
 
 
@@ -417,3 +449,16 @@ class ClickLabel(QtWidgets.QLabel):
             self.clicked.emit()
             self.MyLabelPressed=0
             QtGui.QLabel.mouseReleaseEvent(self, event)
+
+
+# 自定义 TextEdit
+class CustomTextEdit(QtWidgets.QTextEdit):
+
+    focus_out = QtCore.pyqtSignal()
+
+    def __init__(self):
+        super(CustomTextEdit,self).__init__()
+
+    def focusOutEvent(self, event):
+        super(CustomTextEdit,self).focusOutEvent(event)
+        self.focus_out.emit()
