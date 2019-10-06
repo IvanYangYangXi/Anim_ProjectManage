@@ -292,7 +292,7 @@ db_Struct = {
     'dataTypes': [
         'int',
         'int',
-        'int',
+        'text',
         'text',
         'text',
         'img',

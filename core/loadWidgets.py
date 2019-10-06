@@ -46,6 +46,7 @@ class DetailPage(QtWidgets.QWidget):
         self.closeButton = self.ui.pushButton_Detail_Close
         self.closeButton.setToolTip('关闭详细面板')
         self.closeButton.clicked.connect(self.closeEvent)
+        self.ui.pushButton_V_Detail_Close.clicked.connect(self.closeEvent) # 侧边关闭按钮
 
         # name
         # self.ui.lineEdit_TaskName.textChanged.connect(self.nameChanged) # 当内容改变时触发事件
@@ -90,7 +91,7 @@ class DetailPage(QtWidgets.QWidget):
         self.widght = [] # 用于存储动态添加的部件
 
 
-    # 应用详细面板修改的内容
+    # 应用详细面板固定项修改的内容
     def dataChanged(self, label, data):
         labels = configure.get_DB_Struct("rootNode_taskInfo")
         # print(label,labels)
@@ -98,6 +99,31 @@ class DetailPage(QtWidgets.QWidget):
             num = labels.index(label)
             if self.model_Proj_Task != None:
                 self.model_Proj_Task.setDataByDetail(self.model_Proj_Task.getColumnIndex(self.currentIndex, num-4), data)
+    
+    # 应用详细面板动态项修改的内容
+    def dataChangedAll(self):
+        # labels = configure.get_DB_Struct("rootNode_taskInfo")
+        if self.datas != []:
+            # print(self.datas)
+            x = 7
+            for i in self.widght:
+                x += 1
+                if i.inherits('QSpinBox'):
+                    self.datas[x] = i.value()
+                elif i.inherits('QDoubleSpinBox'):
+                    self.datas[x] = i.value()
+                elif i.inherits('QDateEdit'):
+                    self.datas[x] = i.date().toString(QtCore.Qt.ISODate) # 获取日期并转化为文字
+                elif i.inherits('QTextEdit'):
+                    self.datas[x] = i.toPlainText()
+                elif i.inherits('QComboBox'):
+                    self.datas[x] = i.currentText()
+                elif i.inherits('QLineEdit'):
+                    self.datas[x] = i.text()
+                else:
+                    print('FL_Info 存在未指定的控件类型')
+            if self.model_Proj_Task != None:
+                self.model_Proj_Task.setAllDatasByDetail(self.model_Proj_Task.getColumnIndex(self.currentIndex, 0), self.datas)
     
     # 关闭事件
     def closeEvent(self):
@@ -134,14 +160,12 @@ class DetailPage(QtWidgets.QWidget):
     # -------------- 内容改变时 -----------------
     # lineEdit
     def lineEditFinished(self, editor, label):
-        print(editor)
-        print(label)
         # 检测是否进行了任何更改
         if editor.isModified(): 
             self.dataChanged(label, editor.text())
         editor.setModified(False)
 
-    # lineEdit
+    # textEdit
     def textEditFinished(self, editor, label):
         # QtWidgets.QTextEdit.toPlainText
         print(editor, label)
@@ -330,8 +354,9 @@ class DetailPage(QtWidgets.QWidget):
         dataTypes = dataTypes[8:]
 
         self.widght = range(len(dataTypes))
-
+        
         fromlayout = self.FL_Info
+        # 清理FL_Info
         for i in range(fromlayout.count()): 
             # fromlayout.itemAt(i).widget().delete()
             widgetItem = fromlayout.itemAt(0)
@@ -340,6 +365,7 @@ class DetailPage(QtWidgets.QWidget):
                 fromlayout.removeWidget(widget)
                 widget.setParent(None)
                 sip.delete(widget)
+        # 添加控件
         for i in range(len(dataTypes)):
             label = QtWidgets.QLabel(labels[i])
             if dataTypes[i] == 'int':
@@ -357,7 +383,7 @@ class DetailPage(QtWidgets.QWidget):
                 else:
                     self.widght[i].setValue(0)
                 # 当内容修改完成时触发事件
-                self.widght[i].editingFinished.connect(lambda: self.spinBoxFinished(self.widght[i], labels[i]))
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
             elif dataTypes[i] == 'float':
                 self.widght[i] = QtWidgets.QDoubleSpinBox()
                 self.widght[i].setFrame(False)
@@ -373,7 +399,7 @@ class DetailPage(QtWidgets.QWidget):
                 else:
                     self.widght[i].setValue(0)
                 # 当内容修改完成时触发事件
-                self.widght[i].editingFinished.connect(lambda: self.spinBoxFinished(self.widght[i], labels[i]))
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
             elif dataTypes[i] == 'date':
                 self.widght[i] = QtWidgets.QDateEdit()
                 self.widght[i].setDisplayFormat('yyyy-MM-dd')
@@ -385,7 +411,7 @@ class DetailPage(QtWidgets.QWidget):
                     now = QtCore.QDate.currentDate()  # 获取当前日期
                     self.widght[i].setDate(now)
                 # 当内容修改完成时触发事件
-                self.widght[i].editingFinished.connect(lambda: self.dateEditFinished(self.widght[i], labels[i]))
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
             elif dataTypes[i] == 'longText':
                 self.widght[i] = CustomTextEdit()
                 sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed) 
@@ -397,7 +423,7 @@ class DetailPage(QtWidgets.QWidget):
                 self.widght[i].setText(datas[i])
                 # 当内容修改完成时触发事件
                 # self.widght[i].focus_out(self.textEditFinished(self.widght[i], labels[i]))
-                self.widght[i].focus_out.connect(lambda: self.textEditFinished(self.widght[i], labels[i]))
+                self.widght[i].focus_out.connect(self.dataChangedAll)
             elif dataTypes[i].split(':')[0] == 'combo':
                 combos = configure.get_DB_Struct(dataTypes[i].split(':')[1])
                 self.widght[i] = QtWidgets.QComboBox()
@@ -413,15 +439,13 @@ class DetailPage(QtWidgets.QWidget):
                 self.widght[i].setCurrentIndex(defaultComboId)
                 self.widght[i].blockSignals(False)
                 # 当内容修改完成时触发事件
-                self.widght[i].currentIndexChanged.connect(lambda: self.comboBoxSelectionChanged(self.widght[i], labels[i]))
+                self.widght[i].currentIndexChanged.connect(self.dataChangedAll)
             elif dataTypes[i] == 'text' or dataTypes[i] == 'personnel':
                 self.widght[i] = QtWidgets.QLineEdit()
                 # self.widght[i].setMinimumWidth(180)
                 self.widght[i].setText(datas[i])
                 # 当内容修改完成时触发事件
-                print(self.widght[i])
-                print(labels[i])
-                self.widght[i].editingFinished.connect(lambda: self.lineEditFinished(self.widght[i], labels[i]))
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
             fromlayout.addRow(label, self.widght[i])
             # QtWidgets.QFormLayout.addRow()
 

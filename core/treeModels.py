@@ -357,6 +357,25 @@ class TreeModel_Proj_Task(TreeModel):
                 return True
         return False
 
+    # 通过详细面板更新item 所有数据，不执行函数调用
+    def setAllDatasByDetail(self, index, datas, role=QtCore.Qt.EditRole):
+        if index.isValid():
+            item = index.internalPointer()
+
+            if role == QtCore.Qt.EditRole:
+                # if index.column() == 1:
+                # item._itemData = datas
+                datas = datas[8:]
+                # 更新数据库数据
+                x = 3
+                for i in datas:
+                    x += 1
+                    item.setData(i, x)
+                    index_X = self.index(index.row(), x, index.parent())
+                    self.dataChanged.emit(index_X, index_X)  # 更新Model的数据
+                return True
+        return False
+
     # 返回一组标志
     def flags(self, index):
 

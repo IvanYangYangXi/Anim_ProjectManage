@@ -30,7 +30,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_Centralwidget">
       <property name="spacing">
-       <number>3</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="QTabWidget" name="tabWidget">
@@ -208,6 +208,9 @@
           <string>项目</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -222,8 +225,14 @@
           </property>
           <item>
            <widget class="QSplitter" name="splitter_2">
+            <property name="lineWidth">
+             <number>1</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="handleWidth">
+             <number>5</number>
             </property>
             <widget class="QWidget" name="verticalLayoutWidget_4">
              <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,16,0,0">
@@ -231,15 +240,32 @@
                <number>5</number>
               </property>
               <item>
-               <widget class="QListWidget" name="listWidget_3"/>
+               <widget class="QListWidget" name="listWidget_3">
+                <property name="baseSize">
+                 <size>
+                  <width>200</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
               </item>
               <item>
-               <widget class="QTreeView" name="treeView_Proj_list"/>
+               <widget class="QTreeView" name="treeView_Proj_list">
+                <property name="baseSize">
+                 <size>
+                  <width>200</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
