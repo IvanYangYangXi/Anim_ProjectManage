@@ -134,6 +134,8 @@ class DetailPage(QtWidgets.QWidget):
     # -------------- 内容改变时 -----------------
     # lineEdit
     def lineEditFinished(self, editor, label):
+        print(editor)
+        print(label)
         # 检测是否进行了任何更改
         if editor.isModified(): 
             self.dataChanged(label, editor.text())
@@ -417,7 +419,8 @@ class DetailPage(QtWidgets.QWidget):
                 # self.widght[i].setMinimumWidth(180)
                 self.widght[i].setText(datas[i])
                 # 当内容修改完成时触发事件
-                # print(self.widght[i])
+                print(self.widght[i])
+                print(labels[i])
                 self.widght[i].editingFinished.connect(lambda: self.lineEditFinished(self.widght[i], labels[i]))
             fromlayout.addRow(label, self.widght[i])
             # QtWidgets.QFormLayout.addRow()
