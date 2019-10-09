@@ -14,6 +14,7 @@ import threading, time
 import platform
 import subprocess
 import configure
+import shutil # 文件夹操作
 
 
 # 项目列表项
@@ -489,3 +490,149 @@ class CustomTextEdit(QtWidgets.QTextEdit):
     def focusOutEvent(self, event):
         super(CustomTextEdit,self).focusOutEvent(event)
         self.focus_out.emit()
+
+
+# ------------ 文件列表 -------------------#
+class DropListWidget(QtWidgets.QListWidget):
+    def __init__(self, parent=None):
+        super(DropListWidget, self).__init__(parent)
+
+        self.lastPath = configure.getProjectPath()
+
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True) # 开启可拖放事件
+        self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection) # 按住CTRL可多选
+        # 创建右键菜单
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showListRightMenu)
+        # 双击打开文件
+        self.itemDoubleClicked.connect(self.openFile)
+
+        self._path = '' # 列表显示内容所在目录
+
+    # 拖放进入事件
+    def dragEnterEvent(self, event):
+        print(event.mimeData().urls())  # 文件所有的路径
+        print(event.mimeData().text())  # 文件路径
+        print(event.mimeData().formats())  # 支持的所有格式
+        if self._path != '':
+            if event.mimeData().hasUrls():
+                event.accept()
+            elif event.mimeData().hasFormat('application/x-qabstractitemmodeldatalist'):
+                items = self.selectedItems()
+                urls = []
+                for i in items:
+                    urls.append(QtCore.QUrl('file:///' + os.path.join(self._path, i.text())))
+                event.mimeData().setUrls(urls)
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            showErrorMsg('请先选择目录')
+            event.ignore()
+
+    # 拖放移动事件
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.setDropAction(QtCore.Qt.MoveAction)
+            event.accept()
+        elif event.mimeData().hasFormat('application/x-qabstractitemmodeldatalist'):
+            event.setDropAction(QtCore.Qt.MoveAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    # 拖放释放事件
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls():
+            pathes = event.mimeData().urls()
+            for path in pathes:
+                s = str(path)
+                s = s.replace("PyQt5.QtCore.QUrl('file:///",'')
+                s = s.replace("')", '')
+                if os.path.isfile(s):
+                    # fpath,fname = os.path.split(s)
+                    if not os.path.exists(self._path):
+                        os.makedirs(self._path) # 创建路径
+                    shutil.copy(s, self._path)
+            self.updateList()
+
+    # 更新文件列表
+    def updateList(self):
+        self.clear()
+        if os.path.exists(self._path):
+            for data in os.listdir(self._path): # 获取当前路径下的文件
+                self.addItem(data)
+
+    # 创建右键菜单(list)
+    def showListRightMenu(self, pos):
+        # 创建QMenu
+        rightMenu = QtWidgets.QMenu(self)
+        itemOpen = rightMenu.addAction('打开路径')
+        itemImport = rightMenu.addAction('导入文件')
+        itemRefresh = rightMenu.addAction('刷新')
+        rightMenu.addSeparator() # 分隔器
+        itemRename = rightMenu.addAction('重命名')
+        # itemAddChild = rightMenu.addAction('添加子项')
+        itemDelete = rightMenu.addAction('删除选择项')
+        rightMenu.addSeparator() # 分隔器
+        # item3.setEnabled(False)
+        # # 添加二级菜单
+        # secondMenu = rightMenu.addMenu('二级菜单')
+        # item4 = secondMenu.addAction('test4')
+
+        items = self.selectedItems()
+        # 禁用项
+        if len(items) != 1:
+            itemRename.setEnabled(False)
+        if len(items) == 0:
+            itemDelete.setEnabled(False)
+        # 将动作与处理函数相关联 
+        # item1.triggered.connect()
+
+        action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示
+        # ------------------ 右键事件 ------------------- #
+        if action == itemImport:
+            if self._path != '':
+                files = QtWidgets.QFileDialog.getOpenFileNames(None, "Find File", self.lastPath)[0] # 选择文件
+                self.lastPath = os.path.split(files[0])[0] # 设置选择文件的目录
+                for path in files:
+                    if os.path.isfile(path):
+                        if not os.path.exists(self._path):
+                            os.makedirs(self._path) # 创建路径
+                        shutil.copy(path, self._path) # 复制文件
+                self.updateList()
+            else:
+                showErrorMsg('请先选择目录')
+        # 打开路径（在资源管理器中显示）
+        if action == itemOpen:
+            if os.path.exists(self._path):
+                os.startfile(self._path)
+        # 刷新
+        if action == itemRefresh:
+            self.updateList()
+        # 重命名
+        if action == itemRename:
+            value, ok = QtWidgets.QInputDialog.getText(self, "重命名", "请输入文本:", QtWidgets.QLineEdit.Normal, os.path.splitext(items[0].text())[0])
+            if ok:
+                try:
+                    os.rename(os.path.join(self._path, items[0].text()), os.path.join(self._path, value + os.path.splitext(items[0].text())[1]))
+                    self.updateList()
+                except Exception as e:
+                    showErrorMsg('重命名失败，错误代码：%s'%(e))
+        # 删除选择项
+        if action == itemDelete:
+            reply = QtWidgets.QMessageBox.warning(self, "消息框标题",  "确认删除选择项?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            if reply:
+                for i in items:
+                    path = os.path.join(self._path, i.text())
+                    os.remove(path)    #删除文件
+                self.updateList()
+        
+    # 打开文件(可打开外部程序)
+    def openFile(self, item):
+        os.startfile(os.path.join(self._path, item.text()))
+
+
+def showErrorMsg(msg):
+    print(msg)
