@@ -106,7 +106,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.detailPage_Proj_Task.currentIndex = index
 
             labels = configure.get_DB_Struct("rootNode_taskInfo")
-
+            # ---------- 信息 -----------
             # taskName
             if u'任务' in labels:
                 num = labels.index(u'任务')
@@ -139,6 +139,10 @@ class MainWindow(QtWidgets.QMainWindow):
             dataTypes = configure.get_DB_Struct('dataTypes')
             self.detailPage_Proj_Task.setFL_Info(labels, datas, dataTypes)
 
+            # ---------- 文件 -----------
+            # fileList_Path
+            self.detailPage_Proj_Task.fileList._path = configure.getProjectPath() + '/data/Content/%s'%currentItem.datas()[0]
+            self.detailPage_Proj_Task.fileList.updateList() # 更新文件列表
 
     # treeView_Proj_Task item 点击事件
     def taskTreeItemClicked(self, index):

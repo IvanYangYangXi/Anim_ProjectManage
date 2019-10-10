@@ -91,6 +91,9 @@ class DetailPage(QtWidgets.QWidget):
         self.FL_Info = self.ui.formLayout_Detail_Info
         self.widght = [] # 用于存储动态添加的部件
 
+        # -------- fileList ---------
+        self.fileList = DropListWidget(self.ui.verticalLayout_file)
+
 
     # 应用详细面板固定项修改的内容
     def dataChanged(self, label, data):

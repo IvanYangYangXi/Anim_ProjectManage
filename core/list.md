@@ -29,6 +29,7 @@
   - [ ] 系统文件夹（ $PMF_SystemFiles ）并设置文件夹为隐藏
   - [ ] 附件文件夹（ accessories ）
   - [ ] 资产文件夹（ Content ）
+  - [ ] 历史版本文件（ Revisions ）
   - [ ] 自定义资产类型自动归类到对应文件夹下（默认分 sourceFile ：源文件（其他文件）， Meshes ：模型文件， Textures ：贴图文件）
 - [ ] 修改缩略图为指定目录下的图片（$PMF_SystemFiles -> accessories ）
 - [ ] 选择或粘贴缩略图时自动复制到指定目录下
