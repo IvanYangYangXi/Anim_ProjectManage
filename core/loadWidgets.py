@@ -555,6 +555,9 @@ class DropListWidget(QtWidgets.QListWidget):
                 s = s.replace("')", '')
                 if os.path.isfile(s):
                     # fpath,fname = os.path.split(s)
+                    meshPath = self._path + '/Content/Meshes'
+                    texPath = self._path + '/Content/Textures'
+                    sourceFilePath = self._path + '/Content/sourceFile'
                     if not os.path.exists(self._path):
                         os.makedirs(self._path) # 创建路径
                     shutil.copy(s, self._path)
