@@ -92,7 +92,8 @@ class DetailPage(QtWidgets.QWidget):
         self.widght = [] # 用于存储动态添加的部件
 
         # -------- fileList ---------
-        self.fileList = DropListWidget(self.ui.verticalLayout_file)
+        self.fileList = DropListWidget()
+        self.ui.verticalLayout_file.addWidget(self.fileList)
 
 
     # 应用详细面板固定项修改的内容
@@ -150,7 +151,7 @@ class DetailPage(QtWidgets.QWidget):
             filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
-            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
+            imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
             self.imgPath = imgPath[0]
             self.setDetail_Img(self.imgPath)
@@ -327,7 +328,7 @@ class DetailPage(QtWidgets.QWidget):
             filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
-            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
+            imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
             self.imgPath = imgPath[0]
             self.setDetail_Img(imgPath[0])
@@ -495,7 +496,7 @@ class CustomTextEdit(QtWidgets.QTextEdit):
         self.focus_out.emit()
 
 
-# ------------ 文件列表 -------------------#
+# ------------ 列表 -------------------#
 class DropListWidget(QtWidgets.QListWidget):
     def __init__(self, parent=None):
         super(DropListWidget, self).__init__(parent)
@@ -510,14 +511,26 @@ class DropListWidget(QtWidgets.QListWidget):
         self.customContextMenuRequested.connect(self.showListRightMenu)
         # 双击打开文件
         self.itemDoubleClicked.connect(self.openFile)
+        # 设置自定义item
+        self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
+        # self.item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
+        self.itemWidget = loadWidgets.ListItem_General_Proj()  # itemWidget
+        self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
+        self.ui.listWidget_General_Proj.setItemWidget(
+            self.item, self.itemWidget)  # 为item设置widget
 
         self._path = '' # 列表显示内容所在目录
+        # 显示的列表
+        self.showSource = True
+        self.showMesh = True
+        self.showTex = True
+        self.showRevisions = False
 
     # 拖放进入事件
     def dragEnterEvent(self, event):
         print(event.mimeData().urls())  # 文件所有的路径
         print(event.mimeData().text())  # 文件路径
-        print(event.mimeData().formats())  # 支持的所有格式
+        # print(event.mimeData().formats())  # 支持的所有格式
         if self._path != '':
             if event.mimeData().hasUrls():
                 event.accept()
@@ -552,23 +565,71 @@ class DropListWidget(QtWidgets.QListWidget):
             for path in pathes:
                 s = str(path)
                 s = s.replace("PyQt5.QtCore.QUrl('file:///",'')
+                s = s.replace("PyQt5.QtCore.QUrl(u'file:///",'')
                 s = s.replace("')", '')
+                print(s)
                 if os.path.isfile(s):
-                    # fpath,fname = os.path.split(s)
+                    fpath,fname = os.path.split(s) # 分离文件名和路径
+                    # fname = os.path.split(s)[1] # 获取文件名带后缀
                     meshPath = self._path + '/Content/Meshes'
                     texPath = self._path + '/Content/Textures'
-                    sourceFilePath = self._path + '/Content/sourceFile'
-                    if not os.path.exists(self._path):
-                        os.makedirs(self._path) # 创建路径
-                    shutil.copy(s, self._path)
+                    sourceFilePath = self._path + '/Content/SourceFile'
+                    # sourceFilePath_Revisions = sourceFilePath + '/Revisions' # 历史文件
+                    # 模型文件
+                    # os.path.splitext(s)[1] # 获取文件后缀
+                    if os.path.splitext(s)[1] in ['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ']:
+                        if os.path.isfile(meshPath+'/'+fname): # 文件是否已存在（重名文件）
+                            if not os.path.exists(meshPath + '/Revisions'): # 历史版本文件夹
+                                os.makedirs(meshPath + '/Revisions') # 创建路径
+                            shutil.move(meshPath+'/'+fname, meshPath+'/Revisions/'+fname) # 移动文件到历史版本文件夹
+                        if not os.path.exists(meshPath):
+                            os.makedirs(meshPath) # 创建路径
+                        shutil.copy(s, meshPath) # 复制文件
+                    # 贴图文件
+                    elif os.path.splitext(s)[1] in ['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']:
+                        if not os.path.isfile(texPath):
+                            os.makedirs(texPath) # 创建路径
+                        shutil.copy(s, texPath)
+                    # 源文件（其他文件）
+                    else:
+                        if not os.path.exists(sourceFilePath):
+                            os.makedirs(sourceFilePath) # 创建路径
+                        shutil.copy(s, sourceFilePath)
             self.updateList()
 
     # 更新文件列表
     def updateList(self):
+        meshPath = self._path + '/Content/Meshes'
+        texPath = self._path + '/Content/Textures'
+        sourceFilePath = self._path + '/Content/SourceFile'
+
         self.clear()
-        if os.path.exists(self._path):
-            for data in os.listdir(self._path): # 获取当前路径下的文件
-                self.addItem(data)
+        if self.showSource:
+            if os.path.exists(sourceFilePath):
+                for data in os.listdir(sourceFilePath): # 获取当前路径下的文件
+                    self.addItem(data)
+        if self.showMesh:
+            if os.path.exists(meshPath):
+                for data in os.listdir(meshPath): # 获取当前路径下的文件
+                    self.addItem(data)
+        if self.showTex:
+            if os.path.exists(texPath):
+                for data in os.listdir(texPath): # 获取当前路径下的文件
+                    self.addItem(data)
+        # 历史文件
+        if self.showRevisions:
+            if self.showSource:
+                if os.path.exists(sourceFilePath + '/Revisions'):
+                    for data in os.listdir(sourceFilePath + '/Revisions'): 
+                        self.addItem(data)
+            if self.showMesh:
+                if os.path.exists(meshPath + '/Revisions'):
+                    for data in os.listdir(meshPath + '/Revisions'): 
+                        self.addItem(data)
+            if self.showTex:
+                if os.path.exists(texPath + '/Revisions'):
+                    for data in os.listdir(texPath + '/Revisions'): 
+                        self.addItem(data)
 
     # 创建右键菜单(list)
     def showListRightMenu(self, pos):
@@ -578,6 +639,8 @@ class DropListWidget(QtWidgets.QListWidget):
         itemImport = rightMenu.addAction('导入文件')
         itemRefresh = rightMenu.addAction('刷新')
         rightMenu.addSeparator() # 分隔器
+        accessories = rightMenu.addAction('设置缩略图')
+        cleraAccessories = rightMenu.addAction('清除缩略图')
         itemRename = rightMenu.addAction('重命名')
         # itemAddChild = rightMenu.addAction('添加子项')
         itemDelete = rightMenu.addAction('删除选择项')
@@ -591,6 +654,8 @@ class DropListWidget(QtWidgets.QListWidget):
         # 禁用项
         if len(items) != 1:
             itemRename.setEnabled(False)
+            accessories.setEnabled(False)
+            cleraAccessories.setEnabled(False)
         if len(items) == 0:
             itemDelete.setEnabled(False)
         # 将动作与处理函数相关联 
@@ -600,7 +665,7 @@ class DropListWidget(QtWidgets.QListWidget):
         # ------------------ 右键事件 ------------------- #
         if action == itemImport:
             if self._path != '':
-                files = QtWidgets.QFileDialog.getOpenFileNames(None, "Find File", self.lastPath)[0] # 选择文件
+                files = QtWidgets.QFileDialog.getOpenfnames(None, "Find File", self.lastPath)[0] # 选择文件
                 self.lastPath = os.path.split(files[0])[0] # 设置选择文件的目录
                 for path in files:
                     if os.path.isfile(path):
@@ -638,6 +703,11 @@ class DropListWidget(QtWidgets.QListWidget):
     # 打开文件(可打开外部程序)
     def openFile(self, item):
         os.startfile(os.path.join(self._path, item.text()))
+
+
+# # ---------- 文件列表 ----------- #
+# class DetailFileListWidget(DropListWidget):
+
 
 
 def showErrorMsg(msg):

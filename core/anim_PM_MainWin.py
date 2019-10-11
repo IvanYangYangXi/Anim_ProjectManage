@@ -35,6 +35,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
         self.ui.listWidget_General_Proj.setItemWidget(
             self.item, self.itemWidget)  # 为item设置widget
+
+        # -------------------------- 详细信息面板 -------------------------- #
         self.detailPage_Proj_Task = loadWidgets.DetailPage()  # Widget- DetailPage 详细信息面板
 
         # ---------------------------- 项目面板 ---------------------------- #
