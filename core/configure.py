@@ -214,6 +214,7 @@ def removeCollectionPath(path):
                     小数：'float'
                     单行文本：'text'
                     多行文本：'longText'
+                    英文字符: 'string'
                     人员：'personnel'
                     时间：'date'
                     下拉选择框：'combo:下拉框关键字:默认项id'【'combo:TaskType:5'】
@@ -232,6 +233,7 @@ db_Struct = {
         'img text',
         'type NCHAR(30)',
         'state NCHAR(20)',
+        'abbreviation CHAR(50)',
         'executive NCHAR(20)',
         'reporter NCHAR(20)',
         'priority NCHAR(20)',
@@ -248,6 +250,7 @@ db_Struct = {
         'img',
         'type',
         'state',
+        'abbreviation',
         'executive',
         'reporter',
         'priority',
@@ -265,6 +268,7 @@ db_Struct = {
         '缩略图',
         '类型',
         '状态',
+        '英文简称',
         '执行人',
         '报告人',
         '优先级',
@@ -281,6 +285,7 @@ db_Struct = {
         '',
         '任务',
         '待办',
+        '',
         'executive',
         'reporter',
         'medium',
@@ -298,6 +303,7 @@ db_Struct = {
         'img',
         'combo:TaskType:5',
         'combo:TaskState:0',
+        'string',
         'personnel',
         'personnel',
         'combo:priority:1',

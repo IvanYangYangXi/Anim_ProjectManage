@@ -7,89 +7,59 @@
 # @Date   : 7/11/2019, 11:08:15 AM
 
 
-#!/usr/bin/python  
-# -*-coding:utf-8-*-
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-
-# 主入口文件
-class MainWidget(QDialog):
-    def __init__(self, parent=None):
-        super(MainWidget, self).__init__(parent)
-        self.setMinimumSize(100, 100)
-        self.setWindowFlags(Qt.CustomizeWindowHint|Qt.WindowCloseButtonHint)
-        self.setWindowOpacity(0.9)
-
-        # 添加头部group
-        self.headDict = {}
-        self.headPostArrayKey = 0
-        self.HeadGroupBox = QGroupBox(u'动态添加控件数据')
-        self.HeadGroupBox.setMinimumHeight(100)  #高度最小值
-        self.HeadGroupBox.scroll(100,2)
-        self.HeadAddParam = QPushButton(u'+')
-        self.headDict[str(self.headPostArrayKey)+'_key'] = QLineEdit()
-        self.headDict[str(self.headPostArrayKey)+'_value'] = QLineEdit()
-        self.HeadGroupBoxLayout = QGridLayout()
-        self.HeadGroupBoxLayout.addWidget(self.HeadAddParam, 0, 0)
-        self.HeadGroupBoxLayout.addWidget(QLabel(u'Key：'), 1, 0)
-        self.HeadGroupBoxLayout.addWidget(self.headDict[str(self.headPostArrayKey)+'_key'], 1, 1)
-        self.HeadGroupBoxLayout.addWidget(QLabel(u'Value：'), 1, 2)
-        self.HeadGroupBoxLayout.addWidget(self.headDict[str(self.headPostArrayKey)+'_value'], 1, 3)
-        self.HeadGroupBox.setLayout(self.HeadGroupBoxLayout)
-        self.HeadAddParam.clicked.connect(self.addHeadParam)
 
 
-        # 提交按钮
-        self.btnPost = QPushButton(u'提交')
-        self.postbtnLoayout = QHBoxLayout()
-        self.postbtnLoayout.addStretch()
-        self.postbtnLoayout.addWidget(self.btnPost)
-        # Main布局
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.HeadGroupBox)
-        main_layout.addLayout(self.postbtnLoayout)  # addLayout 添加的是 Layout
-        main_layout.setSpacing(0)
-        self.setLayout(main_layout)
+#QLineEdit控件使用
+import sys
+from  PyQt5.QtWidgets import QPushButton,QApplication,QMainWindow,QLineEdit,QFormLayout,QWidget,QLabel
+from PyQt5.QtGui import QIntValidator,QDoubleValidator,QRegExpValidator
+from PyQt5.QtCore import  QRegExp
+class QLineEditDemo(QWidget):
+    def __init__(self,parent=None):
+        super(QLineEditDemo,self).__init__(parent)
 
-        self.connect(self.btnPost, SIGNAL('clicked()'), self.postData)
+        self.setWindowTitle("QLineEdit控件使用格式校验")
+        self.resize(500,600)
+        self.formLayout=QFormLayout()
+
+        edit_int=QLineEdit()
+        edit_int.setPlaceholderText("请输入整数！")
+        #设置获取焦点
+        edit_int.setFocus()
+
+        edit_float=QLineEdit()
+        edit_float.setPlaceholderText("请输入浮点数！")
+
+        edit_chars= QLineEdit()
+        edit_chars.setPlaceholderText("请输入指定格式字符！")
 
 
-    def postData(self):
-        self.headdictdata={}
-        for k, v in self.headDict.items():
-            temp=k.split('_')
-            if temp[1]=='key':
-                if self.headdictdata.has_key(temp[0]):
-                    self.headdictdata[temp[0]]['key'] =str(v.text())
-                else:
-                    self.headdictdata[temp[0]] = {'key':str(v.text())}
+        self.formLayout.addRow("整数",edit_int)
+        self.formLayout.addRow("浮点型",edit_float)
+        self.formLayout.addRow("指定格式字符串", edit_chars)
+        #格式校验
+        intValidator=QIntValidator(self)
+        intValidator.setRange(1,200)
 
-            elif temp[1]=='value':
-                if self.headdictdata.has_key(temp[0]):
-                    self.headdictdata[temp[0]]['value'] =str(v.text())
-                else:
-                    self.headdictdata[temp[0]] = {'value':str(v.text())}
+        doubleValidator=QDoubleValidator(self)
+        doubleValidator.setRange(-300,300)
+        doubleValidator.setNotation(QDoubleValidator.StandardNotation)
+        doubleValidator.setDecimals(2)
 
-        print(self.headdictdata)
+        reg=QRegExp("[a-zA-Z]{6,8}")
+        cValidator=QRegExpValidator(self)
+        cValidator.setRegExp(reg)
 
-    # 添加头部Data
-    def addHeadParam(self):
-        sts=str(self.headPostArrayKey+1)
-        self.headDict[sts+'_key'] = QLineEdit(sts+'name')
-        self.headDict[sts+'_value'] = QLineEdit(sts+'chrome')
+        edit_int.setValidator(intValidator)
+        edit_float.setValidator(doubleValidator)
+        edit_chars.setValidator(cValidator)
 
-        self.HeadGroupBoxLayout.addWidget(QLabel(u'Key'))
-        self.HeadGroupBoxLayout.addWidget(self.headDict[sts+'_key'])
-        self.HeadGroupBoxLayout.addWidget(QLabel(u'Value'))
-        self.HeadGroupBoxLayout.addWidget(self.headDict[sts+'_value'])
-        self.headPostArrayKey+=1
+        self.setLayout(self.formLayout)
 
 
 
-if __name__ == "__main__":
-    import sys
-    app = QApplication(sys.argv) 
-    main_widget = MainWidget()
-    main_widget.show()
+if __name__=="__main__":
+    app=QApplication(sys.argv)
+    win=QLineEditDemo()
+    win.show()
     sys.exit(app.exec_())

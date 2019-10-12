@@ -89,6 +89,9 @@ class MainWindow(QtWidgets.QMainWindow):
             elif dataTypes[i] == 'date':
                 self.delegate[i] = DateEditDelegate()
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
+            elif dataTypes[i] == 'string':
+                self.delegate[i] = StringLineEditDelegate()
+                self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])
             elif dataTypes[i].split(':')[0] == 'combo':
                 self.delegate[i] = ComboBoxDelegate(dataTypes[i].split(':')[1], dataTypes[i].split(':')[2])
                 self.ui.treeView_Proj_Task.setItemDelegateForColumn(i, self.delegate[i])

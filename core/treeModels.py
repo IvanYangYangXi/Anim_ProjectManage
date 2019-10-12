@@ -9,7 +9,7 @@
 
 import sys, os
 import shutil
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5 import QtCore, QtGui, QtWidgets, uic, Qt
 import DB
 import configure
 
@@ -557,7 +557,6 @@ class ComboBoxDelegate(QtWidgets.QItemDelegate):
         editor.setGeometry(option.rect)
 
 
-
 # 时间选择控件
 class DateEditDelegate(QtWidgets.QItemDelegate):
     '''
@@ -700,6 +699,52 @@ class DoubleSpinBoxDelegate(QtWidgets.QItemDelegate):
     def setModelData(self, spinBox, model, index):
         spinBox.interpretText()
         value = spinBox.value()
+
+        model.setData(index, value, QtCore.Qt.EditRole)
+
+    # 根据给定的样式选项更新索引指定的项目的编辑器。
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+
+# 英文字符输入框
+class StringLineEditDelegate(QtWidgets.QItemDelegate):
+    '''
+    '''
+    def __init__(self):
+        QtWidgets.QItemDelegate.__init__(self)
+        self.func = None
+        self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
+
+    # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
+
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QLineEdit(parent)
+        # editor.setInputMask("000.000.000;_") #格式校验
+        validator = QtGui.QRegExpValidator(self._mask, editor) # 构造一个验证器，该父对象接受与正则表达式匹配的所有字符串。这里的父对象就是QLineEdit对象了。
+        editor.setValidator(validator) #将密码输入框设置为仅接受符合验证器条件的输入。 这允许您对可能输入的文本设置任何约束条件。
+        # editor.valueChanged.connect(
+        #     lambda: self.currentIndexDataChanged(editor))
+
+        return editor
+
+    def currentIndexDataChanged(self, editor):
+        if self.func != None:
+            self.func()
+
+    # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, QtCore.Qt.EditRole)
+        try:
+            editor.setText(value)
+        except Exception as e:
+            editor.setText('')
+            print('StringLineEditDelegate error:%s' % (e))
+
+    # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
+    def setModelData(self, editor, model, index):
+        editor.interpretText()
+        value = editor.text()
 
         model.setData(index, value, QtCore.Qt.EditRole)
 

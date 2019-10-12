@@ -28,6 +28,18 @@ class ListItem_General_Proj(QtWidgets.QWidget):
         self.ui = uic.loadUi(uiPath, self)
 
 
+# 细节面板文件列表项
+class ListItem_fileItem(QtWidgets.QWidget):
+    def __init__(self, uiPath='', parent=None):
+        super(ListItem_fileItem, self).__init__(parent)
+
+        if uiPath == '':
+            uiPath = './UI/listItem_fileItem.ui'
+        # PyQt5 加载ui文件方法
+        self.ui = uic.loadUi(uiPath, self)
+
+
+
 # 任务面板 树列表 对应的 详细信息面板UI
 class DetailPage(QtWidgets.QWidget):
     def __init__(self, uiPath='', parent=None):
@@ -94,6 +106,7 @@ class DetailPage(QtWidgets.QWidget):
         # -------- fileList ---------
         self.fileList = DropListWidget()
         self.ui.verticalLayout_file.addWidget(self.fileList)
+        self.fileList.datas = self.datas # 更新文件列表对应的items数据
 
 
     # 应用详细面板固定项修改的内容
@@ -129,6 +142,7 @@ class DetailPage(QtWidgets.QWidget):
                     print('FL_Info 存在未指定的控件类型')
             if self.model_Proj_Task != None:
                 self.model_Proj_Task.setAllDatasByDetail(self.model_Proj_Task.getColumnIndex(self.currentIndex, 0), self.datas)
+                self.fileList.datas = self.datas
     
     # 关闭事件
     def closeEvent(self):
@@ -196,6 +210,8 @@ class DetailPage(QtWidgets.QWidget):
     # set name
     def setTaskName(self, data):
         self.ui.lineEdit_TaskName.setText(data)
+        self.datas[4] = data
+        self.fileList.datas = self.datas
 
     # -------------- Type -----------------
     # 设置编辑器从模型索引指定的数据模型项中显示和编辑的数据。
@@ -206,13 +222,16 @@ class DetailPage(QtWidgets.QWidget):
         if data in taskType:
             comboId = taskType.index(data)
 
-        # 避免不是由用户引起的信号,因此我们使用blockSignals.
-        self.comboBox_TaskType.blockSignals(True)
-        # ComboBox当前项使用setCurrentIndex()来设置
-        self.comboBox_TaskType.setCurrentIndex(comboId)
-        self.comboBox_TaskType.blockSignals(False)
+            # 避免不是由用户引起的信号,因此我们使用blockSignals.
+            self.comboBox_TaskType.blockSignals(True)
+            # ComboBox当前项使用setCurrentIndex()来设置
+            self.comboBox_TaskType.setCurrentIndex(comboId)
+            self.comboBox_TaskType.blockSignals(False)
 
-        self.setTypeIcon() # 设置 Type 图标
+            self.setTypeIcon() # 设置 Type 图标
+
+            self.datas[6] = data
+            self.fileList.datas = self.datas
 
     # 从编辑器窗口小部件获取数据
     def getTaskType(self):
@@ -227,11 +246,13 @@ class DetailPage(QtWidgets.QWidget):
         if data in TaskState:
             comboId = TaskState.index(data)
 
-        # 避免不是由用户引起的信号,因此我们使用blockSignals.
-        self.comboBox_TaskState.blockSignals(True)
-        # ComboBox当前项使用setCurrentIndex()来设置
-        self.comboBox_TaskState.setCurrentIndex(comboId)
-        self.comboBox_TaskState.blockSignals(False)
+            # 避免不是由用户引起的信号,因此我们使用blockSignals.
+            self.comboBox_TaskState.blockSignals(True)
+            # ComboBox当前项使用setCurrentIndex()来设置
+            self.comboBox_TaskState.setCurrentIndex(comboId)
+            self.comboBox_TaskState.blockSignals(False)
+            self.datas[7] = data
+            self.fileList.datas = self.datas
 
     # 从编辑器窗口小部件获取数据
     def getTaskState(self):
@@ -373,7 +394,22 @@ class DetailPage(QtWidgets.QWidget):
         # 添加控件
         for i in range(len(dataTypes)):
             label = QtWidgets.QLabel(labels[i])
-            if dataTypes[i] == 'int':
+            if dataTypes[i] == 'text' or dataTypes[i] == 'personnel':
+                self.widght[i] = QtWidgets.QLineEdit()
+                # self.widght[i].setMinimumWidth(180)
+                self.widght[i].setText(datas[i])
+                # 当内容修改完成时触发事件
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
+            elif dataTypes[i] == 'string':
+                self.widght[i] = QtWidgets.QLineEdit()
+                # self.widght[i].setMinimumWidth(180)
+                self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
+                validator = QtGui.QRegExpValidator(self._mask, self.widght[i]) # 构造一个验证器，该父对象接受与正则表达式匹配的所有字符串。这里的父对象就是QLineEdit对象了。
+                self.widght[i].setValidator(validator) #将密码输入框设置为仅接受符合验证器条件的输入。 这允许您对可能输入的文本设置任何约束条件。
+                self.widght[i].setText(datas[i])
+                # 当内容修改完成时触发事件
+                self.widght[i].editingFinished.connect(self.dataChangedAll)
+            elif dataTypes[i] == 'int':
                 self.widght[i] = QtWidgets.QSpinBox()
                 self.widght[i].setFrame(False)
                 self.widght[i].setFrame(False)
@@ -445,12 +481,6 @@ class DetailPage(QtWidgets.QWidget):
                 self.widght[i].blockSignals(False)
                 # 当内容修改完成时触发事件
                 self.widght[i].currentIndexChanged.connect(self.dataChangedAll)
-            elif dataTypes[i] == 'text' or dataTypes[i] == 'personnel':
-                self.widght[i] = QtWidgets.QLineEdit()
-                # self.widght[i].setMinimumWidth(180)
-                self.widght[i].setText(datas[i])
-                # 当内容修改完成时触发事件
-                self.widght[i].editingFinished.connect(self.dataChangedAll)
             fromlayout.addRow(label, self.widght[i])
             # QtWidgets.QFormLayout.addRow()
 
@@ -502,6 +532,7 @@ class DropListWidget(QtWidgets.QListWidget):
         super(DropListWidget, self).__init__(parent)
 
         self.lastPath = configure.getProjectPath()
+        self.datas = [] # Item 数据
 
         self.setAcceptDrops(True)
         self.setDragEnabled(True) # 开启可拖放事件
@@ -514,7 +545,7 @@ class DropListWidget(QtWidgets.QListWidget):
         # 设置自定义item
         self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
         # self.item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
-        self.itemWidget = loadWidgets.ListItem_General_Proj()  # itemWidget
+        self.itemWidget = ListItem_fileItem()  # itemWidget
         self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
         self.ui.listWidget_General_Proj.setItemWidget(
             self.item, self.itemWidget)  # 为item设置widget
@@ -525,6 +556,8 @@ class DropListWidget(QtWidgets.QListWidget):
         self.showMesh = True
         self.showTex = True
         self.showRevisions = False
+        self.prefix = ['SM_', 'T_'] # 默认前缀
+        self.suffix = ['', ''] # 默认后缀
 
     # 拖放进入事件
     def dragEnterEvent(self, event):
@@ -574,27 +607,71 @@ class DropListWidget(QtWidgets.QListWidget):
                     meshPath = self._path + '/Content/Meshes'
                     texPath = self._path + '/Content/Textures'
                     sourceFilePath = self._path + '/Content/SourceFile'
-                    # sourceFilePath_Revisions = sourceFilePath + '/Revisions' # 历史文件
+
                     # 模型文件
                     # os.path.splitext(s)[1] # 获取文件后缀
                     if os.path.splitext(s)[1] in ['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ']:
-                        if os.path.isfile(meshPath+'/'+fname): # 文件是否已存在（重名文件）
+                        # 重命名
+                        newFName = self.prefix[0] + self.datas[8] + self.suffix[0] + os.path.splitext(s)[1]
+                        if fname != newFName:
+                            text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
+                            if ok and text:
+                                newFName = text
+                            else:
+                                newFName = fname
+                        # 历史版本
+                        if os.path.isfile(meshPath+'/'+newFName): # 文件是否已存在（重名文件）
                             if not os.path.exists(meshPath + '/Revisions'): # 历史版本文件夹
                                 os.makedirs(meshPath + '/Revisions') # 创建路径
-                            shutil.move(meshPath+'/'+fname, meshPath+'/Revisions/'+fname) # 移动文件到历史版本文件夹
+                            # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
+                            ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
+                            shutil.move(meshPath+'/'+newFName, meshPath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(s)[1]) 
+                        # 复制文件
                         if not os.path.exists(meshPath):
                             os.makedirs(meshPath) # 创建路径
                         shutil.copy(s, meshPath) # 复制文件
                     # 贴图文件
                     elif os.path.splitext(s)[1] in ['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']:
-                        if not os.path.isfile(texPath):
+                        # 重命名
+                        newFName = self.prefix[1] + self.datas[8] + self.suffix[1] + os.path.splitext(s)[1]
+                        if fname != newFName:
+                            text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
+                            if ok and text:
+                                newFName = text
+                            else:
+                                newFName = fname
+                        # 历史版本
+                        if os.path.isfile(texPath+'/'+newFName): # 文件是否已存在（重名文件）
+                            if not os.path.exists(texPath + '/Revisions'): # 历史版本文件夹
+                                os.makedirs(texPath + '/Revisions') # 创建路径
+                            # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
+                            ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
+                            shutil.move(texPath+'/'+newFName, texPath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(s)[1]) 
+                        # 复制文件
+                        if not os.path.exists(texPath):
                             os.makedirs(texPath) # 创建路径
-                        shutil.copy(s, texPath)
+                        shutil.copy(s, texPath) # 复制文件
                     # 源文件（其他文件）
                     else:
+                        # 重命名
+                        newFName = self.prefix[0] + self.datas[8] + self.suffix[0] + os.path.splitext(s)[1]
+                        if fname != newFName:
+                            text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
+                            if ok and text:
+                                newFName = text
+                            else:
+                                newFName = fname
+                        # 历史版本
+                        if os.path.isfile(sourceFilePath+'/'+newFName): # 文件是否已存在（重名文件）
+                            if not os.path.exists(sourceFilePath + '/Revisions'): # 历史版本文件夹
+                                os.makedirs(sourceFilePath + '/Revisions') # 创建路径
+                            # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
+                            ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
+                            shutil.move(sourceFilePath+'/'+newFName, sourceFilePath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(s)[1]) 
+                        # 复制文件
                         if not os.path.exists(sourceFilePath):
                             os.makedirs(sourceFilePath) # 创建路径
-                        shutil.copy(s, sourceFilePath)
+                        shutil.copy(s, sourceFilePath) # 复制文件
             self.updateList()
 
     # 更新文件列表
