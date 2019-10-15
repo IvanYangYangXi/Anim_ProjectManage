@@ -612,7 +612,11 @@ class DropListWidget(QtWidgets.QListWidget):
                     # os.path.splitext(s)[1] # 获取文件后缀
                     if os.path.splitext(s)[1] in ['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ']:
                         # 重命名
-                        newFName = self.prefix[0] + self.datas[8] + self.suffix[0] + os.path.splitext(s)[1]
+                        if self.datas[configure.getIndexByLabel(u'英文简称')] != '':
+                            abbreviation = self.datas[configure.getIndexByLabel(u'英文简称')] # 获取英文简称
+                        else:
+                            abbreviation = os.path.splitext(fname)[0]
+                        newFName = self.prefix[0] + abbreviation + self.suffix[0] + os.path.splitext(s)[1] # 重组名字
                         if fname != newFName:
                             text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
                             if ok and text:
@@ -633,7 +637,7 @@ class DropListWidget(QtWidgets.QListWidget):
                     # 贴图文件
                     elif os.path.splitext(s)[1] in ['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']:
                         # 重命名
-                        newFName = self.prefix[1] + self.datas[8] + self.suffix[1] + os.path.splitext(s)[1]
+                        newFName = self.prefix[1] + abbreviation + self.suffix[1] + os.path.splitext(s)[1]
                         if fname != newFName:
                             text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
                             if ok and text:
@@ -654,7 +658,10 @@ class DropListWidget(QtWidgets.QListWidget):
                     # 源文件（其他文件）
                     else:
                         # 重命名
-                        newFName = self.prefix[0] + self.datas[8] + self.suffix[0] + os.path.splitext(s)[1]
+                        if os.path.splitext(s)[1] in ['.mb', '.ma', '.max', '.ZBR', '.zbr', '.ZTL', '.ztl']:
+                            newFName = self.prefix[0] + abbreviation + self.suffix[0] + os.path.splitext(s)[1]
+                        else:
+                            newFName = abbreviation + self.suffix[0] + os.path.splitext(s)[1]
                         if fname != newFName:
                             text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
                             if ok and text:

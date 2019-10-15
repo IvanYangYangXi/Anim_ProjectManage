@@ -397,6 +397,15 @@ def get_DB_Struct_ToString(variable):
         print('ProjectConfigure get_DB_Struct_ToString error:%s' % e)
 
 
+# 根据标签获取id
+def getIndexByLabel(label):
+    labels = get_DB_Struct('rootNode_taskInfo')
+    if label in labels:
+        return labels.index(label)
+    else:
+        return None
+
+
 # 用于创建列表
 # 建立自增主键:id integer primary key autoincrement
 def create_taskInfo():
