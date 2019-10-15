@@ -167,14 +167,21 @@ class DetailPage(QtWidgets.QWidget):
                 os.makedirs(filePath) # 创建路径
             imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
-            self.imgPath = imgPath[0]
-            self.setDetail_Img(self.imgPath)
-            # set 任务树item的缩略图
-            self.dataChanged(u'缩略图', self.imgPath)
+            if imgPath[1]:
+                imgName = os.path.split(imgPath[0])[1] # 分离文件名
+                if not os.path.exists(filePath+'/$PMF_SystemFiles'):
+                    os.makedirs(filePath+'/$PMF_SystemFiles') # 创建系统文件路径
+                if os.path.exists(filePath+'/$PMF_SystemFiles'+imgName):
+                    os.remove(filePath+'/$PMF_SystemFiles'+imgName)
+                shutil.copy(imgPath[0], filePath+'/$PMF_SystemFiles') # 复制文件到指定目录
+                self.imgPath = '/data/Content/%s'%(self.datas[0]) + '/$PMF_SystemFiles/' + imgName # 重组路径
+                self.setDetail_Img(configure.getProjectPath() + self.imgPath)
+                # set 任务树item的缩略图
+                self.dataChanged(u'缩略图', self.imgPath)
         elif q.text().encode("utf-8") == "清除缩略图":
             self.setDetail_Img()
             # set 任务树item的缩略图
-            self.dataChanged(u'缩略图', self.imgPath)
+            self.dataChanged(u'缩略图', '')
 
     # -------------- 内容改变时 -----------------
     # lineEdit
@@ -356,6 +363,7 @@ class DetailPage(QtWidgets.QWidget):
             # set 任务树item的缩略图
             self.dataChanged(u'缩略图', self.imgPath)
         else:
+            path = os.path.abspath(path)
             # 打开文件(可打开外部程序)
             sysstr = platform.system()
             if(sysstr =="Windows"):
