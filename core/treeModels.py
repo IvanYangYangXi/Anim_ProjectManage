@@ -298,7 +298,7 @@ class TreeModel_Proj_Task(TreeModel):
 
         # item = index.internalPointer()
         item = self.getItem(index)
-        imgPath = item.data(1) # 获取缩略图路径
+        imgPath = configure.getProjectPath() + item.data(1) # 获取缩略图路径
 
         # 设置行高
         if role == QtCore.Qt.SizeHintRole:

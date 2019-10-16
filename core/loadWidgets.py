@@ -13,6 +13,7 @@ import sip
 import threading, time
 import platform
 import subprocess
+import win32con, win32api
 import configure
 import shutil # 文件夹操作
 
@@ -165,19 +166,24 @@ class DetailPage(QtWidgets.QWidget):
             filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
+            # 选择缩略图
             imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
+            # 设置缩略图
             if imgPath[1]:
                 imgName = os.path.split(imgPath[0])[1] # 分离文件名
                 if not os.path.exists(filePath+'/$PMF_SystemFiles'):
                     os.makedirs(filePath+'/$PMF_SystemFiles') # 创建系统文件路径
+                    if 'Windows' in platform.system():
+                        win32api.SetFileAttributes(filePath+'/$PMF_SystemFiles', win32con.FILE_ATTRIBUTE_HIDDEN) # 隐藏文件夹
                 if os.path.exists(filePath+'/$PMF_SystemFiles'+imgName):
                     os.remove(filePath+'/$PMF_SystemFiles'+imgName)
                 shutil.copy(imgPath[0], filePath+'/$PMF_SystemFiles') # 复制文件到指定目录
-                self.imgPath = '/data/Content/%s'%(self.datas[0]) + '/$PMF_SystemFiles/' + imgName # 重组路径
-                self.setDetail_Img(configure.getProjectPath() + self.imgPath)
+                imgRelativePath = '/data/Content/%s'%(self.datas[0]) + '/$PMF_SystemFiles/' + imgName # 重组路径,相对路径
+                self.imgPath = configure.getProjectPath() + imgRelativePath
+                self.setDetail_Img(self.imgPath)
                 # set 任务树item的缩略图
-                self.dataChanged(u'缩略图', self.imgPath)
+                self.dataChanged(u'缩略图', imgRelativePath)
         elif q.text().encode("utf-8") == "清除缩略图":
             self.setDetail_Img()
             # set 任务树item的缩略图
@@ -352,16 +358,28 @@ class DetailPage(QtWidgets.QWidget):
         thread_imgBtn.start()
         
     def openFile(self, path):
-        if path == os.path.abspath('./UI/img_loss.png'):
+        if path == os.path.abspath('./UI/img_loss.png') or os.path.isfile():
             filePath = configure.getProjectPath() + '/data/Content/%s'%(self.datas[0])
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
+            # 选择缩略图
             imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
-            self.imgPath = imgPath[0]
-            self.setDetail_Img(imgPath[0])
-            # set 任务树item的缩略图
-            self.dataChanged(u'缩略图', self.imgPath)
+            # 设置缩略图
+            if imgPath[1]:
+                imgName = os.path.split(imgPath[0])[1] # 分离文件名
+                if not os.path.exists(filePath+'/$PMF_SystemFiles'):
+                    os.makedirs(filePath+'/$PMF_SystemFiles') # 创建系统文件路径
+                    if 'Windows' in platform.system():
+                        win32api.SetFileAttributes(filePath+'/$PMF_SystemFiles', win32con.FILE_ATTRIBUTE_HIDDEN) # 隐藏文件夹
+                if os.path.exists(filePath+'/$PMF_SystemFiles'+imgName):
+                    os.remove(filePath+'/$PMF_SystemFiles'+imgName)
+                shutil.copy(imgPath[0], filePath+'/$PMF_SystemFiles') # 复制文件到指定目录
+                imgRelativePath = '/data/Content/%s'%(self.datas[0]) + '/$PMF_SystemFiles/' + imgName # 重组路径,相对路径
+                self.imgPath = configure.getProjectPath() + imgRelativePath
+                self.setDetail_Img(self.imgPath)
+                # set 任务树item的缩略图
+                self.dataChanged(u'缩略图', imgRelativePath)
         else:
             path = os.path.abspath(path)
             # 打开文件(可打开外部程序)
