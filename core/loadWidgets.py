@@ -167,7 +167,7 @@ class DetailPage(QtWidgets.QWidget):
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
             # 选择缩略图
-            imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
+            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
             # 设置缩略图
             if imgPath[1]:
@@ -363,7 +363,7 @@ class DetailPage(QtWidgets.QWidget):
             if not os.path.exists(filePath):
                 os.makedirs(filePath) # 创建路径
             # 选择缩略图
-            imgPath = QtWidgets.QFileDialog.getOpenfname(None, "Find Img", \
+            imgPath = QtWidgets.QFileDialog.getOpenFileName(None, "Find Img", \
                 filePath, "Image Files(*.jpg *.png *.jpge *.tga *.gif)")
             # 设置缩略图
             if imgPath[1]:
@@ -569,12 +569,11 @@ class DropListWidget(QtWidgets.QListWidget):
         # 双击打开文件
         self.itemDoubleClicked.connect(self.openFile)
         # 设置自定义item
-        self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
+        # self.item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
         # self.item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
-        self.itemWidget = ListItem_fileItem()  # itemWidget
-        self.ui.listWidget_General_Proj.addItem(self.item)  # 添加item
-        self.ui.listWidget_General_Proj.setItemWidget(
-            self.item, self.itemWidget)  # 为item设置widget
+        # self.itemWidget = ListItem_fileItem()  # itemWidget
+        # self.addItem(self.item)  # 添加item
+        # self.setItemWidget(self.item, self.itemWidget)  # 为item设置widget
 
         self._path = '' # 列表显示内容所在目录
         # 显示的列表
@@ -712,6 +711,13 @@ class DropListWidget(QtWidgets.QListWidget):
         meshPath = self._path + '/Content/Meshes'
         texPath = self._path + '/Content/Textures'
         sourceFilePath = self._path + '/Content/SourceFile'
+
+        # 设置自定义item
+        # item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象
+        # item.setSizeHint(QtCore.QSize(200, 50))  # 设置QListWidgetItem大小
+        # itemWidget = ListItem_fileItem()  # itemWidget
+        # self.addItem(item)  # 添加item
+        # self.setItemWidget(item, itemWidget)  # 为item设置widget
 
         self.clear()
         if self.showSource:
