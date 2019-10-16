@@ -298,7 +298,6 @@ class TreeModel_Proj_Task(TreeModel):
 
         # item = index.internalPointer()
         item = self.getItem(index)
-        imgPath = configure.getProjectPath() + item.data(1) # 获取缩略图路径
 
         # 设置行高
         if role == QtCore.Qt.SizeHintRole:
@@ -323,6 +322,8 @@ class TreeModel_Proj_Task(TreeModel):
                 else:
                     return QtGui.QIcon(QtGui.QPixmap('./UI/point_gray.png')) 
             if index.column() == 1: # 缩略图列
+                imgId = configure.getIndexByLabel(u'缩略图')
+                imgPath = configure.getProjectPath() + item.datas()[imgId] # 获取缩略图路径
                 if os.path.isfile(imgPath): # 判断文件
                     if imgPath.endswith(('.jpg', '.jpge', '.png', '.tga', '.gif')):
                         return QtGui.QIcon(QtGui.QPixmap(imgPath))
