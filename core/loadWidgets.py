@@ -631,6 +631,22 @@ class DropListWidget(QtWidgets.QListWidget):
             # Ctrl+V
             if evt.modifiers() == Qt.Qt.ControlModifier and evt.key() == Qt.Qt.Key_V: #修饰键与普通键的组合
                 print('键盘粘贴事件')
+                data = clipboard.mimeData()
+
+                # # try:
+                # if data.hasFormat('text/uri-list'):
+                #     for path in data.urls():
+                #         s=str(path)
+                #         s=s.replace("PyQt5.QtCore.QUrl('file:///",'')
+                #         s = s.replace("')", '')
+                #         if os.path.exists(s):
+                #             global myWin
+                #             myWin.view()
+                #             print(s)
+                # # except BaseException:
+                # #     print('error')
+                # #     exit(0)
+
                 # self.pasteFile()
 
     # 粘贴文件
