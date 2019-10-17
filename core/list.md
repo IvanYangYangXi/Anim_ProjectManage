@@ -32,14 +32,14 @@
   - [x] 检测是否有同名文件，有则创建历史版本文件
 - [x] 自动重命名文件及历史版本，自动前缀后缀
 - [ ] 为每个项创建目录
-  - [ ] 系统文件夹（ dbid/$PMF_SystemFiles ）并设置文件夹为隐藏
+  - [x] 系统文件夹（ dbid/\$PMF_SystemFiles ）并设置文件夹为隐藏
   - [ ] 附件文件夹（ dbid/accessories ）
   - [x] 资产文件夹（ dbid/Content ）
   - [x] 历史版本文件（ dbid/Content/Revisions ）
   - [x] 自定义资产类型自动归类到对应文件夹下（默认分 sourceFile ：源文件（其他文件）， Meshes ：模型文件， Textures ：贴图文件）
-- [ ] 修改缩略图为指定目录下的图片（dbid/$PMF_SystemFiles ）
+- [x] 修改缩略图为指定目录下的图片（dbid/\$PMF_SystemFiles ）
 - [ ] 选择或粘贴缩略图时自动复制到指定目录下
-- [ ] 根据标签获取id
+- [x] 根据标签获取 id
 - [ ] 文件显示大小，描述，路径
 
 # Bug 记录

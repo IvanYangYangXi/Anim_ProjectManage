@@ -96,7 +96,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QLabel" name="label_type">
+    <widget class="QLabel" name="label_Size">
      <property name="minimumSize">
       <size>
        <width>80</width>
@@ -110,7 +110,7 @@
       </size>
      </property>
      <property name="text">
-      <string>类型</string>
+      <string>size</string>
      </property>
     </widget>
    </item>
