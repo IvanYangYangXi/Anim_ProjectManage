@@ -18,6 +18,8 @@ import configure
 import shutil # 文件夹操作
 
 
+# clipboard = QtWidgets.QApplication.clipboard()
+
 # 项目列表项
 class ListItem_General_Proj(QtWidgets.QWidget):
     def __init__(self, uiPath='', parent=None):
@@ -152,25 +154,29 @@ class DetailPage(QtWidgets.QWidget):
     # 应用详细面板动态项修改的内容
     def dataChangedAll(self):
         # labels = configure.get_DB_Struct("rootNode_taskInfo")
+        print('1111111111111')
         if self.datas != []:
-            # print(self.datas)
+            print(self.datas)
             x = 7
             for i in self.widght:
                 x += 1
-                if i.inherits('QSpinBox'):
-                    self.datas[x] = i.value()
-                elif i.inherits('QDoubleSpinBox'):
-                    self.datas[x] = i.value()
-                elif i.inherits('QDateEdit'):
-                    self.datas[x] = i.date().toString(QtCore.Qt.ISODate) # 获取日期并转化为文字
-                elif i.inherits('QTextEdit'):
-                    self.datas[x] = i.toPlainText()
-                elif i.inherits('QComboBox'):
-                    self.datas[x] = i.currentText()
-                elif i.inherits('QLineEdit'):
-                    self.datas[x] = i.text()
-                else:
-                    print('FL_Info 存在未指定的控件类型')
+                try:
+                    if i.inherits('QSpinBox'):
+                        self.datas[x] = i.value()
+                    elif i.inherits('QDoubleSpinBox'):
+                        self.datas[x] = i.value()
+                    elif i.inherits('QDateEdit'):
+                        self.datas[x] = i.date().toString(QtCore.Qt.ISODate) # 获取日期并转化为文字
+                    elif i.inherits('QTextEdit'):
+                        self.datas[x] = i.toPlainText()
+                    elif i.inherits('QComboBox'):
+                        self.datas[x] = i.currentText()
+                    elif i.inherits('QLineEdit'):
+                        self.datas[x] = i.text()
+                    else:
+                        print('FL_Info 存在未指定的控件类型')
+                except BaseException:
+                    print('dataChangedAll error')
             if self.model_Proj_Task != None:
                 self.model_Proj_Task.setAllDatasByDetail(self.model_Proj_Task.getColumnIndex(self.currentIndex, 0), self.datas)
                 self.fileList.datas = self.datas
@@ -460,8 +466,8 @@ class DetailPage(QtWidgets.QWidget):
                 self.widght[i] = QtWidgets.QLineEdit()
                 # self.widght[i].setMinimumWidth(180)
                 self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
-                validator = QtGui.QRegExpValidator(self._mask, self.widght[i]) # 构造一个验证器，该父对象接受与正则表达式匹配的所有字符串。这里的父对象就是QLineEdit对象了。
-                self.widght[i].setValidator(validator) #将密码输入框设置为仅接受符合验证器条件的输入。 这允许您对可能输入的文本设置任何约束条件。
+                validator = QtGui.QRegExpValidator(self._mask, self) # 构造一个验证器，该父对象接受与正则表达式匹配的所有字符串。这里的父对象就是QLineEdit对象了。
+                self.widght[i].setValidator(validator) #将输入框设置为仅接受符合验证器条件的输入。 这允许您对可能输入的文本设置任何约束条件。
                 self.widght[i].setText(datas[i])
                 # 当内容修改完成时触发事件
                 self.widght[i].editingFinished.connect(self.dataChangedAll)
@@ -631,21 +637,21 @@ class DropListWidget(QtWidgets.QListWidget):
             # Ctrl+V
             if evt.modifiers() == Qt.Qt.ControlModifier and evt.key() == Qt.Qt.Key_V: #修饰键与普通键的组合
                 print('键盘粘贴事件')
-                data = clipboard.mimeData()
 
-                # # try:
-                # if data.hasFormat('text/uri-list'):
-                #     for path in data.urls():
-                #         s=str(path)
-                #         s=s.replace("PyQt5.QtCore.QUrl('file:///",'')
-                #         s = s.replace("')", '')
-                #         if os.path.exists(s):
-                #             global myWin
-                #             myWin.view()
-                #             print(s)
-                # # except BaseException:
-                # #     print('error')
-                # #     exit(0)
+                clipboard = QtWidgets.QApplication.clipboard()
+                data = clipboard.mimeData()
+                try:
+                    if data.hasFormat('text/uri-list'):
+                        for path in data.urls():
+                            s=str(path)
+                            s=s.replace("PyQt5.QtCore.QUrl('file:///",'')
+                            s=s.replace("PyQt5.QtCore.QUrl(u'file:///",'')
+                            s = s.replace("')", '')
+                            print(s)
+                            if os.path.exists(s):
+                                print(s)
+                except BaseException:
+                    print('keyPressEvent error')
 
                 # self.pasteFile()
 

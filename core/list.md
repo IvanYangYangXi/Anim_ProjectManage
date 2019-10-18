@@ -46,6 +46,8 @@
 
 - [x] 详细信息面板 优先级 数据不更新
 - [x] setFL_Info connect 混乱
+- [ ] 树列表部件处于编辑状态时点击详细面板报错 in dataChangedAll if i.inherits('QSpinBox'):-AttributeError: 'int' object has no attribute 'inherits'
+- [ ] 细节面板 英文简称 项改变时 dataChangedAll 无触发
 
 # 优化
 
