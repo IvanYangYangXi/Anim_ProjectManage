@@ -154,9 +154,9 @@ class DetailPage(QtWidgets.QWidget):
     # 应用详细面板动态项修改的内容
     def dataChangedAll(self):
         # labels = configure.get_DB_Struct("rootNode_taskInfo")
-        print('1111111111111')
+        # print('1111111111111')
         if self.datas != []:
-            print(self.datas)
+            # print(self.datas)
             x = 7
             for i in self.widght:
                 x += 1
@@ -465,7 +465,7 @@ class DetailPage(QtWidgets.QWidget):
             elif dataTypes[i] == 'string':
                 self.widght[i] = QtWidgets.QLineEdit()
                 # self.widght[i].setMinimumWidth(180)
-                self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
+                self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{0,49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
                 validator = QtGui.QRegExpValidator(self._mask, self) # 构造一个验证器，该父对象接受与正则表达式匹配的所有字符串。这里的父对象就是QLineEdit对象了。
                 self.widght[i].setValidator(validator) #将输入框设置为仅接受符合验证器条件的输入。 这允许您对可能输入的文本设置任何约束条件。
                 self.widght[i].setText(datas[i])

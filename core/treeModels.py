@@ -361,20 +361,25 @@ class TreeModel_Proj_Task(TreeModel):
     # 通过详细面板更新item 所有数据，不执行函数调用
     def setAllDatasByDetail(self, index, datas, role=QtCore.Qt.EditRole):
         if index.isValid():
-            item = index.internalPointer()
+            item = index.internalPointer() # 获取item
 
             if role == QtCore.Qt.EditRole:
                 # if index.column() == 1:
                 # item._itemData = datas
                 datas = datas[8:]
-                # 更新数据库数据
                 x = 3
                 for i in datas:
                     x += 1
-                    item.setData(i, x)
-                    index_X = self.index(index.row(), x, index.parent())
-                    self.dataChanged.emit(index_X, index_X)  # 更新Model的数据
-                return True
+                    # 获取数据库的数据
+                    dbKey = configure.get_DB_Struct('struct_taskInfo')[x + 3]
+                    dbData = DB.findData(configure.getProjectPath(), 'table_taskInfo', 'id=%d' %
+                      (item._dbId), '%s' % (dbKey))
+                    if i != dbData: # 判断数据是否有修改
+                        # 更新树列表及数据库数据
+                        item.setData(i, x)
+                        index_X = self.index(index.row(), x, index.parent())
+                        self.dataChanged.emit(index_X, index_X)  # 更新Model的数据
+                        return True
         return False
 
     # 返回一组标志
@@ -715,7 +720,7 @@ class StringLineEditDelegate(QtWidgets.QItemDelegate):
     def __init__(self):
         QtWidgets.QItemDelegate.__init__(self)
         self.func = None
-        self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
+        self._mask = QtCore.QRegExp("[0-9A-Za-z_-]{0,49}") # 为给定的模式字符串构造一个正则表达式对象。(字符只能是字母或者数字或下划线,长度不能超过50位)
 
     # createEditor 返回用于更改模型数据的小部件，可以重新实现以自定义编辑行为。
 
@@ -744,7 +749,6 @@ class StringLineEditDelegate(QtWidgets.QItemDelegate):
 
     # 从编辑器窗口小部件获取数据，并将其存储在项索引处的指定模型中。
     def setModelData(self, editor, model, index):
-        editor.interpretText()
         value = editor.text()
 
         model.setData(index, value, QtCore.Qt.EditRole)
