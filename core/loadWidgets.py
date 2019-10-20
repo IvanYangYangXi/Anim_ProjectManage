@@ -44,6 +44,7 @@ class ListItem_fileItem(QtWidgets.QWidget):
         self.path = path
         self.filePath = self.path + '/' + self.name
 
+        # 文件大小
         fsize = os.path.getsize(self.filePath)
         fsize = fsize/float(1024 * 1024)
         self.size = "%.2f MB"%(round(fsize, 2))
@@ -417,18 +418,7 @@ class DetailPage(QtWidgets.QWidget):
                 # set 任务树item的缩略图
                 self.dataChanged(u'缩略图', imgRelativePath)
         else:
-            path = os.path.abspath(path)
-            # 打开文件(可打开外部程序)
-            sysstr = platform.system()
-            if(sysstr =="Windows"):
-                # print('Windows')
-                os.startfile(path)
-            elif(sysstr == "Linux"):
-                # print('Linux')
-                subprocess.call(["xdg-open", path])
-            else:
-                # print('otherSys')
-                subprocess.call(["open", path])
+            openFile(path)
 
     # 计时器
     def timeing(self):
@@ -887,6 +877,7 @@ class DropListWidget(QtWidgets.QListWidget):
 
         action = rightMenu.exec_(QtGui.QCursor.pos()) # 在鼠标位置显示
         # ------------------ 右键事件 ------------------- #
+        # 导入文件
         if action == itemImport:
             if self._path != '':
                 files = QtWidgets.QFileDialog.getOpenfnames(None, "Find File", self.lastPath)[0] # 选择文件
@@ -898,11 +889,11 @@ class DropListWidget(QtWidgets.QListWidget):
                         shutil.copy(path, self._path) # 复制文件
                 self.updateList()
             else:
-                showErrorMsg('请先选择目录')
+                showErrorMsg('请先选择文件')
         # 打开路径（在资源管理器中显示）
         if action == itemOpen:
             if os.path.exists(self._path):
-                os.startfile(self._path)
+                openFile(self._path)
         # 刷新
         if action == itemRefresh:
             self.updateList()
@@ -926,7 +917,7 @@ class DropListWidget(QtWidgets.QListWidget):
         
     # 打开文件(可打开外部程序)
     def openFile(self, item):
-        os.startfile(os.path.join(self._path, item.text()))
+        openFile(os.path.join(self._path, item.text()))
 
 
 # # ---------- 文件列表 ----------- #
@@ -936,3 +927,19 @@ class DropListWidget(QtWidgets.QListWidget):
 
 def showErrorMsg(msg):
     print(msg)
+
+
+# 按操作系统打开文件
+def openFile(path):
+    path = os.path.abspath(path)
+    # 打开文件(可打开外部程序)
+    sysstr = platform.system()
+    if(sysstr =="Windows"):
+        # print('Windows')
+        os.startfile(path)
+    elif(sysstr == "Linux"):
+        # print('Linux')
+        subprocess.call(["xdg-open", path])
+    else:
+        # print('otherSys')
+        subprocess.call(["open", path])
