@@ -275,7 +275,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="comboBox_TaskState"/>
+          <widget class="QComboBox" name="comboBox_TaskState">
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
          </item>
          <item row="1" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_Detail_TreePath">
@@ -366,11 +373,45 @@
           <number>9</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QComboBox" name="comboBox"/>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkBox">
+             <property name="text">
+              <string>原文件</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
-           <item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string>模型</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="text">
+              <string>贴图</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QCheckBox" name="checkBox_4">
+             <property name="text">
+              <string>历史</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -383,14 +424,14 @@
              </property>
             </spacer>
            </item>
-           <item>
+           <item row="0" column="5">
             <widget class="QToolButton" name="toolButton">
              <property name="text">
               <string>...</string>
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="6">
             <widget class="QToolButton" name="toolButton_2">
              <property name="text">
               <string>...</string>
@@ -410,7 +451,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>40</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>

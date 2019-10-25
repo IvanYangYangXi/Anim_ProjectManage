@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>399</width>
-    <height>40</height>
+    <height>54</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -17,6 +17,9 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -33,8 +36,33 @@
     <widget class="QLabel" name="label_TypeColor">
      <property name="minimumSize">
       <size>
-       <width>6</width>
+       <width>8</width>
        <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>8</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_state">
+     <property name="minimumSize">
+      <size>
+       <width>8</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>8</width>
+       <height>16777215</height>
       </size>
      </property>
      <property name="text">
@@ -96,28 +124,16 @@
     </spacer>
    </item>
    <item>
-    <widget class="QLabel" name="label_Size">
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>80</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>size</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="label_state">
+      <widget class="QLabel" name="label_Time">
+       <property name="text">
+        <string>time</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_Size">
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -131,10 +147,17 @@
         </size>
        </property>
        <property name="text">
-        <string>状态</string>
+        <string>size</string>
        </property>
       </widget>
      </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="spacing">
+      <number>5</number>
+     </property>
     </layout>
    </item>
   </layout>

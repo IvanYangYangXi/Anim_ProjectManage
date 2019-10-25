@@ -603,8 +603,8 @@ class DropListWidget(QtWidgets.QListWidget):
         self.showMesh = True
         self.showTex = True
         self.showRevisions = False
-        self.prefix = ['SM_', 'T_'] # 默认前缀
-        self.suffix = ['', ''] # 默认后缀
+        self.prefix = {'SM':{''}} # 默认前缀
+        self.suffix = '' # 默认后缀
 
         self.mouseIn = False
 
@@ -637,13 +637,11 @@ class DropListWidget(QtWidgets.QListWidget):
                             s=s.replace("PyQt5.QtCore.QUrl('file:///",'')
                             s=s.replace("PyQt5.QtCore.QUrl(u'file:///",'')
                             s = s.replace("')", '')
-                            print(s)
                             if os.path.exists(s):
-                                print(s)
+                                self.pasteFile(s)
                 except BaseException:
                     print('keyPressEvent error')
 
-                # self.pasteFile()
 
     # 粘贴文件
     def pasteFile(self, path):

@@ -234,6 +234,7 @@ db_Struct = {
         'type NCHAR(30)',
         'state NCHAR(20)',
         'abbreviation CHAR(50)',
+        'label NCHAR(50)'
         'executive NCHAR(20)',
         'reporter NCHAR(20)',
         'priority NCHAR(20)',
@@ -251,6 +252,7 @@ db_Struct = {
         'type',
         'state',
         'abbreviation',
+        'label'
         'executive',
         'reporter',
         'priority',
@@ -269,6 +271,7 @@ db_Struct = {
         '类型',
         '状态',
         '英文简称',
+        '标签',
         '执行人',
         '报告人',
         '优先级',
@@ -285,6 +288,7 @@ db_Struct = {
         '',
         '任务',
         '待办',
+        '',
         '',
         'executive',
         'reporter',
@@ -304,6 +308,7 @@ db_Struct = {
         'combo:TaskType:5',
         'combo:TaskState:0',
         'string',
+        'text',
         'personnel',
         'personnel',
         'combo:priority:1',
@@ -312,6 +317,19 @@ db_Struct = {
         'float',
         'float'
         ],
+    'filePathByLabel':{
+        'prefix':{
+            'SM_':['模型', '贴图'],
+            'SK_':['绑定', '融合变形']
+        },
+        'suffix':{},
+        'repath':{
+            '/Content/SourceFile':[],
+            '/Content/Meshes':['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ'],
+            '/Content/Textures':['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']
+        }
+    },
+    'label':['剧集', '场次', '镜头', '资产', '角色', '场景', '模型', '贴图', '材质', '绑定', '融合变形', '动画', '灯光', '地编', '特效', '开发'],
     'TaskType': ['项目', '史诗故事', '主题故事', '用户故事', '任务', '里程碑', '信息', '文件夹', '功能', '错误', '改进', '重构', '研究', '测试', '文件'],
     'TaskState': ['待办', '进行中', '提交审核', '审核通过', '返修'],
     'priority': ['hight', 'medium', 'low']
