@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
+import time
 
-dire = {
-            u"'模型','贴图'":'SM_',
-            'SK_':[u'绑定', u'融合变形']
-        }
-print(dire.keys())
+t = os.path.getmtime('C:\\Users\\Drock\\Desktop\\aa\\test1.fbx')
+print(t)
+print(time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(t)))
 
-
-a = 'aa中文'
-b = a.decode("utf-8").encode("utf-8")
-print(b)
+a = u'aa中文'
+# b = a.decode("utf-8").encode("utf-8")
+print(a)
 
 aa = ['cc', 'dd', 'ee']
 bb = aa.index('dd')

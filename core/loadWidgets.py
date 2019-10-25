@@ -40,10 +40,17 @@ class ListItem_fileItem(QtWidgets.QWidget):
             uiPath = './UI/listItem_fileItem.ui'
         # PyQt5 加载ui文件方法
         self.ui = uic.loadUi(uiPath, self)
+        # 文件名
         self.name = name
+        self.ui.label_name.setText(self.name)
+        # 文件路径
         self.path = path
         self.filePath = self.path + '/' + self.name
-
+        self.ui.label_path.setText(self.path)
+        # 文件修改时间
+        t = os.path.getmtime(self.filePath)
+        self.time = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(t))
+        self.ui.label_Time.setText(self.time)
         # 文件大小
         fsize = os.path.getsize(self.filePath)
         fsize = fsize/float(1024 * 1024)
@@ -141,7 +148,21 @@ class DetailPage(QtWidgets.QWidget):
         self.fileList = DropListWidget()
         self.ui.verticalLayout_file.addWidget(self.fileList)
         self.fileList.datas = self.datas # 更新文件列表对应的items数据
+        self.changeFileShow()
 
+        self.ui.checkBox_source.stateChanged.connect(self.changeFileShow)
+        self.ui.checkBox_mesh.stateChanged.connect(self.changeFileShow)
+        self.ui.checkBox_tex.stateChanged.connect(self.changeFileShow)
+        self.ui.checkBox_Revisions.stateChanged.connect(self.changeFileShow)
+
+
+    # 文件显示项改变时
+    def changeFileShow(self):
+        self.fileList.showSource = self.ui.checkBox_source.isChecked()
+        self.fileList.showMesh = self.ui.checkBox_mesh.isChecked()
+        self.fileList.showTex = self.ui.checkBox_tex.isChecked()
+        self.fileList.showRevisions = self.ui.checkBox_Revisions.isChecked()
+        self.fileList.updateList()
 
     # 应用详细面板固定项修改的内容
     def dataChanged(self, label, data):
@@ -603,8 +624,6 @@ class DropListWidget(QtWidgets.QListWidget):
         self.showMesh = True
         self.showTex = True
         self.showRevisions = False
-        self.prefix = {'SM':{''}} # 默认前缀
-        self.suffix = '' # 默认后缀
 
         self.mouseIn = False
 
@@ -648,81 +667,58 @@ class DropListWidget(QtWidgets.QListWidget):
         if os.path.isfile(path):
             fpath,fname = os.path.split(path) # 分离文件名和路径
             # fname = os.path.split(s)[1] # 获取文件名带后缀
-            meshPath = self._path + '/Content/Meshes'
-            texPath = self._path + '/Content/Textures'
-            sourceFilePath = self._path + '/Content/SourceFile'
 
-            # 模型文件
-            # os.path.splitext(s)[1] # 获取文件后缀
-            if os.path.splitext(path)[1] in ['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ']:
-                # 重命名
-                if self.datas[configure.getIndexByLabel(u'英文简称')] != '':
-                    abbreviation = self.datas[configure.getIndexByLabel(u'英文简称')] # 获取英文简称
+            fileInfoBy = configure.get_DB_Struct('fileInfoBy')
+            
+            # 获取前缀信息
+            prefix = fileInfoBy['prefix'] # 前缀信息
+            for pr in prefix.keys():
+                label = self.datas[configure.getIndexByLabel(u'标签')].split(',')[0].strip() # 获取标签，移除空格
+                if label in pr and label!= '':
+                    outPrefix = prefix[pr]
                 else:
-                    abbreviation = os.path.splitext(fname)[0]
-                newFName = self.prefix[0] + abbreviation + self.suffix[0] + os.path.splitext(path)[1] # 重组名字
-                if fname != newFName:
-                    text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
-                    if ok and text:
-                        newFName = text
-                    else:
-                        newFName = fname
-                # 历史版本
-                if os.path.isfile(meshPath+'/'+newFName): # 文件是否已存在（重名文件）
-                    if not os.path.exists(meshPath + '/Revisions'): # 历史版本文件夹
-                        os.makedirs(meshPath + '/Revisions') # 创建路径
-                    # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
-                    ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
-                    shutil.move(meshPath+'/'+newFName, meshPath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(path)[1]) 
-                # 复制文件
-                if not os.path.exists(meshPath):
-                    os.makedirs(meshPath) # 创建路径
-                shutil.copy(path, meshPath) # 复制文件
-            # 贴图文件
-            elif os.path.splitext(path)[1] in ['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']:
-                # 重命名
-                newFName = self.prefix[1] + abbreviation + self.suffix[1] + os.path.splitext(path)[1]
-                if fname != newFName:
-                    text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
-                    if ok and text:
-                        newFName = text
-                    else:
-                        newFName = fname
-                # 历史版本
-                if os.path.isfile(texPath+'/'+newFName): # 文件是否已存在（重名文件）
-                    if not os.path.exists(texPath + '/Revisions'): # 历史版本文件夹
-                        os.makedirs(texPath + '/Revisions') # 创建路径
-                    # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
-                    ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
-                    shutil.move(texPath+'/'+newFName, texPath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(path)[1]) 
-                # 复制文件
-                if not os.path.exists(texPath):
-                    os.makedirs(texPath) # 创建路径
-                shutil.copy(path, texPath) # 复制文件
-            # 源文件（其他文件）
+                    outPrefix = prefix['default']
+            # 获取后缀信息
+            suffix = fileInfoBy['suffix'] # 后缀信息
+            for pr in suffix.keys():
+                label = self.datas[configure.getIndexByLabel(u'标签')].split(',')[0].strip() # 获取标签，移除空格
+                if label in pr and label!= '':
+                    outSuffix = suffix[pr]
+                else:
+                    outSuffix = suffix['default']
+            # 获取粘贴路径
+            fileType = fileInfoBy['fileType'] # 文件类型
+            pathBy = fileInfoBy['pathBy'] # 路径信息
+            for ft in fileType.keys():
+                if os.path.splitext(path)[1] in fileType[ft]:
+                    outPath = self._path + pathBy[ft]
+                else:
+                    outPath = self._path + pathBy['default']
+            
+            # 重命名
+            if self.datas[configure.getIndexByLabel(u'英文简称')] != '':
+                abbreviation = self.datas[configure.getIndexByLabel(u'英文简称')] # 获取英文简称
             else:
-                # 重命名
-                if os.path.splitext(path)[1] in ['.mb', '.ma', '.max', '.ZBR', '.zbr', '.ZTL', '.ztl']:
-                    newFName = self.prefix[0] + abbreviation + self.suffix[0] + os.path.splitext(path)[1]
+                abbreviation = os.path.splitext(fname)[0]
+            newFName = outPrefix + abbreviation + outSuffix + os.path.splitext(path)[1] # 重组名字
+            if fname != newFName:
+                text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
+                if ok and text:
+                    newFName = text
                 else:
-                    newFName = abbreviation + self.suffix[0] + os.path.splitext(path)[1]
-                if fname != newFName:
-                    text, ok=QtWidgets.QInputDialog.getText(self, '重命名', '重命名：', QtWidgets.QLineEdit.Normal, "%s"%(newFName))
-                    if ok and text:
-                        newFName = text
-                    else:
-                        newFName = fname
-                # 历史版本
-                if os.path.isfile(sourceFilePath+'/'+newFName): # 文件是否已存在（重名文件）
-                    if not os.path.exists(sourceFilePath + '/Revisions'): # 历史版本文件夹
-                        os.makedirs(sourceFilePath + '/Revisions') # 创建路径
-                    # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
-                    ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
-                    shutil.move(sourceFilePath+'/'+newFName, sourceFilePath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(path)[1]) 
-                # 复制文件
-                if not os.path.exists(sourceFilePath):
-                    os.makedirs(sourceFilePath) # 创建路径
-                shutil.copy(path, sourceFilePath) # 复制文件
+                    newFName = fname
+            # 历史版本
+            if os.path.isfile(outPath+'/'+newFName): # 文件是否已存在（重名文件）
+                if not os.path.exists(outPath + '/Revisions'): # 历史版本文件夹
+                    os.makedirs(outPath + '/Revisions') # 创建路径
+                # 移动文件到历史版本文件夹,并重命名及记录版本创建时间
+                ftime = time.strftime('%y%m%d%H%M%S',time.localtime(time.time()))
+                shutil.move(outPath+'/'+newFName, outPath+'/Revisions/'+os.path.splitext(newFName)[0]+'_'+ftime+os.path.splitext(path)[1]) 
+            # 复制文件
+            if not os.path.exists(outPath):
+                os.makedirs(outPath) # 创建路径
+            shutil.copy(path, outPath) # 复制文件
+            
 
     # 拖放进入事件
     def dragEnterEvent(self, event):
@@ -771,9 +767,12 @@ class DropListWidget(QtWidgets.QListWidget):
 
     # 更新文件列表
     def updateList(self):
-        meshPath = self._path + '/Content/Meshes'
-        texPath = self._path + '/Content/Textures'
-        sourceFilePath = self._path + '/Content/SourceFile'
+        fileInfoBy = configure.get_DB_Struct('fileInfoBy')
+        pathBy = fileInfoBy['pathBy'] # 路径信息
+
+        sourceFilePath = self._path + pathBy['source']
+        meshPath = self._path + pathBy['mesh']
+        texPath = self._path + pathBy['texture']
 
         # # 设置自定义item
         # item = QtWidgets.QListWidgetItem()  # 创建QListWidgetItem对象

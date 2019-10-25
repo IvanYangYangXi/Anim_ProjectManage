@@ -317,16 +317,25 @@ db_Struct = {
         'float',
         'float'
         ],
-    'filePathByLabel':{
+    'fileInfoBy':{
         'prefix':{
-            'SM_':['模型', '贴图'],
-            'SK_':['绑定', '融合变形']
+            'default': '',
+            '模型,贴图':'SM_',
+            '绑定,融合变形':'SK_'
         },
-        'suffix':{},
-        'repath':{
-            '/Content/SourceFile':[],
-            '/Content/Meshes':['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ'],
-            '/Content/Textures':['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']
+        'suffix':{
+            'default': ''
+        },
+        'fileType':{
+            'source':['.mb', '.ma', '.max', '.ZBR', '.zbr', '.ZTL', '.ztl'],
+            'mesh':['.fbx', '.abc', '.FBX', '.ABC', '.obj', '.OBJ'],
+            'texture':['.tga', '.TGA', '.jpg', '.jpeg', '.png', '.dds']
+        },
+        'pathBy':{
+            'default': '/Content/SourceFile',
+            'source':'/Content/SourceFile',
+            'mesh':'/Content/Meshes',
+            'texture':'/Content/Textures'
         }
     },
     'label':['剧集', '场次', '镜头', '资产', '角色', '场景', '模型', '贴图', '材质', '绑定', '融合变形', '动画', '灯光', '地编', '特效', '开发'],
